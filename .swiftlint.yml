@@ -3,9 +3,6 @@ excluded:
   - Plugins
   - Scripts
   - Tuist
-  - ./Mogakco/Sources/App/AppDelegate.swift
-  - ./Mogakco/Sources/App/SceneDelegate.swift
-  - ./Mogakco/Sources/App/DIContainer.swift
   - Project.swift
 
 disabled_rules:
@@ -19,7 +16,7 @@ opt_in_rules:
   - closure_end_indentation
   - closure_spacing
   - collection_alignment
-  - colon # promote to error
+  - colon
   - convenience_type
   - discouraged_object_literal
   - empty_collection_literal
