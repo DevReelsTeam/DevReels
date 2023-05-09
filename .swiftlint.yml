@@ -3,6 +3,9 @@ excluded:
   - Plugins
   - Scripts
   - Tuist
+  - ./DevReels/Sources/App/AppDelegate.swift
+  - ./DevReels/Sources/App/SceneDelegate.swift
+  - ./DevReels/Sources/App/DIContainer.swift
   - Project.swift
 
 disabled_rules:
