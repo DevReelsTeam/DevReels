@@ -1,6 +1,6 @@
 import UIKit
-import DevReelsKit
-import DevReelsUI
+//import DevReelsKit
+//import DevReelsUI
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,8 +16,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         viewController.view.backgroundColor = .white
         window?.rootViewController = viewController
         window?.makeKeyAndVisible()
-        DevReelsKit.hello()
-        DevReelsUI.hello()
+//        DevReelsKit.hello()
+//        DevReelsUI.hello()
 
         return true
     }
