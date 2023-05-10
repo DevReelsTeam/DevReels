@@ -7,3 +7,34 @@
 //
 
 import Foundation
+
+import Swinject
+
+final class DIContainer {
+    static let shared = DIContainer()
+    let container = Container()
+    private init() {}
+    
+    func inject() {
+        registerDataSources()
+        registerRepositories()
+        registerUseCases()
+        registerViewModels()
+    }
+    
+    private func registerDataSources() {
+        
+    }
+    
+    private func registerRepositories() {
+        
+    }
+    
+    private func registerUseCases() {
+        
+    }
+    
+    private func registerViewModels() {
+        
+    }
+}
