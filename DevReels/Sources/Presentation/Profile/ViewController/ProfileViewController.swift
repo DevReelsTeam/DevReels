@@ -62,39 +62,71 @@ class ProfileViewController: UIViewController, ViewModelBindable {
         return imageView
     }()
     
-    private var userProfileEditButton: UIButton = {
+    private let userProfileEditButton: UIButton = {
         let button = UIButton()
         return button
     }()
     
-    private var userName: UILabel = {
+    private let userName: UILabel = {
         let label = UILabel()
         
         return label
     }()
     
-    private var userIntroduction: UILabel = {
+    private let userIntroduction: UILabel = {
         let label = UILabel()
         return label
     }()
     
-    private var githubButton: UIButton = {
+    private let githubButton: UIButton = {
         let button = UIButton()
         return button
     }()
     
-    private var blogButton: UIButton = {
+    private let blogButton: UIButton = {
         let button = UIButton()
         return button
     }()
     
-    private var feedCollectionView: UICollectionView = {
-        let collectionView = UICollectionView()
+    private let postCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = .zero
+        layout.minimumInteritemSpacing = .zero
+        let itemSize = UIScreen.main.bounds.width / 3.0
+        
+        layout.itemSize = CGSize(
+            width: itemSize,
+            height: itemSize
+        )
+        
+        let collectionView = UICollectionView(
+            frame: .zero,
+            collectionViewLayout: layout
+        )
+
+//        collectionView.register(PostCell.self)
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.alwaysBounceHorizontal = false
         
         return collectionView
     }()
     
+    // MARK: Bind View Model
     func bindViewModel() {
+        
+    }
+    
+    // MARK: - View Life Cycle
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        layout()
+    }
+
+    // MARK: - Layout
+    private func layout() {
         
     }
 }
