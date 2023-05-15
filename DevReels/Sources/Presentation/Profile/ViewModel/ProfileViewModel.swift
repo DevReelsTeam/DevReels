@@ -10,9 +10,35 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-class ProfileViewModel: ViewModelType {
+enum ProfileNavigation {
+    case editProfile
+    case github
+    case blog
+    case follower
+    case following
+    case post
+    case finish
+}
+
+struct Post {
+    typealias ID = Int
     
-    var disposeBag: RxSwift.DisposeBag = .init()
+    let id: Int
+    let image: UIImage
+}
+
+struct Count {
+    var count: Int
+    
+    init?(count: Int) {
+        guard count >= 0 else { return nil }
+        self.count = count
+    }
+}
+
+final class ProfileViewModel: ViewModelType {
+    
+    var disposeBag: DisposeBag = .init()
     
     struct Input {
         let editButtonTapped = PublishRelay<Void>()
