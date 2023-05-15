@@ -21,7 +21,7 @@ enum ProfileNavigation {
 }
 
 struct Post {
-    typealias ID = Int
+    typealias Identifier = Int
     
     let id: Int
     let image: UIImage
@@ -30,13 +30,13 @@ struct Post {
 struct Count {
     var count: Int
     
-    init?(count: Int) {
-        guard count >= 0 else { return nil }
-        self.count = count
+    init?(cnt: Int) {
+        guard cnt >= 0 else { return nil }
+        self.count = cnt
     }
 }
 
-final class ProfileViewModel: ViewModelType {
+final class ProfileViewModel: ViewModel {
     
     var disposeBag: DisposeBag = .init()
     
@@ -46,7 +46,7 @@ final class ProfileViewModel: ViewModelType {
         let blogButtonTapped = PublishRelay<Void>()
         let followerButtonTapped = PublishRelay<Void>()
         let followingButtonTapped = PublishRelay<Void>()
-        let postTapped = PublishRelay<Post.ID>()
+        let postTapped = PublishRelay<Post.Identifier>()
     }
     
     struct Output {

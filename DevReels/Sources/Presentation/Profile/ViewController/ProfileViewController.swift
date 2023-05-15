@@ -10,7 +10,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-class ProfileViewController: UIViewController, ViewModelBindable {
+class ProfileViewController: UIViewController {
     
     var disposeBag: DisposeBag = .init()
     var viewModel: ProfileViewModel!
