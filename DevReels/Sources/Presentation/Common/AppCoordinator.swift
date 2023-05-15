@@ -19,7 +19,7 @@ final class AppCoordinator: BaseCoordinator<Void> {
     }
     
     private func setup(with window: UIWindow?) {
-        window?.rootViewController = navigationController
+        window?.rootViewController = ReelsViewController()
         window?.makeKeyAndVisible()
         window?.backgroundColor = .systemBackground
     }
