@@ -15,7 +15,49 @@ class ProfileViewController: UIViewController, ViewModelBindable {
     var disposeBag: DisposeBag = .init()
     var viewModel: ProfileViewModel!
     
-    private var userProfileImageView: UIImageView = {
+    private enum Metric {
+        enum ProfileImage {
+            static let height = 0
+            static let leftMargin = 0
+            static let topMargin = 0
+            static let rightMargin = 0
+            static let bottomMargin = 0
+        }
+        
+        enum UserInformation {
+            static let leftMargin = 0
+            static let topMargin = 0
+            static let rightMargin = 0
+            static let bottomMargin = 0
+        }
+        
+        enum UserURL {
+            static let leftMargin = 0
+            static let topMargin = 0
+            static let rightMargin = 0
+            static let bottomMargin = 0
+        }
+        
+        enum PostFollowInfo {
+            static let leftMargin = 0
+            static let topMargin = 0
+            static let rightMargin = 0
+            static let bottomMargin = 0
+        }
+        
+        enum PostCollectionView {
+            static let leftMargin = 0
+            static let topMargin = 0
+            static let rightMargin = 0
+            static let bottomMargin = 0
+        }
+    }
+    
+    private enum Constant {
+        static let headerTitle: String = "마이페이지"
+    }
+    
+    private let userProfileImageView: UIImageView = {
         let imageView = UIImageView()
         return imageView
     }()
