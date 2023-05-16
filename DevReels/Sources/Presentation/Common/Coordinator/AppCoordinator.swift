@@ -19,28 +19,30 @@ final class AppCoordinator: BaseCoordinator<Void> {
     }
     
     private func setup(with window: UIWindow?) {
-        window?.rootViewController = ReelsViewController()
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
         window?.backgroundColor = .systemBackground
     }
     
     override func start() -> Observable<Void> {
         setup(with: window)
-        showTab()
+        showLogin()
         return Observable.never()
     }
     
     private func showLogin() {
         navigationController.setNavigationBarHidden(true, animated: true)
-//        let login = LoginCoordinator(navigationController)
-//        coordinate(to: login)
-//            .subscribe(onNext: { [weak self] in
-//                switch $0 {
-//                case .finish:
-//                    self?.showTab()
-//                }
-//            })
-//            .disposed(by: disposeBag)
+        let login = LoginCoordinator(navigationController)
+        coordinate(to: login)
+            .subscribe(onNext: { [weak self] in
+                switch $0 {
+                case .finish:
+                    self?.showTab()
+                default:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
     }
 
     private func showTab() {
