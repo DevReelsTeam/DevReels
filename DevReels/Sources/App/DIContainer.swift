@@ -35,6 +35,10 @@ final class DIContainer {
     }
     
     private func registerViewModels() {
-        
+        container.register(LoginViewModel.self) { resolver in
+            let viewModel = LoginViewModel()
+            
+            return viewModel
+        }
     }
 }

@@ -7,7 +7,6 @@
 //
 
 import UIKit
-
 import RxSwift
 
 class ViewController: UIViewController {
@@ -21,7 +20,7 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.systemBackground
+        view.backgroundColor = .white
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
         layout()
         bind()
