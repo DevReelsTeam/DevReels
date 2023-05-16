@@ -10,7 +10,7 @@ import UIKit
 import AVFoundation
 import SnapKit
 
-class ReelsCell: UITableViewCell {
+class ReelsCell: UITableViewCell, Identifiable {
     
     private lazy var titleLabel = UILabel().then {
         $0.text = "릴스제목"

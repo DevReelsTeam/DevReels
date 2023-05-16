@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import RxSwift
 
 protocol ReelsRepositoryProtocol: AnyObject {
     func refresh()
@@ -25,7 +26,20 @@ struct VideoObject {
     }
 }
 
-class ReelsViewModel: NSObject {
+class ReelsViewModel: ViewModel {
+    
+    struct Input {
+    }
+    
+    struct Output {
+    }
+    
+    var disposeBag = DisposeBag()
+    
+    func transform(input: Input) -> Output {
+        Output.init()
+    }
+    
     var videos: [VideoObject] = [
         VideoObject.init(
             videoURL: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",

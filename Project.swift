@@ -46,6 +46,9 @@ class BaseProjectFactory: ProjectFactory {
                 ]
             ]
         ],
+        "NSAppTransportSecurity": [
+            "NSAllowsArbitraryLoads": true
+        ]
     ]
     
     let baseSettings: [String: SettingValue] = [
