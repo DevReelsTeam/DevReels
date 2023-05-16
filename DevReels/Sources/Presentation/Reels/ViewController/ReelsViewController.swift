@@ -11,27 +11,20 @@ import SnapKit
 import Then
 import RxSwift
 
-final class ReelsViewController: UIViewController {
-    
-    enum Constant {
-        static let reelsTitle = "릴스 제목"
-    }
+final class ReelsViewController: ViewController {
     
     private lazy var tableView = UITableView().then {
-        // tableViewCell 만들고나서
         $0.backgroundColor = .systemBackground
         $0.showsVerticalScrollIndicator = false
         $0.delegate = self
         $0.dataSource = self
-        $0.register(ReelsCell.self, forCellReuseIdentifier: "ReelsCell")
+        $0.register(ReelsCell.self, forCellReuseIdentifier: ReelsCell.identifier)
     }
     
     private lazy var topGradientImageView = UIImageView().then {
         $0.contentMode = .scaleToFill
     }
-    
-    private let disposeBag = DisposeBag()
-    
+        
     var viewModel: ReelsViewModel?
     
     init() {
@@ -56,7 +49,7 @@ final class ReelsViewController: UIViewController {
         }
     }
     
-    func layout() {
+    override func layout() {
         view.addSubview(tableView)
         view.addSubview(topGradientImageView)
         
@@ -90,12 +83,15 @@ final class ReelsViewController: UIViewController {
 }
 
 extension ReelsViewController: UITableViewDelegate, UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel?.videos.count ?? 0
     }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return self.view.frame.height
     }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ReelsCell") as? ReelsCell else {
             return UITableViewCell()
@@ -103,6 +99,7 @@ extension ReelsViewController: UITableViewDelegate, UITableViewDataSource {
         cell.configureCell(data: viewModel?.videos[indexPath.row] ?? VideoObject(videoURL: "", thumbnailURL: "", title: "", videoDescription: ""))
         return cell
     }
+    
     func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if let videoCell = cell as? PlayVideoLayerContainer {
             if videoCell.videoURL != nil {
@@ -110,9 +107,11 @@ extension ReelsViewController: UITableViewDelegate, UITableViewDataSource {
             }
         }
     }
+    
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         VideoPlayerController.sharedVideoPlayer.pausePlayeVideosFor(tableView: tableView)
     }
+    
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         if !decelerate {
             VideoPlayerController.sharedVideoPlayer.pausePlayeVideosFor(tableView: tableView)
