@@ -12,6 +12,8 @@ import SnapKit
 
 class ReelsCell: UITableViewCell, Identifiable {
     
+    // MARK: - Properties
+    
     private lazy var titleLabel = UILabel().then {
         $0.text = "릴스제목"
     }
@@ -26,10 +28,19 @@ class ReelsCell: UITableViewCell, Identifiable {
     
     private lazy var bottomGradientImageView = UIImageView().then {
         $0.contentMode = .scaleToFill
+        let util = Utilities.shared
+        let color1 = UIColor.black.withAlphaComponent(0.0)
+        let color2 = UIColor.black.withAlphaComponent(0.7)
+        let gradient = util.createGradient(color1: color1, color2: color2, frame: $0.bounds)
+        $0.image = gradient
+    }
+    
+    internal lazy var videoLayer = AVPlayerLayer().then {
+        $0.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
     }
     
     var playerController: VideoPlayerController?
-    var videoLayer = AVPlayerLayer()
+    
     var videoURL: String? {
         didSet {
             if let videoURL = videoURL {
@@ -39,15 +50,11 @@ class ReelsCell: UITableViewCell, Identifiable {
         }
     }
     
+    // MARK: - Inits
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         layout()
-        let bottomGradient = Utilities.shared.createGradient(color1: UIColor.black.withAlphaComponent(0.0),
-                                            color2: UIColor.black.withAlphaComponent(0.7),
-                                            frame: bottomGradientImageView.bounds)
-        bottomGradientImageView.contentMode = .scaleAspectFill
-        bottomGradientImageView.image = bottomGradient
-        self.contentView.backgroundColor = .random
         videoLayer.backgroundColor = UIColor.clear.cgColor
         videoLayer.videoGravity = AVLayerVideoGravity.resize
         thumbnailImageView.layer.addSublayer(videoLayer)
@@ -58,6 +65,8 @@ class ReelsCell: UITableViewCell, Identifiable {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Methods
+    
     override func prepareForReuse() {
         thumbnailImageView.imageURL = nil
         super.prepareForReuse()
@@ -65,23 +74,19 @@ class ReelsCell: UITableViewCell, Identifiable {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        videoLayer.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)
     }
     
     private func layout() {
-        contentView.addSubview(bottomGradientImageView)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(descriptionLabel)
-        contentView.addSubview(thumbnailImageView)
+        contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel])
 
-        titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(contentView.snp.top).offset(8)
-            make.leading.equalTo(contentView.snp.leading).offset(8)
-            make.trailing.equalTo(contentView.snp.trailing).offset(-8)
+        titleLabel.snp.makeConstraints {
+            $0.top.equalTo(contentView.snp.bottom).offset(-150)
+            $0.leading.equalTo(contentView.snp.leading).offset(20)
+            $0.trailing.equalTo(contentView.snp.trailing).offset(-20)
         }
 
         descriptionLabel.snp.makeConstraints {
-            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-20)
+            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-120)
             $0.leading.equalTo(thumbnailImageView.snp.leading).offset(20)
             $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-20)
         }
@@ -90,11 +95,11 @@ class ReelsCell: UITableViewCell, Identifiable {
             $0.edges.equalToSuperview()
         }
 
-        bottomGradientImageView.snp.makeConstraints { make in
-            make.top.equalTo(thumbnailImageView.snp.bottom)
-            make.leading.equalTo(contentView.snp.leading)
-            make.trailing.equalTo(contentView.snp.trailing)
-            make.bottom.equalTo(contentView.snp.bottom)
+        bottomGradientImageView.snp.makeConstraints {
+            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-120)
+            $0.leading.equalTo(thumbnailImageView.snp.leading)
+            $0.trailing.equalTo(thumbnailImageView.snp.trailing)
+            $0.bottom.equalTo(thumbnailImageView.snp.bottom)
         }
     }
 
