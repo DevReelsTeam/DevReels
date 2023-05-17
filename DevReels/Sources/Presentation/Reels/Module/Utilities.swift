@@ -19,6 +19,7 @@ class Utilities {
         return gradientLayer.toImage()
     }
 }
+
 extension UIColor {
     static var random: UIColor {
         return UIColor(
@@ -29,6 +30,7 @@ extension UIColor {
         )
     }
 }
+
 extension CAGradientLayer {
     func toImage() -> UIImage {
         UIGraphicsBeginImageContextWithOptions(self.frame.size, false, 0)
@@ -43,6 +45,7 @@ extension CAGradientLayer {
 }
 
 private var xoAssociationKey: UInt8 = 0
+
 extension UIImageView {
     @nonobjc static var imageCache = NSCache<NSString, AnyObject>()
     var imageURL: String? {
@@ -88,6 +91,7 @@ extension UIImageView {
             }
         }
     }
+    
     func setImageColour(color: UIColor) {
         guard let tempImage = image?.withRenderingMode(.alwaysTemplate) else { return }
         image = tempImage
