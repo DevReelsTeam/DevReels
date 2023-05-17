@@ -27,7 +27,8 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "FirebaseFirestore"),
         .external(name: "FirebaseStorage"),
         .external(name: "FirebaseMessaging"),
-        .external(name: "Swinject")
+        .external(name: "Swinject"),
+        .external(name: "PryntTrimmerView")
 //        .target(name: "내부모듈")    // 모듈만들경우 사용
     ]
     
