@@ -28,15 +28,12 @@ class ReelsCell: UITableViewCell, Identifiable {
     
     private lazy var bottomGradientImageView = UIImageView().then {
         $0.contentMode = .scaleToFill
-        let util = Utilities.shared
-        let color1 = UIColor.black.withAlphaComponent(0.0)
-        let color2 = UIColor.black.withAlphaComponent(0.7)
-        let gradient = util.createGradient(color1: color1, color2: color2, frame: $0.bounds)
-        $0.image = gradient
     }
     
     internal lazy var videoLayer = AVPlayerLayer().then {
         $0.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        $0.backgroundColor = UIColor.clear.cgColor
+        $0.videoGravity = AVLayerVideoGravity.resize
     }
     
     var playerController: VideoPlayerController?
@@ -55,9 +52,6 @@ class ReelsCell: UITableViewCell, Identifiable {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         layout()
-        videoLayer.backgroundColor = UIColor.clear.cgColor
-        videoLayer.videoGravity = AVLayerVideoGravity.resize
-        thumbnailImageView.layer.addSublayer(videoLayer)
         selectionStyle = .none
     }
     
@@ -74,8 +68,25 @@ class ReelsCell: UITableViewCell, Identifiable {
     
     override func layoutSubviews() {
         super.layoutSubviews()
+        configureGradient()
     }
     
+    func configureGradient() {
+        let util = Utilities.shared
+        let color1 = UIColor.black.withAlphaComponent(0.0)
+        let color2 = UIColor.black.withAlphaComponent(0.7)
+        let gradient = util.createGradient(color1: color1, color2: color2, frame: bottomGradientImageView.bounds)
+        bottomGradientImageView.image = gradient
+    }
+    
+    func configureCell(data: VideoObject) {
+        self.thumbnailImageView.imageURL = data.thumbnailURL
+        self.videoURL = data.videoURL
+        self.titleLabel.text = data.title
+        self.descriptionLabel.text = data.videoDescription
+    }
+    
+    // MARK: - Layout
     private func layout() {
         contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel])
 
@@ -101,14 +112,8 @@ class ReelsCell: UITableViewCell, Identifiable {
             $0.trailing.equalTo(thumbnailImageView.snp.trailing)
             $0.bottom.equalTo(thumbnailImageView.snp.bottom)
         }
-    }
-
-    
-    func configureCell(data: VideoObject) {
-        self.thumbnailImageView.imageURL = data.thumbnailURL
-        self.videoURL = data.videoURL
-        self.titleLabel.text = data.title
-        self.descriptionLabel.text = data.videoDescription
+        
+        thumbnailImageView.layer.addSublayer(videoLayer)
     }
 }
 
