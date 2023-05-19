@@ -11,8 +11,10 @@ import UIKit
 import AVFoundation
 
 final class VideoContainer {
+    
     var url: String
-    var shouldPlay: Bool = false {
+    
+    var shouldPlay = false {
         didSet {
             if shouldPlay {
                 player.play()
@@ -21,6 +23,7 @@ final class VideoContainer {
             }
         }
     }
+    
     var playOn: Bool {
         didSet {
             player.isMuted = VideoPlayerController.sharedVideoPlayer.mute
@@ -32,8 +35,11 @@ final class VideoContainer {
             }
         }
     }
+    
     let player: AVPlayer
+    
     let playerItem: AVPlayerItem
+    
     init(player: AVPlayer, item: AVPlayerItem, url: String) {
         self.player = player
         self.playerItem = item

@@ -27,6 +27,7 @@ final class ReelsViewController: ViewController {
         
     var viewModel: ReelsViewModel?
     
+    // MARK: - Inits
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -35,6 +36,7 @@ final class ReelsViewController: ViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -49,6 +51,10 @@ final class ReelsViewController: ViewController {
         }
     }
     
+    override func bind() {
+    }
+    
+    // MARK: - Layout
     override func layout() {
         view.addSubview(tableView)
         view.addSubview(topGradientImageView)
