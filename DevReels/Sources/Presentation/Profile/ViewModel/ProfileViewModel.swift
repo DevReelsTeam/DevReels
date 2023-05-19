@@ -61,7 +61,10 @@ final class ProfileViewModel: ViewModel {
 //        let posts: Driver<[Post]>
     }
     
+    let navigation = PublishSubject<ProfileNavigation>()
+    
     func transform(input: Input) -> Output {
+        
         return Output()
     }
     
