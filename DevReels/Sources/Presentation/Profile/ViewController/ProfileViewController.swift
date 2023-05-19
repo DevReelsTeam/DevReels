@@ -13,8 +13,18 @@ import RxCocoa
 class ProfileViewController: UIViewController {
     
     var disposeBag: DisposeBag = .init()
-    var viewModel: ProfileViewModel!
+    var viewModel: ProfileViewModel
     
+    init(viewModel: ProfileViewModel) {
+        self.viewModel = ProfileViewModel()
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Constants
     private enum Metric {
         enum ProfileImage {
             static let height = 0
@@ -57,6 +67,7 @@ class ProfileViewController: UIViewController {
         static let headerTitle: String = "마이페이지"
     }
     
+    // MARK: - Components
     private let userProfileImageView: UIImageView = {
         let imageView = UIImageView()
         return imageView
