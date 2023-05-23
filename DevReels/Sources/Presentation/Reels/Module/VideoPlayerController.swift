@@ -208,11 +208,7 @@ final class VideoPlayerController: NSObject, NSCacheDelegate {
             .disposed(by: disposeBag)
         
         let item = currentItem.observe(\.status, options: [.new, .initial]) { [weak self] playerItem, change in
-            guard let newStatus = change.newValue else {
-                let newStatus = AVPlayerItem.Status.unknown
-                // Handle unknown status
-                return
-            }
+            guard let newStatus = change.newValue else { return }
             
             if newStatus == .readyToPlay {
                 if let currentItem = self?.currentVideoContainer()?.player.currentItem,
@@ -302,6 +298,6 @@ final class VideoPlayerController: NSObject, NSCacheDelegate {
     }
 
     deinit {
-        print("DEBUG:: 비디오레이어 해제 - 리테인 사이클, 메모리 누수 없음")
+        print("DEBUG:: 비디오레이어 해제 - 리테인 사이클, 메모리 릭 없음")
     }
 }

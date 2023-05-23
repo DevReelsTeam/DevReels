@@ -28,8 +28,8 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "FirebaseStorage"),
         .external(name: "FirebaseMessaging"),
         .external(name: "Swinject"),
-        .external(name: "PryntTrimmerView")
-//        .target(name: "내부모듈")    // 모듈만들경우 사용
+        .external(name: "PryntTrimmerView"),
+        .target(name: "RxDevReelsYa")    // 모듈만들경우 사용
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [
@@ -91,19 +91,19 @@ class BaseProjectFactory: ProjectFactory {
                 entitlements: "\(projectName).entitlements",
                 scripts: [.pre(path: "Scripts/SwiftLintRunScript.sh", arguments: [], name: "SwiftLint")],
                 dependencies: dependencies
+            ),
+            Target(
+                name: "RxDevReelsYa",
+                platform: .iOS,
+                product: .framework,
+                bundleId: "com.team.\(projectName).RxDevReelsYa",
+                deploymentTarget: deploymentTarget,
+                infoPlist: .default,
+                sources: ["RxDevReelsYa/Sources/**"],
+                dependencies: [
+                    .external(name: "Alamofire")
+                ]
             )
-//            Target(
-//                name: "내부모듈이름",
-//                platform: .iOS,
-//                product: .framework,
-//                bundleId: "com.team.\(projectName).내부모듈이름",
-//                deploymentTarget: deploymentTarget,
-//                sources: ["내부모듈이름/Sources/**"]
-//                ,
-//                dependencies: [
-//                    .external(name: "SnapKit")
-//                ]
-//            )
         ]
     }
 }
