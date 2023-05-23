@@ -79,7 +79,7 @@ class ReelsCell: UITableViewCell, Identifiable {
         bottomGradientImageView.image = gradient
     }
     
-    func configureCell(data: VideoObject) {
+    func configureCell(data: Reels) {
         self.thumbnailImageView.imageURL = data.thumbnailURL
         self.videoURL = data.videoURL
         self.titleLabel.text = data.title

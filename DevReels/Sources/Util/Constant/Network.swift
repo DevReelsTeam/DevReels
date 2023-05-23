@@ -9,5 +9,5 @@
 import Foundation
 
 enum Network {
-    
+    static let baseURLString: String = "https://firestore.googleapis.com/v1/projects/devreels/databases/(default)"
 }
