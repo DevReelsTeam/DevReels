@@ -23,21 +23,34 @@ final class DIContainer {
     }
     
     private func registerDataSources() {
-        
+        container.register(ReelsDataSourceProtocol.self) { _ in ReelsDataSource() }
     }
     
     private func registerRepositories() {
-        
+        container.register(ReelsRepositoryProtocol.self) { resolver in
+            var repository = ReelsRepository()
+            repository.reelsDataSource = resolver.resolve(ReelsDataSourceProtocol.self)
+            return repository
+        }
     }
     
     private func registerUseCases() {
-        
+        container.register(ReelsUseCaseProtocol.self) { resolver in
+            var useCase = ReelsUseCase()
+            useCase.reelsRepository = resolver.resolve(ReelsRepositoryProtocol.self)
+            return useCase
+        }
     }
     
     private func registerViewModels() {
         container.register(LoginViewModel.self) { resolver in
             let viewModel = LoginViewModel()
             
+            return viewModel
+        }
+        container.register(ReelsViewModel.self) { resolver in
+            let viewModel = ReelsViewModel()
+            viewModel.reelsUseCase = resolver.resolve(ReelsUseCaseProtocol.self)
             return viewModel
         }
     }

@@ -8,38 +8,45 @@
 
 import Foundation
 import RxSwift
+import RxCocoa
 
 final class ReelsViewModel: ViewModel {
     
     struct Input {
-        let refresh: Observable<Void>
+        let viewWillAppear: Observable<Void>
     }
     
     struct Output {
-        private let studyList = PublishSubject<[Reels]>()
+        let reelsList: Driver<[Reels]>
     }
     
-    var reelsUseCase: ReelsUseCaseProtocol?
     var disposeBag = DisposeBag()
-    private let reelsList = PublishSubject<[Reels]>()
-    private let refresh = PublishSubject<Int>()
+    var reelsUseCase: ReelsUseCaseProtocol?
+    private let reelsList = BehaviorSubject<[Reels]>(value: [])
+    static let reload = PublishSubject<Void>()
     
     func transform(input: Input) -> Output {
-        Output.init()
+        bindRefresh(input: input)
+        return Output(
+            reelsList: reelsList.asDriver(onErrorJustReturn: [])
+        )
     }
     
     func bindRefresh(input: Input) {
-//        refresh
-//            .debounce(.milliseconds(500), scheduler: MainScheduler.instance)
-//            .withUnretained(self)
-//            .flatMap { delay, arguments -> Observable<Result<[Reels], Error>> in
-//                return Observable.combineLatest(
-//                    Observable.just(()).delay(
-//                        .seconds(delay),
-//                        scheduler: MainScheduler.instance
-//                    ),
-//                    self.reelsUseCase.list()
-//                )
-//            }
+        input.viewWillAppear
+            .withUnretained(self)
+            .flatMap { viewModel, _ in
+                viewModel.reelsUseCase?.list().asResult() ?? .empty()
+            }
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, result in
+                switch result {
+                case let .success(reelsList):
+                    viewModel.reelsList.onNext(reelsList)
+                case .failure:
+                    viewModel.reelsList.onNext([])
+                }
+            })
+            .disposed(by: disposeBag)
     }
 }
