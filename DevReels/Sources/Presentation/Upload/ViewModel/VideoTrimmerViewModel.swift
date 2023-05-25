@@ -10,7 +10,7 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-final class TrimVideoViewModel {
+final class VideoTrimmerViewModel {
     var disposeBag: DisposeBag = .init()
     
     struct Input {
