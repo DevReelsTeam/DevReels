@@ -19,8 +19,7 @@ final class AppCoordinator: BaseCoordinator<Void> {
     }
     
     private func setup(with window: UIWindow?) {
-        guard let viewModel = DIContainer.shared.container.resolve(ReelsViewModel.self) else { return }
-        window?.rootViewController = ReelsViewController(viewModel: viewModel)
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
         window?.backgroundColor = .systemBackground
     }
