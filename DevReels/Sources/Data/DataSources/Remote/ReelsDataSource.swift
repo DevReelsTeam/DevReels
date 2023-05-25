@@ -17,6 +17,7 @@ struct ReelsDataSource: ReelsDataSourceProtocol {
     }
     
     func list() -> Observable<Documents<[ReelsResponseDTO]>> {
+        print("DataSource의 함수가 불렸다.")
         return provider.request(ReelsTarget.list)
     }
 }

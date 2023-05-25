@@ -24,6 +24,7 @@ class ReelsCell: UITableViewCell, Identifiable {
     
     private lazy var thumbnailImageView = UIImageView().then {
         $0.contentMode = .scaleToFill
+        $0.backgroundColor = .random
     }
     
     private lazy var bottomGradientImageView = UIImageView().then {
@@ -52,7 +53,6 @@ class ReelsCell: UITableViewCell, Identifiable {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         layout()
-        selectionStyle = .none
     }
     
     required init?(coder: NSCoder) {
@@ -69,6 +69,7 @@ class ReelsCell: UITableViewCell, Identifiable {
     override func layoutSubviews() {
         super.layoutSubviews()
         configureGradient()
+        VideoPlayerController.sharedVideoPlayer.playVideo(withLayer: videoLayer, url: videoURL ?? "")
     }
     
     func configureGradient() {

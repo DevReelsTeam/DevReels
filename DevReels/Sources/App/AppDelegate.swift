@@ -12,10 +12,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
     ) -> Bool {
 
-//        DevReelsKit.hello()
-//        DevReelsUI.hello()
+        DIContainer.shared.inject()
 
         return true
     }
-
 }
