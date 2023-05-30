@@ -20,7 +20,7 @@ final class VideoLayerObject: NSObject {
     }
 }
 
-struct VideoLayers {
+public struct VideoLayers {
     
     var layers: [VideoLayerObject] = []
     
@@ -30,14 +30,14 @@ struct VideoLayers {
         }
     }
     
-    func getLayerForParentLayer(parentLayer: CALayer) -> AVPlayerLayer {
+    public func getLayerForParentLayer(parentLayer: CALayer) -> AVPlayerLayer {
         for videoObject in layers where videoObject.layer.superlayer == parentLayer {
             return videoObject.layer
         }
         return getFreeVideoLayer()
     }
     
-    func getFreeVideoLayer() -> AVPlayerLayer {
+    public func getFreeVideoLayer() -> AVPlayerLayer {
         for videoObject in layers where videoObject.used == false {
             videoObject.used = true
             return videoObject.layer
@@ -45,7 +45,7 @@ struct VideoLayers {
         return layers[0].layer
     }
     
-    func freeLayer(layerToFree: AVPlayerLayer) {
+    public func freeLayer(layerToFree: AVPlayerLayer) {
         for videoObject in layers where videoObject.layer == layerToFree {
             videoObject.used = false
             videoObject.layer.player = nil

@@ -14,7 +14,6 @@ struct ReelsUseCase: ReelsUseCaseProtocol {
     var reelsRepository: ReelsRepositoryProtocol?
     
     func list() -> Observable<[Reels]> {
-        print("usecase 불렸따.")
         return reelsRepository?.list() ?? .empty()
     }
 }

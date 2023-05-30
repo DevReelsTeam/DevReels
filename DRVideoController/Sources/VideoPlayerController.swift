@@ -6,18 +6,18 @@
 //  Copyright © 2023 DevReels. All rights reserved.
 //
 
-import Foundation
 import UIKit
 import AVFoundation
 import RxSwift
+import RxCocoa
 
-protocol PlayVideoLayerContainer {
+public protocol PlayVideoLayerContainer {
     var videoURL: String? { get set }
     var videoLayer: AVPlayerLayer { get set }
     func visibleVideoHeight() -> CGFloat
 }
 
-final class VideoPlayerController: NSObject, NSCacheDelegate {
+public final class VideoPlayerController: NSObject, NSCacheDelegate {
     
     var shouldPlay = true {
         didSet {
@@ -35,7 +35,7 @@ final class VideoPlayerController: NSObject, NSCacheDelegate {
     
     static private var playerViewControllerKVOContext = 0
     
-    static let sharedVideoPlayer = VideoPlayerController()
+    public static let sharedVideoPlayer = VideoPlayerController()
 
     private var videoURL: String?
     
@@ -59,7 +59,7 @@ final class VideoPlayerController: NSObject, NSCacheDelegate {
     
     /// URL에 해당하는 Video Container가 없을 경우 asset을 다운로드합니다.
     /// asset을 이용하여 새로운 플레이어 목록을 만듭니다.
-    func setupVideoFor(url: String) {
+    public func setupVideoFor(url: String) {
         guard videoCache.object(forKey: url as NSString) == nil else {
             return
         }
@@ -110,7 +110,7 @@ final class VideoPlayerController: NSObject, NSCacheDelegate {
         }
     }
     
-    func playVideo(withLayer layer: AVPlayerLayer, url: String) {
+    public func playVideo(withLayer layer: AVPlayerLayer, url: String) {
         videoURL = url
         currentLayer = layer
         
@@ -138,7 +138,7 @@ final class VideoPlayerController: NSObject, NSCacheDelegate {
         }
     }
     
-    func removeLayerFor(cell: PlayVideoLayerContainer) {
+    public func removeLayerFor(cell: PlayVideoLayerContainer) {
         if let url = cell.videoURL {
             removeFromSuperLayer(layer: cell.videoLayer, url: url)
         }
@@ -252,7 +252,7 @@ final class VideoPlayerController: NSObject, NSCacheDelegate {
 
     
     /// 스크롤이 멈출 때 최대로 보이는 비디오 레이어 높이를 가진 UITableViewCell의 비디오 플레이어를 재생합니다.
-    func pausePlayeVideosFor(tableView: UITableView, appEnteredFromBackground: Bool = false) {
+    public func pausePlayeVideosFor(tableView: UITableView, appEnteredFromBackground: Bool = false) {
         
         let visisbleCells = tableView.visibleCells
         
@@ -291,7 +291,7 @@ final class VideoPlayerController: NSObject, NSCacheDelegate {
     }
     
     /// 캐시에서 객체가 제거될 때, 관찰 대상 URL을 false로 설정합니다.
-    func cache(_ cache: NSCache<AnyObject, AnyObject>, willEvictObject obj: Any) {
+    public func cache(_ cache: NSCache<AnyObject, AnyObject>, willEvictObject obj: Any) {
         if let videoObject = obj as? VideoContainer {
             observingURLs[videoObject.url] = false
         }
