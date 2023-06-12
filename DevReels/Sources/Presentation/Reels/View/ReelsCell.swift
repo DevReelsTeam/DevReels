@@ -16,7 +16,7 @@ class ReelsCell: UITableViewCell, Identifiable {
     // MARK: - Properties
     
     private lazy var titleLabel = UILabel().then {
-        $0.text = "릴스제목"
+        $0.text = "릴스 제목"
     }
     
     private lazy var descriptionLabel = UILabel().then {
