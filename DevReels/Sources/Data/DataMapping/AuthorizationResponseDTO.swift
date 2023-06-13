@@ -9,20 +9,17 @@
 import Foundation
 
 // ex
-//struct AuthorizationResponseDTO: Decodable {
-//    private let idToken: String
-//    private let email: String
-//    private let refreshToken: String
-//    private let expiresIn: String
-//    private let localId: String
-//
-//    func toDomain() -> Authorization {
-//        return Authorization(
-//            idToken: idToken,
-//            email: email,
-//            refreshToken: refreshToken,
-//            expiresIn: expiresIn,
-//            localId: localId
-//        )
-//    }
-//}
+struct AuthorizationResponseDTO: Decodable {
+    private let idToken: String
+    private let email: String
+    private let refreshToken: String
+    private let localId: String
+    
+    func toDomain() -> Authorization {
+        return Authorization(
+            idToken: idToken,
+            email: email,
+            refreshToken: refreshToken,
+            localId: localId)
+    }
+}

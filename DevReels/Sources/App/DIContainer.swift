@@ -23,21 +23,31 @@ final class DIContainer {
     }
     
     private func registerDataSources() {
-        
+        container.register(AuthServiceProtocol.self) { _ in FBAuthService() }
     }
     
     private func registerRepositories() {
-        
+        container.register(AuthRepositoryProtocol.self) { resolver in
+            var repository = AuthRepository()
+//            repository.authService = resolver.resolve(AuthServiceProtocol.self)
+            
+            return repository
+        }
     }
     
     private func registerUseCases() {
-        
+        container.register(LoginUseCaseProtocol.self) { resolver in
+            var useCase = LoginUseCase()
+            useCase.authRepository = resolver.resolve(AuthRepositoryProtocol.self)
+
+            return useCase
+        }
     }
     
     private func registerViewModels() {
         container.register(LoginViewModel.self) { resolver in
             let viewModel = LoginViewModel()
-            
+            viewModel.loginUseCase = resolver.resolve(LoginUseCaseProtocol.self)
             return viewModel
         }
     }

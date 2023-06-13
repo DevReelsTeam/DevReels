@@ -19,8 +19,7 @@ final class AppCoordinator: BaseCoordinator<Void> {
     }
     
     private func setup(with window: UIWindow?) {
-        let viewModel = ReelsViewModel()
-        window?.rootViewController = ReelsViewController(viewModel: viewModel)
+        window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
         window?.backgroundColor = .systemBackground
     }
@@ -47,7 +46,10 @@ final class AppCoordinator: BaseCoordinator<Void> {
     }
 
     private func showTab() {
-        navigationController.setNavigationBarHidden(true, animated: true)
+        navigationController.pushViewController(ReelsViewController(viewModel: ReelsViewModel()), animated: true)
+        
+//        navigationController.setNavigationBarHidden(true, animated: true)
+        
 //        let tab = TabCoordinator(navigationController)
 //        coordinate(to: tab)
 //            .subscribe(onNext: { [weak self] in
