@@ -15,9 +15,13 @@ class ProfileViewController: UIViewController {
     var disposeBag: DisposeBag = .init()
     var viewModel: ProfileViewModel
     
+    let profileHeader: ProfileHeaderViewController
+    
     init(viewModel: ProfileViewModel) {
         self.viewModel = ProfileViewModel()
+        self.profileHeader = ProfileHeaderViewController()
         super.init(nibName: nil, bundle: nil)
+        bindViewModel()
     }
     
     required init?(coder: NSCoder) {
@@ -46,7 +50,7 @@ class ProfileViewController: UIViewController {
         layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = .zero
         layout.minimumInteritemSpacing = .zero
-        let itemSize = UIScreen.main.bounds.width / 3.0
+        let itemSize = (UIScreen.main.bounds.width - 34) / 2.0
         
         layout.itemSize = CGSize(
             width: itemSize,
@@ -58,16 +62,21 @@ class ProfileViewController: UIViewController {
             collectionViewLayout: layout
         )
 
-//        collectionView.register(PostCell.self)
+        collectionView.register(ReelsCollectionCell.self)
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.alwaysBounceHorizontal = false
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
         
         return collectionView
     }()
     
     // MARK: Bind View Model
     func bindViewModel() {
-        
+        viewModel.output.posts
+            .drive(postCollectionView.rx.items(cellIdentifier: ReelsCollectionCell.defaultReuseIdentifier, cellType: ReelsCollectionCell.self)) { _, _, cell in
+                cell.layer.cornerRadius = 6
+            }
+            .disposed(by: disposeBag)
     }
     
     // MARK: - View Life Cycle
@@ -79,6 +88,17 @@ class ProfileViewController: UIViewController {
 
     // MARK: - Layout
     private func layout() {
+        self.view.addSubview(profileHeader.view)
+        profileHeader.view.snp.makeConstraints { make in
+            make.top.left.right.equalToSuperview()
+        }
         
+        self.view.addSubview(postCollectionView)
+        postCollectionView.snp.makeConstraints { make in
+            postCollectionView.snp.makeConstraints { make in
+                make.top.equalTo(profileHeader.view.snp.bottom)
+                make.left.right.bottom.equalToSuperview()
+            }
+        }
     }
 }
