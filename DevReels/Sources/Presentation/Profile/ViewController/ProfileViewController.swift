@@ -26,35 +26,6 @@ class ProfileViewController: UIViewController {
     
     // MARK: - Constants
     private enum Metric {
-        enum ProfileImage {
-            static let height = 0
-            static let leftMargin = 0
-            static let topMargin = 0
-            static let rightMargin = 0
-            static let bottomMargin = 0
-        }
-        
-        enum UserInformation {
-            static let leftMargin = 0
-            static let topMargin = 0
-            static let rightMargin = 0
-            static let bottomMargin = 0
-        }
-        
-        enum UserURL {
-            static let leftMargin = 0
-            static let topMargin = 0
-            static let rightMargin = 0
-            static let bottomMargin = 0
-        }
-        
-        enum PostFollowInfo {
-            static let leftMargin = 0
-            static let topMargin = 0
-            static let rightMargin = 0
-            static let bottomMargin = 0
-        }
-        
         enum PostCollectionView {
             static let leftMargin = 0
             static let topMargin = 0
@@ -68,36 +39,6 @@ class ProfileViewController: UIViewController {
     }
     
     // MARK: - Components
-    private let userProfileImageView: UIImageView = {
-        let imageView = UIImageView()
-        return imageView
-    }()
-    
-    private let userProfileEditButton: UIButton = {
-        let button = UIButton()
-        return button
-    }()
-    
-    private let userName: UILabel = {
-        let label = UILabel()
-        
-        return label
-    }()
-    
-    private let userIntroduction: UILabel = {
-        let label = UILabel()
-        return label
-    }()
-    
-    private let githubButton: UIButton = {
-        let button = UIButton()
-        return button
-    }()
-    
-    private let blogButton: UIButton = {
-        let button = UIButton()
-        return button
-    }()
     
     private let postCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
