@@ -7,9 +7,8 @@
 //
 
 import Foundation
+import RxSwift
 
-// ex
-//protocol AuthServiceProtocol {
-//    func signup(_ request: EmailAuthorizationRequestDTO) -> Observable<AuthorizationResponseDTO>
-//    func login(_ request: EmailAuthorizationRequestDTO) -> Observable<AuthorizationResponseDTO>
-//}
+protocol AuthServiceProtocol {
+//    func login(_ request: AppleAuthorizationRequestDTO) -> Observable<AuthorizationResponseDTO>
+}

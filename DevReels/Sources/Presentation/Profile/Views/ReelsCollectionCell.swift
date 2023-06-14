@@ -75,7 +75,7 @@ class ReelsCollectionCell: UICollectionViewCell {
     
     // MARK: - Layout
     private func layout() {
-        
+
         self.addSubview(thumbnailImageView)
         thumbnailImageView.snp.makeConstraints { make in
             make.left.top.right.equalToSuperview()

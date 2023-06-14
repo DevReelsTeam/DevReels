@@ -23,21 +23,23 @@ final class DIContainer {
     }
     
     private func registerDataSources() {
-        container.register(ReelsDataSourceProtocol.self) { _ in ReelsDataSource() }
+        container.register(AuthServiceProtocol.self) { _ in FBAuthService() }
     }
     
     private func registerRepositories() {
-        container.register(ReelsRepositoryProtocol.self) { resolver in
-            var repository = ReelsRepository()
-            repository.reelsDataSource = resolver.resolve(ReelsDataSourceProtocol.self)
+        container.register(AuthRepositoryProtocol.self) { resolver in
+            var repository = AuthRepository()
+//            repository.authService = resolver.resolve(AuthServiceProtocol.self)
+            
             return repository
         }
     }
     
     private func registerUseCases() {
-        container.register(ReelsUseCaseProtocol.self) { resolver in
-            var useCase = ReelsUseCase()
-            useCase.reelsRepository = resolver.resolve(ReelsRepositoryProtocol.self)
+        container.register(LoginUseCaseProtocol.self) { resolver in
+            var useCase = LoginUseCase()
+            useCase.authRepository = resolver.resolve(AuthRepositoryProtocol.self)
+
             return useCase
         }
     }
@@ -45,16 +47,7 @@ final class DIContainer {
     private func registerViewModels() {
         container.register(LoginViewModel.self) { resolver in
             let viewModel = LoginViewModel()
-            
-            return viewModel
-        }
-        container.register(ReelsViewModel.self) { resolver in
-            let viewModel = ReelsViewModel()
-            viewModel.reelsUseCase = resolver.resolve(ReelsUseCaseProtocol.self)
-            return viewModel
-        }
-        container.register(ProfileViewModel.self) { reslover in
-            let viewModel = ProfileViewModel()
+            viewModel.loginUseCase = resolver.resolve(LoginUseCaseProtocol.self)
             return viewModel
         }
     }

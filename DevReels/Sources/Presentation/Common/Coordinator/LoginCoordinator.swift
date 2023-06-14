@@ -14,7 +14,6 @@ import RxSwift
 
 enum LoginCoordinatorResult {
     case finish
-    case back
 }
 
 
@@ -25,11 +24,26 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult>{
     
     override func start() -> Observable<LoginCoordinatorResult> {
         showLogin()
-        
         return finish
     }
     
     func showLogin(){
+        guard let viewModel = DIContainer.shared.container.resolve(LoginViewModel.self) else { return }
         
+        viewModel.navigation
+            .subscribe(onNext: { [weak self] in
+                switch $0 {
+                case .finish:
+                    self?.showReels()
+                }
+            })
+        let viewController = LoginViewController(viewModel: viewModel)
+        push(viewController, animated: true, isRoot: true)
+    }
+    
+    func showReels(){
+        let profile = ProfileCoordinator(navigationController)
+        
+        push(ProfileViewController(viewModel: ProfileViewModel()), animated: true)
     }
 }
