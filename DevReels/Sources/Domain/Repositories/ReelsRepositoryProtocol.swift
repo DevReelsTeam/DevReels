@@ -10,4 +10,5 @@ import RxSwift
 
 protocol ReelsRepositoryProtocol {
     func list() -> Observable<[Reels]>
+    func upload() -> Observable<Void>
 }

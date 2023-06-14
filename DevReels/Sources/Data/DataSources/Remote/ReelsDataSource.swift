@@ -6,10 +6,13 @@
 //  Copyright © 2023 DevReels. All rights reserved.
 //
 
+import Foundation
 import RxDevReelsYa
 import RxSwift
+import Firebase
 
 struct ReelsDataSource: ReelsDataSourceProtocol {
+    
     private let provider: Provider
     
     init() {
@@ -18,6 +21,30 @@ struct ReelsDataSource: ReelsDataSourceProtocol {
     
     func list() -> Observable<Documents<[ReelsResponseDTO]>> {
         return provider.request(ReelsTarget.list)
+    }
+    
+    func uploadVideo(uid: String, videoData: Data) -> Observable<URL> {
+        return Observable.create { emitter in
+            let ref = Storage.storage().reference().child("Videos").child(uid)
+            if let uploadData = videoData as Data? {
+                ref.putData(videoData, metadata: nil) { _, error in
+                    if let error = error {
+                        emitter.onError(error)
+                        return
+                    }
+                    ref.downloadURL { url, error in
+                        guard let url else {
+                            if let error = error {
+                                emitter.onError(error)
+                            }
+                            return
+                        }
+                        emitter.onNext(url)
+                    }
+                }
+            }
+            return Disposables.create()
+        }
     }
 }
 

@@ -75,22 +75,26 @@ class ReelsCollectionCell: UICollectionViewCell {
     
     // MARK: - Layout
     private func layout() {
+
         self.addSubview(thumbnailImageView)
         thumbnailImageView.snp.makeConstraints { make in
             make.left.top.right.equalToSuperview()
             make.height.equalTo(Metric.ThumbnailImageView.height)
         }
+
         self.addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(thumbnailImageView.snp.bottom).offset(Metric.Title.topMargin)
             make.left.equalToSuperview().inset(Metric.Title.leftMargin)
         }
+
         self.addSubview(likeCount)
         likeCount.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(Metric.Like.topMargin)
             make.left.equalTo(titleLabel)
             make.bottom.equalToSuperview().inset(Metric.Like.bottomMargin)
         }
+
         self.addSubview(commentCount)
         commentCount.snp.makeConstraints { make in
             make.centerY.equalTo(likeCount)

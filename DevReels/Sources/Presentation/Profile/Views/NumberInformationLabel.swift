@@ -39,11 +39,8 @@ class NumberInformationLabel: UIStackView {
     
     private func configure() {
         self.axis = .horizontal
-//        self.addArrangedSubview([
-//            titleLabel,
-//            countLabel
-//        ])
         self.alignment = .center
         self.spacing = 4
     }
+    
 }

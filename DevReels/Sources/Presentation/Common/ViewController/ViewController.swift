@@ -15,7 +15,7 @@ class ViewController: UIViewController {
     
     let backButton = UIButton().then {
         $0.setTitle("이전", for: .normal)
-        $0.setTitleColor(UIColor.systemBackground, for: .normal)
+        $0.setTitleColor(UIColor.systemOrange, for: .normal)
     }
 
     override func viewDidLoad() {
