@@ -11,6 +11,7 @@ import SnapKit
 import Then
 import RxSwift
 import RxCocoa
+import DRVideoController
 
 final class ReelsViewController: UIViewController {
     
@@ -31,6 +32,7 @@ final class ReelsViewController: UIViewController {
     }
         
     private let viewModel: ReelsViewModel
+    private let videoPlayer = VideoPlayerController.sharedVideoPlayer
     private let disposeBag = DisposeBag()
     
     // MARK: - Inits
@@ -58,27 +60,22 @@ final class ReelsViewController: UIViewController {
         let ouput = viewModel.transform(input: input)
         
         ouput.reelsList
-            .drive(tableView.rx.items) { tableView, index, reels in
-                guard let cell = tableView.dequeueReusableCell(
-                    withIdentifier: ReelsCell.identifier,
-                    for: IndexPath(row: index, section: 0)
-                ) as? ReelsCell else {
-                    return UITableViewCell()
-                }
-                cell.selectionStyle = .none
+            .drive(tableView.rx.items(
+                cellIdentifier: ReelsCell.identifier,
+                cellType: ReelsCell.self
+            )) { _, reels, cell in
                 cell.prepareForReuse()
                 cell.configureCell(data: reels)
-                return cell
             }
             .disposed(by: disposeBag)
         
         tableView.rx.didEndDisplayingCell
             .subscribe(onNext: { [weak self] cell, _ in
-                guard self != nil else { return }
+                guard let self = self else { return }
                 
                 if let videoCell = cell as? PlayVideoLayerContainer {
                     if videoCell.videoURL != nil {
-                        VideoPlayerController.sharedVideoPlayer.removeLayerFor(cell: videoCell)
+                        videoPlayer.removeLayerFor(cell: videoCell)
                     }
                 }
             })
@@ -88,7 +85,7 @@ final class ReelsViewController: UIViewController {
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 
-                VideoPlayerController.sharedVideoPlayer.pausePlayeVideosFor(tableView: tableView)
+                videoPlayer.pausePlayeVideosFor(tableView: tableView)
             })
             .disposed(by: disposeBag)
         
@@ -96,7 +93,7 @@ final class ReelsViewController: UIViewController {
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 
-                VideoPlayerController.sharedVideoPlayer.pausePlayeVideosFor(tableView: tableView)
+                videoPlayer.pausePlayeVideosFor(tableView: tableView)
             })
             .disposed(by: disposeBag)
     }

@@ -1,53 +1,33 @@
 //
-//  Utilities.swift
+//  UIImageView+ImageURL.swift
 //  DevReels
 //
-//  Created by hanjongwoo on 2023/05/14.
+//  Created by hanjongwoo on 2023/05/30.
 //  Copyright © 2023 DevReels. All rights reserved.
 //
 
 import UIKit
 
-class Utilities {
-    static let shared = Utilities()
-    func createGradient(color1: UIColor, color2: UIColor, frame: CGRect) -> UIImage {
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.frame = frame
-        gradientLayer.startPoint = CGPoint(x: 1.0, y: 0.0)
-        gradientLayer.endPoint = CGPoint(x: 1.0, y: 1.0)
-        gradientLayer.colors = [color1.cgColor, color2.cgColor]
-        return gradientLayer.toImage()
-    }
-}
-
-extension CAGradientLayer {
-    func toImage() -> UIImage {
-        UIGraphicsBeginImageContextWithOptions(self.frame.size, false, 0)
-        if let context = UIGraphicsGetCurrentContext() {
-            self.render(in: context)
-            let outputImage = UIGraphicsGetImageFromCurrentImageContext()
-            UIGraphicsEndImageContext()
-            return outputImage ?? UIImage()
-        }
-        return UIImage()
-    }
-}
-
-private var xoAssociationKey: UInt8 = 0
 
 extension UIImageView {
+    
+    private struct AssociatedKeys {
+        static var imageURL: UInt8 = 0
+    }
+    
     @nonobjc static var imageCache = NSCache<NSString, AnyObject>()
-    var imageURL: String? {
+    
+    public var imageURL: String? {
         get {
-            return objc_getAssociatedObject(self, &xoAssociationKey) as? String
+            return objc_getAssociatedObject(self, &AssociatedKeys.imageURL) as? String
         }
         set(newValue) {
             guard let urlString = newValue else {
-                objc_setAssociatedObject(self, &xoAssociationKey, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+                objc_setAssociatedObject(self, &AssociatedKeys.imageURL, newValue, .OBJC_ASSOCIATION_RETAIN)
                 image = nil
                 return
             }
-            objc_setAssociatedObject(self, &xoAssociationKey, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+            objc_setAssociatedObject(self, &AssociatedKeys.imageURL, newValue, .OBJC_ASSOCIATION_RETAIN)
             if let image = UIImageView.imageCache.object(
                 forKey: "\((urlString as NSString).hash)" as NSString) as? UIImage {
                 self.image = image
@@ -81,7 +61,7 @@ extension UIImageView {
         }
     }
     
-    func setImageColour(color: UIColor) {
+    func setImageColor(color: UIColor) {
         guard let tempImage = image?.withRenderingMode(.alwaysTemplate) else { return }
         image = tempImage
         tintColor = color
