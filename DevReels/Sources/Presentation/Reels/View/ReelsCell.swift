@@ -9,6 +9,7 @@
 import UIKit
 import AVFoundation
 import SnapKit
+import DRVideoController
 
 class ReelsCell: UITableViewCell, Identifiable {
     
@@ -24,6 +25,7 @@ class ReelsCell: UITableViewCell, Identifiable {
     
     private lazy var thumbnailImageView = UIImageView().then {
         $0.contentMode = .scaleToFill
+        $0.backgroundColor = .black
     }
     
     private lazy var bottomGradientImageView = UIImageView().then {
@@ -51,8 +53,8 @@ class ReelsCell: UITableViewCell, Identifiable {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        self.selectionStyle = .none
         layout()
-        selectionStyle = .none
     }
     
     required init?(coder: NSCoder) {
@@ -69,13 +71,13 @@ class ReelsCell: UITableViewCell, Identifiable {
     override func layoutSubviews() {
         super.layoutSubviews()
         configureGradient()
+        VideoPlayerController.sharedVideoPlayer.playVideo(withLayer: videoLayer, url: videoURL ?? "")
     }
     
     func configureGradient() {
-        let util = Utilities.shared
         let color1 = UIColor.black.withAlphaComponent(0.0)
         let color2 = UIColor.black.withAlphaComponent(0.7)
-        let gradient = util.createGradient(color1: color1, color2: color2, frame: bottomGradientImageView.bounds)
+        let gradient = UIImage.createGradient(color1: color1, color2: color2, frame: bottomGradientImageView.bounds)
         bottomGradientImageView.image = gradient
     }
     

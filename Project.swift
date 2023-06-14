@@ -29,7 +29,8 @@ class BaseProjectFactory: ProjectFactory {
         .external(name: "FirebaseMessaging"),
         .external(name: "Swinject"),
         .external(name: "PryntTrimmerView"),
-        .target(name: "RxDevReelsYa")    // 모듈만들경우 사용
+        .target(name: "RxDevReelsYa"),
+        .target(name: "DRVideoController")
     ]
     
     let infoPlist: [String: InfoPlist.Value] = [
@@ -102,6 +103,19 @@ class BaseProjectFactory: ProjectFactory {
                 sources: ["RxDevReelsYa/Sources/**"],
                 dependencies: [
                     .external(name: "Alamofire")
+                ]
+            ),
+            Target(
+                name: "DRVideoController",
+                platform: .iOS,
+                product: .framework,
+                bundleId: "com.team.\(projectName).DRVideoController",
+                deploymentTarget: deploymentTarget,
+                infoPlist: .default,
+                sources: ["DRVideoController/Sources/**"],
+                dependencies: [
+                    .external(name: "RxSwift"),
+                    .external(name: "RxCocoa")
                 ]
             )
         ]

@@ -54,7 +54,7 @@ public class Provider: ProviderProtocol {
             let request = self.session
                 .request(urlConvertible)
                 .validate(statusCode: 200 ..< 300)
-                .response() { response in
+                .response { response in
                     print("@@@@@@@@ REST API \(urlConvertible.urlRequest?.url?.absoluteString ?? "") @@@@@@@@")
                     switch response.result {
                     case .success:

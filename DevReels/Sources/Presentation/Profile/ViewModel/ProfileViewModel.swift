@@ -50,22 +50,27 @@ final class ProfileViewModel: ViewModel {
     }
     
     struct Output {
-//        let userImage: Driver<UIImage>
-//        let userName: Driver<String>
-//        let userIntroduction: Driver<String>
-//        let userGithubURL: Driver<URL>
-//        let userBlogURL: Driver<URL>
-//        let postCount: Driver<Count>
-//        let followerCount: Driver<Count>
-//        let followingCount: Driver<Count>
-//        let posts: Driver<[Post]>
+        //        let userImage: Driver<UIImage>
+        //        let userName: Driver<String>
+        //        let userIntroduction: Driver<String>
+        //        let userGithubURL: Driver<URL>
+        //        let userBlogURL: Driver<URL>
+        //        let postCount: Driver<Count>
+        //        let followerCount: Driver<Count>
+        //        let followingCount: Driver<Count>
+        let posts: Driver<[String]>
     }
     
     let navigation = PublishSubject<ProfileNavigation>()
     
     func transform(input: Input) -> Output {
         
-        return Output()
+        let posts = Observable.of(["1", "2", "3", "4", "5", "6", "7"])
+        
+        
+        return Output(
+            posts: posts.asDriver(onErrorJustReturn: [])
+        )
     }
     
     let input = Input()

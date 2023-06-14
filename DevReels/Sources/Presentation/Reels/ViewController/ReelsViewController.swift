@@ -10,23 +10,30 @@ import UIKit
 import SnapKit
 import Then
 import RxSwift
+import RxCocoa
+import DRVideoController
 
-final class ReelsViewController: ViewController {
+final class ReelsViewController: UIViewController {
     
     // MARK: - Properties
     private lazy var tableView = UITableView().then {
+        $0.register(ReelsCell.self, forCellReuseIdentifier: ReelsCell.identifier)
+        $0.rowHeight = UIScreen.main.bounds.height
         $0.backgroundColor = .systemBackground
         $0.showsVerticalScrollIndicator = false
-        $0.delegate = self
-        $0.dataSource = self
-        $0.register(ReelsCell.self, forCellReuseIdentifier: ReelsCell.identifier)
+        $0.isPagingEnabled = true
+        $0.bounces = false
+        $0.showsVerticalScrollIndicator = false
+        $0.contentInsetAdjustmentBehavior = .never
     }
     
     private lazy var topGradientImageView = UIImageView().then {
         $0.contentMode = .scaleToFill
     }
         
-    var viewModel: ReelsViewModel
+    private let viewModel: ReelsViewModel
+    private let videoPlayer = VideoPlayerController.sharedVideoPlayer
+    private let disposeBag = DisposeBag()
     
     // MARK: - Inits
     init(viewModel: ReelsViewModel) {
@@ -42,20 +49,57 @@ final class ReelsViewController: ViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         layout()
+        bind()
     }
     
-    override func viewDidLayoutSubviews() {
-        configure()
-        DispatchQueue.main.async {
-            VideoPlayerController.sharedVideoPlayer.pausePlayeVideosFor(tableView: self.tableView)
-        }
-    }
-    
-    override func bind() {
+    func bind() {
+        let input = ReelsViewModel.Input(
+            viewWillAppear: rx.viewWillAppear.map { _ in () }
+                .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance)
+        )
+        let ouput = viewModel.transform(input: input)
+        
+        ouput.reelsList
+            .drive(tableView.rx.items(
+                cellIdentifier: ReelsCell.identifier,
+                cellType: ReelsCell.self
+            )) { _, reels, cell in
+                cell.prepareForReuse()
+                cell.configureCell(data: reels)
+            }
+            .disposed(by: disposeBag)
+        
+        tableView.rx.didEndDisplayingCell
+            .subscribe(onNext: { [weak self] cell, _ in
+                guard let self = self else { return }
+                
+                if let videoCell = cell as? PlayVideoLayerContainer {
+                    if videoCell.videoURL != nil {
+                        videoPlayer.removeLayerFor(cell: videoCell)
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        tableView.rx.didEndDecelerating
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                
+                videoPlayer.pausePlayeVideosFor(tableView: tableView)
+            })
+            .disposed(by: disposeBag)
+        
+        tableView.rx.didEndDragging
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                
+                videoPlayer.pausePlayeVideosFor(tableView: tableView)
+            })
+            .disposed(by: disposeBag)
     }
     
     // MARK: - Layout
-    override func layout() {
+    func layout() {
         view.addSubview(tableView)
         view.addSubview(topGradientImageView)
         
@@ -65,64 +109,6 @@ final class ReelsViewController: ViewController {
         
         topGradientImageView.snp.makeConstraints {
             $0.edges.equalToSuperview()
-        }
-    }
-    
-    private func configure() {
-        configureGradients()
-        configureTableView()
-    }
-    
-    fileprivate func configureGradients() {
-        let topGradient = Utilities.shared.createGradient(color1: .black.withAlphaComponent(0.7), color2: .black.withAlphaComponent(0.0), frame: topGradientImageView.bounds)
-        
-        topGradientImageView.contentMode = .scaleAspectFill
-        topGradientImageView.image = topGradient
-    }
-    
-    fileprivate func configureTableView() {
-        tableView.isPagingEnabled = true
-        tableView.bounces = false
-        tableView.showsVerticalScrollIndicator = false
-        tableView.contentInsetAdjustmentBehavior = .never
-    }
-}
-
-extension ReelsViewController: UITableViewDelegate, UITableViewDataSource {
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-//        return viewModel.videos.count
-        return 0
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return self.view.frame.height
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "ReelsCell") as? ReelsCell else {
-            return UITableViewCell()
-        }
-//        let data = viewModel.videos[indexPath.row]
-//        cell.configureCell(data: data)
-        return UITableViewCell()
-    }
-    
-    func tableView(_ tableView: UITableView, didEndDisplaying cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if let videoCell = cell as? PlayVideoLayerContainer {
-            if videoCell.videoURL != nil {
-                VideoPlayerController.sharedVideoPlayer.removeLayerFor(cell: videoCell)
-            }
-        }
-    }
-    
-    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-        VideoPlayerController.sharedVideoPlayer.pausePlayeVideosFor(tableView: tableView)
-    }
-    
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if !decelerate {
-            VideoPlayerController.sharedVideoPlayer.pausePlayeVideosFor(tableView: tableView)
         }
     }
 }

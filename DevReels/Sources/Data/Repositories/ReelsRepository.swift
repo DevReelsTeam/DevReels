@@ -13,6 +13,8 @@ struct ReelsRepository: ReelsRepositoryProtocol {
     var reelsDataSource: ReelsDataSourceProtocol?
     
     func list() -> Observable<[Reels]> {
-        return .empty()
+        let reels = reelsDataSource?.list()
+            .map { $0.documents.map { $0.toDomain() } }
+        return reels ?? .empty()
     }
 }

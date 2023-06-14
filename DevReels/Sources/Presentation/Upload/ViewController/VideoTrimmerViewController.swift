@@ -12,7 +12,7 @@ import SnapKit
 import Then
 import PhotosUI
 
-final class TrimVideoViewController: ViewController {
+final class VideoTrimmerViewController: ViewController {
 
     private lazy var playButton = UIButton().then {
         $0.backgroundColor = .blue
@@ -83,7 +83,7 @@ final class TrimVideoViewController: ViewController {
         player = AVPlayer(playerItem: playerItem)
 
         NotificationCenter.default.addObserver(self,
-                                               selector: #selector(TrimVideoViewController.itemDidFinishPlaying(_:)),
+                                               selector: #selector(VideoTrimmerViewController.itemDidFinishPlaying(_:)),
                                                name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
                                                object: playerItem)
 
@@ -168,7 +168,7 @@ final class TrimVideoViewController: ViewController {
 
 // MARK: Tirmmer Delegate
 
-extension TrimVideoViewController: TrimmerViewDelegate {
+extension VideoTrimmerViewController: TrimmerViewDelegate {
     func positionBarStoppedMoving(_ playerTime: CMTime) {
         player?.seek(to: playerTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
         player?.play()
@@ -190,7 +190,7 @@ extension TrimVideoViewController: TrimmerViewDelegate {
 
 // MARK: Picker
 
-extension TrimVideoViewController {
+extension VideoTrimmerViewController {
     private func configurePicker() {
         var configuration = PHPickerConfiguration()
         configuration.filter = .videos
@@ -207,7 +207,7 @@ extension TrimVideoViewController {
 
 // MARK: Picker Delegate
 
-extension TrimVideoViewController: PHPickerViewControllerDelegate {
+extension VideoTrimmerViewController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
         
