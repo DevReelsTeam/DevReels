@@ -69,28 +69,29 @@ class ReelsCollectionCell: UICollectionViewCell {
         layout()
     }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - Layout
     private func layout() {
-        self.addSubView(thumbnailImageView)
+        self.addSubview(thumbnailImageView)
         thumbnailImageView.snp.makeConstraints { make in
             make.left.top.right.equalToSuperview()
             make.height.equalTo(Metric.ThumbnailImageView.height)
         }
-        
-        self.addSubView(titleLabel)
+        self.addSubview(titleLabel)
         titleLabel.snp.makeConstraints { make in
             make.top.equalTo(thumbnailImageView.snp.bottom).offset(Metric.Title.topMargin)
             make.left.equalToSuperview().inset(Metric.Title.leftMargin)
         }
-        
-        self.addSubView(likeCount)
+        self.addSubview(likeCount)
         likeCount.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(Metric.Like.topMargin)
             make.left.equalTo(titleLabel)
             make.bottom.equalToSuperview().inset(Metric.Like.bottomMargin)
         }
-        
-        self.addSubView(commentCount)
+        self.addSubview(commentCount)
         commentCount.snp.makeConstraints { make in
             make.centerY.equalTo(likeCount)
             make.left.equalTo(likeCount.snp.right).offset(Metric.Comment.leftMargin)
