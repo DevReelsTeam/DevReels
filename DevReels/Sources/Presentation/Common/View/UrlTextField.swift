@@ -1,18 +1,17 @@
 //
-//  CountTextField.swift
+//  UrlTextField.swift
 //  DevReels
 //
-//  Created by HoJun on 2023/05/25.
+//  Created by HoJun on 2023/06/10.
 //  Copyright © 2023 DevReels. All rights reserved.
 //
 
 import UIKit
-import Then
-import SnapKit
-import RxCocoa
 import RxSwift
+import RxCocoa
+import Then
 
-final class CountTextField: UIView {
+final class UrlTextField: UIView {
     
     // MARK: Public
     
@@ -36,16 +35,10 @@ final class CountTextField: UIView {
             titleLabel.text = title
         }
     }
-    
-    var maxCount: Int = -1 {
-        didSet {
-            update()
-        }
-    }
-    
+        
     // MARK: Private
     
-    fileprivate let textField: TextField = TextField()
+    fileprivate let textField = TextField()
     
     private let stackView = UIStackView().then {
         $0.axis = .horizontal
@@ -56,8 +49,9 @@ final class CountTextField: UIView {
         $0.textAlignment = .left
     }
     
-    private let countLabel = UILabel().then {
+    private let validUrlLabel = UILabel().then {
         $0.font = UIFont.systemFont(ofSize: 14)
+        $0.textColor = .systemRed
         $0.textAlignment = .right
     }
     
@@ -91,12 +85,12 @@ final class CountTextField: UIView {
     }
     
     private func update() {
-        let maxCount = maxCount < 0 ? Int.max : maxCount
-        if let str = textField.text?.prefix(maxCount) {
-            textField.text = String(str)
+        if let urlString = textField.text,
+           let url = URL(string: urlString) {
+            validUrlLabel.text = UIApplication.shared.canOpenURL(url) ? nil : "올바르지 않은 URL 형식입니다."
+        } else {
+            validUrlLabel.text = nil
         }
-        countLabel.isHidden = maxCount == Int.max ? true : false
-        countLabel.text = "\(textField.text?.count ?? 0)/\(maxCount)"
     }
     
     private func layout() {
@@ -105,7 +99,7 @@ final class CountTextField: UIView {
     }
     
     private func layoutStackView() {
-        [titleLabel, countLabel].forEach {
+        [titleLabel, validUrlLabel].forEach {
             stackView.addArrangedSubview($0)
         }
         addSubview(stackView)
@@ -125,9 +119,19 @@ final class CountTextField: UIView {
     }
 }
 
-extension Reactive where Base: CountTextField {
+extension Reactive where Base: UrlTextField {
     
     var text: ControlProperty<String?> {
         return base.textField.rx.text
+    }
+    
+    var isValidURL: Observable<Bool> {
+        return base.textField.rx.text
+            .map { urlString in
+                guard let urlString = urlString else { return false }
+                guard let url = URL(string: urlString) else { return false }
+                return UIApplication.shared.canOpenURL(url)
+            }
+            .share(replay: 1)
     }
 }

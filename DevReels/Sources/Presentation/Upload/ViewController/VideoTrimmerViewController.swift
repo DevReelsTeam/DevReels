@@ -7,6 +7,9 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
+import AVFoundation
 import PryntTrimmerView
 import SnapKit
 import Then
@@ -19,35 +22,59 @@ final class VideoTrimmerViewController: ViewController {
         $0.setTitle("플레이", for: .normal)
         $0.addTarget(self, action: #selector(play), for: .touchUpInside)
     }
-    
-    private lazy var selectAssetButton = UIButton().then {
+
+    private var selectVideoButton = UIButton().then {
         $0.backgroundColor = .red
         $0.setImage(UIImage(systemName: "square.stack"), for: .normal)
-        $0.addTarget(self, action: #selector(selectAsset), for: .touchUpInside)
     }
-    
-    private lazy var hStack = UIStackView(arrangedSubviews: [playButton, selectAssetButton]).then {
+
+    private lazy var hStack = UIStackView(arrangedSubviews: [playButton, selectVideoButton]).then {
         $0.distribution = .fillEqually
         $0.spacing = 30
         $0.axis = .horizontal
     }
-    
+
+    private lazy var nextButton = UIButton().then {
+        $0.backgroundColor = .yellow
+        $0.setTitle("다음", for: .normal)
+    }
+
     private let playerView = UIView()
     private let trimmerView = TrimmerView()
-    
+
     var player: AVPlayer?
     var playbackTimeCheckerTimer: Timer?
     var trimmerPositionChangedTimer: Timer?
-    
+
     private var videoPicker: PHPickerViewController?
-    private var videoURL: NSURL?
+    private var videoSourceURL: URL?
+    private var videoDestinationURL: URL?
     
+    let selectedVideoURLSubject = PublishSubject<URL>()
+    let startTimeSubject = PublishSubject<CMTime>()
+    let endTimeSubject = PublishSubject<CMTime>()
+    
+    private var viewModel: VideoTrimmerViewModel
+    
+    init(viewModel: VideoTrimmerViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
         trimmerView.handleColor = UIColor.white
         trimmerView.mainColor = UIColor.darkGray
-        trimmerView.minDuration = 10
-        layout()
+        trimmerView.positionBarColor = .orange
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.isNavigationBarHidden = true
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -55,12 +82,27 @@ final class VideoTrimmerViewController: ViewController {
         configurePicker()
     }
 
-    @objc func selectAsset(_ sender: Any) {
-        presentPicker()
+    override func bind() {
+        selectVideoButton.rx.tap
+            .observe(on: MainScheduler.instance)
+            .subscribe(onNext: { [weak self] in
+                self?.presentPicker()
+            })
+            .disposed(by: disposeBag)
+        
+        
+        let input = VideoTrimmerViewModel.Input(
+            nextButtonTapped: nextButton.rx.tap.throttle(.seconds(1), scheduler: MainScheduler.instance),
+            selectedVideoURL: selectedVideoURLSubject.asObserver(),
+            startTime: startTimeSubject.asObserver(),
+            endTime: endTimeSubject.asObserver()
+        )
+        
+        _ = viewModel.transform(input: input)
     }
 
-    @objc func play(_ sender: Any) {
 
+    @objc func play() {
         guard let player = player else { return }
 
         if !player.isPlaying {
@@ -71,7 +113,7 @@ final class VideoTrimmerViewController: ViewController {
             stopPlaybackTimeChecker()
         }
     }
-    
+
     func loadAsset(_ asset: AVAsset) {
         trimmerView.asset = asset
         trimmerView.delegate = self
@@ -82,11 +124,6 @@ final class VideoTrimmerViewController: ViewController {
         let playerItem = AVPlayerItem(asset: asset)
         player = AVPlayer(playerItem: playerItem)
 
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(VideoTrimmerViewController.itemDidFinishPlaying(_:)),
-                                               name: NSNotification.Name.AVPlayerItemDidPlayToEndTime,
-                                               object: playerItem)
-
         let layer = AVPlayerLayer(player: player)
         layer.backgroundColor = UIColor.white.cgColor
         layer.frame = CGRect(x: 0, y: 0, width: playerView.frame.width, height: playerView.frame.height)
@@ -95,15 +132,6 @@ final class VideoTrimmerViewController: ViewController {
         playerView.layer.addSublayer(layer)
     }
 
-    @objc func itemDidFinishPlaying(_ notification: Notification) {
-        if let startTime = trimmerView.startTime {
-            guard let player else { return }
-            player.seek(to: startTime)
-            if !player.isPlaying {
-                player.play()
-            }
-        }
-    }
 
     func startPlaybackTimeChecker() {
         stopPlaybackTimeChecker()
@@ -115,16 +143,15 @@ final class VideoTrimmerViewController: ViewController {
     }
 
     func stopPlaybackTimeChecker() {
-
         playbackTimeCheckerTimer?.invalidate()
         playbackTimeCheckerTimer = nil
     }
 
     @objc func onPlaybackTimeChecker() {
 
-        guard let startTime = trimmerView.startTime, let endTime = trimmerView.endTime, let player = player else {
-            return
-        }
+        guard let startTime = trimmerView.startTime,
+              let endTime = trimmerView.endTime,
+              let player = player else { return }
 
         let playBackTime = player.currentTime()
         trimmerView.seek(to: playBackTime)
@@ -134,10 +161,10 @@ final class VideoTrimmerViewController: ViewController {
             trimmerView.seek(to: startTime)
         }
     }
-    
+
     override func layout() {
         view.backgroundColor = .white
-        
+
         playerView.backgroundColor = .gray
         view.addSubview(playerView)
         playerView.snp.makeConstraints { make in
@@ -146,7 +173,7 @@ final class VideoTrimmerViewController: ViewController {
             make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
             make.height.equalToSuperview().multipliedBy(0.65)
         }
-        
+
         view.addSubview(trimmerView)
         trimmerView.snp.makeConstraints { make in
             make.top.equalTo(playerView.snp.bottom).offset(30)
@@ -154,7 +181,7 @@ final class VideoTrimmerViewController: ViewController {
             make.height.equalTo(60)
             make.centerX.equalToSuperview()
         }
-        
+
         hStack.backgroundColor = .gray
         view.addSubview(hStack)
         hStack.snp.makeConstraints { make in
@@ -162,6 +189,13 @@ final class VideoTrimmerViewController: ViewController {
             make.width.equalToSuperview().offset(0.7)
             make.height.equalTo(50)
             make.centerX.equalToSuperview()
+        }
+
+        view.addSubview(nextButton)
+        nextButton.snp.makeConstraints { make in
+            make.height.equalTo(30)
+            make.bottom.equalTo(hStack.snp.top)
+            make.trailing.equalToSuperview()
         }
     }
 }
@@ -180,9 +214,10 @@ extension VideoTrimmerViewController: TrimmerViewDelegate {
         player?.pause()
         player?.seek(to: playerTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
         if let start = trimmerView.startTime,
-           let end = trimmerView.endTime {
+            let end = trimmerView.endTime {
             let duration = (end - start).seconds
-            print(duration)
+            startTimeSubject.onNext(start)
+            endTimeSubject.onNext(end)
         }
     }
 }
@@ -198,7 +233,7 @@ extension VideoTrimmerViewController {
         videoPicker = PHPickerViewController(configuration: configuration)
         videoPicker?.delegate = self
     }
-    
+
     private func presentPicker() {
         guard let videoPicker else { return }
         present(videoPicker, animated: true)
@@ -210,14 +245,14 @@ extension VideoTrimmerViewController {
 extension VideoTrimmerViewController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
-        
+
         guard let provider = results.first?.itemProvider else { return }
         if provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
             provider.loadItem(forTypeIdentifier: UTType.movie.identifier, options: [:]) { [weak self] videoURL, _ in
-                DispatchQueue.main.async {
-                    if let url = videoURL as? URL {
-                        let asset = AVAsset(url: url)
-                        self?.loadAsset(asset)
+                if let url = videoURL as? URL {
+                    self?.selectedVideoURLSubject.onNext(url)
+                    DispatchQueue.main.async {
+                        self?.loadAsset(AVAsset(url: url))
                     }
                 }
             }

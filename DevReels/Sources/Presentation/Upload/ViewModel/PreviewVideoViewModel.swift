@@ -11,8 +11,9 @@ import RxSwift
 import RxCocoa
 
 final class PreviewVideoViewModel: ViewModel {
-    var disposeBag: DisposeBag = .init()
     
+    var disposeBag = DisposeBag()
+
     struct Input {
     }
     
