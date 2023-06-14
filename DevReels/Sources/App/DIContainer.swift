@@ -53,5 +53,9 @@ final class DIContainer {
             viewModel.reelsUseCase = resolver.resolve(ReelsUseCaseProtocol.self)
             return viewModel
         }
+        container.register(ProfileViewModel.self) { reslover in
+            let viewModel = ProfileViewModel()
+            return viewModel
+        }
     }
 }
