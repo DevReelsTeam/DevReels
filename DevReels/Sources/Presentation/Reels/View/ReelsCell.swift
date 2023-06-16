@@ -23,6 +23,26 @@ class ReelsCell: UITableViewCell, Identifiable {
         $0.text = "설명"
     }
     
+    private lazy var heartImageView = UIImageView().then {
+        $0.image = UIImage(systemName: "heart")
+    }
+    
+    private lazy var heartNumberLabel = UILabel().then {
+        $0.text = "5.0k"
+    }
+    
+    private lazy var commentImageView = UIImageView().then {
+        $0.image = UIImage(systemName: "bubble.left")
+    }
+    
+    private lazy var commentNumberLabel = UILabel().then {
+        $0.text = "25"
+    }
+    
+    private lazy var shareImageView = UIImageView().then {
+        $0.image = UIImage(systemName: "arrow.turn.up.right")
+    }
+    
     private lazy var thumbnailImageView = UIImageView().then {
         $0.contentMode = .scaleToFill
         $0.backgroundColor = .black
@@ -32,18 +52,18 @@ class ReelsCell: UITableViewCell, Identifiable {
         $0.contentMode = .scaleToFill
     }
     
-    internal lazy var videoLayer = AVPlayerLayer().then {
+    lazy var videoLayer = AVPlayerLayer().then {
         $0.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
         $0.backgroundColor = UIColor.clear.cgColor
         $0.videoGravity = AVLayerVideoGravity.resize
     }
     
-    var playerController: VideoPlayerController?
+    private let videoController = VideoPlayerController.sharedVideoPlayer
     
     var videoURL: String? {
         didSet {
             if let videoURL = videoURL {
-                VideoPlayerController.sharedVideoPlayer.setupVideoFor(url: videoURL)
+                videoController.setupVideoFor(url: videoURL)
             }
             videoLayer.isHidden = videoURL == nil
         }
@@ -71,7 +91,7 @@ class ReelsCell: UITableViewCell, Identifiable {
     override func layoutSubviews() {
         super.layoutSubviews()
         configureGradient()
-        VideoPlayerController.sharedVideoPlayer.playVideo(withLayer: videoLayer, url: videoURL ?? "")
+        videoController.playVideo(withLayer: videoLayer, url: videoURL ?? "")
     }
     
     func configureGradient() {
@@ -90,7 +110,7 @@ class ReelsCell: UITableViewCell, Identifiable {
     
     // MARK: - Layout
     private func layout() {
-        contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel])
+        contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel, heartImageView, heartNumberLabel, commentImageView, commentNumberLabel, shareImageView])
 
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(contentView.snp.bottom).offset(-150)
@@ -107,6 +127,8 @@ class ReelsCell: UITableViewCell, Identifiable {
         thumbnailImageView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
+        thumbnailImageView.layer.addSublayer(videoLayer)
 
         bottomGradientImageView.snp.makeConstraints {
             $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-120)
@@ -115,7 +137,12 @@ class ReelsCell: UITableViewCell, Identifiable {
             $0.bottom.equalTo(thumbnailImageView.snp.bottom)
         }
         
-        thumbnailImageView.layer.addSublayer(videoLayer)
+        heartImageView.snp.makeConstraints {
+            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-200)
+            $0.leading.equalTo(thumbnailImageView.snp.trailing).offset(-120)
+            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-80)
+            $0.bottom.equalTo(thumbnailImageView.snp.bottom).offset(-160)
+        }
     }
 }
 

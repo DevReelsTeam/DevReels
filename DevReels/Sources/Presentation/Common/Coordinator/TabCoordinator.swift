@@ -89,6 +89,18 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
             .disposed(by: disposeBag)
     }
     
+    private func showReels(_ root: UINavigationController) {
+        let child = ReelsCoordinator(root)
+        coordinate(to: child)
+            .subscribe(onNext: { [weak self] in
+                switch $0 {
+                case .finish:
+                    self?.finish.onNext(.finish)
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
 //    private func showStudyList(_ root: UINavigationController) {
 //        let child = StudyListCoordinator(root)
 //        coordinate(to: child)
