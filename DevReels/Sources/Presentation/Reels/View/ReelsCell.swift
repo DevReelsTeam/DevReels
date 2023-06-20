@@ -17,30 +17,37 @@ class ReelsCell: UITableViewCell, Identifiable {
     
     private lazy var titleLabel = UILabel().then {
         $0.text = "릴스 제목"
+        $0.textColor = .white
     }
     
     private lazy var descriptionLabel = UILabel().then {
         $0.text = "설명"
+        $0.textColor = .white
     }
     
     private lazy var heartImageView = UIImageView().then {
         $0.image = UIImage(systemName: "heart")
+        $0.tintColor = .white
     }
     
     private lazy var heartNumberLabel = UILabel().then {
         $0.text = "5.0k"
+        $0.textColor = .white
     }
     
     private lazy var commentImageView = UIImageView().then {
         $0.image = UIImage(systemName: "bubble.left")
+        $0.tintColor = .white
     }
     
     private lazy var commentNumberLabel = UILabel().then {
         $0.text = "25"
+        $0.textColor = .white
     }
     
     private lazy var shareImageView = UIImageView().then {
         $0.image = UIImage(systemName: "arrow.turn.up.right")
+        $0.tintColor = .white
     }
     
     private lazy var thumbnailImageView = UIImageView().then {
@@ -139,24 +146,16 @@ class ReelsCell: UITableViewCell, Identifiable {
         
         heartImageView.snp.makeConstraints {
             $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-200)
-            $0.leading.equalTo(thumbnailImageView.snp.trailing).offset(-120)
-            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-80)
+            $0.leading.equalTo(thumbnailImageView.snp.trailing).offset(-60)
+            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-20)
             $0.bottom.equalTo(thumbnailImageView.snp.bottom).offset(-160)
         }
-    }
-}
-
-extension ReelsCell: PlayVideoLayerContainer {
-    
-    func visibleVideoHeight() -> CGFloat {
-        let videoFrameInParentSuperView: CGRect? = self.superview?.superview?.convert(
-            thumbnailImageView.frame,
-            from: thumbnailImageView)
-        guard let videoFrame = videoFrameInParentSuperView,
-              let superViewFrame = superview?.frame else {
-                  return 0
-              }
-        let visibleVideoFrame = videoFrame.intersection(superViewFrame)
-        return visibleVideoFrame.size.height
+        
+        heartNumberLabel.snp.makeConstraints {
+            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-160)
+            $0.leading.equalTo(thumbnailImageView.snp.trailing).offset(-60)
+            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-20)
+            $0.bottom.equalTo(thumbnailImageView.snp.bottom).offset(-120)
+        }
     }
 }

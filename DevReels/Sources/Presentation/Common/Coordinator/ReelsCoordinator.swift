@@ -28,7 +28,6 @@ final class ReelsCoordinator: BaseCoordinator<ReelsCoordinatorResult> {
             })
     }
     
-    // 릴스로 이동하는건 아니겠지만 일단 릴스로 네이밍해둠
     func showReels() {
         guard let viewModel = DIContainer.shared.container.resolve(ReelsViewModel.self) else { return }
         
@@ -39,5 +38,8 @@ final class ReelsCoordinator: BaseCoordinator<ReelsCoordinatorResult> {
                     self?.finish.onNext(.finish)
                 }
             })
+            .disposed(by: disposeBag)
+        let viewController = ReelsViewController(viewModel: viewModel)
+        push(viewController, animated: true, isRoot: true)
     }
 }

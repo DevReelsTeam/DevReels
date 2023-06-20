@@ -55,7 +55,7 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
             rootViewControllers.append(navigationController)
             
             switch $0 {
-//            case .study: showReels(navigationController)
+            case .reels: showReels(navigationController)
             case .upload: showUpload(navigationController)
 //            case .profile: showProfile(navigationController)
             default: break
