@@ -12,7 +12,6 @@ import SnapKit
 import DRVideoController
 
 class ReelsCell: UITableViewCell, Identifiable {
-    
     // MARK: - Properties
     
     private lazy var titleLabel = UILabel().then {
@@ -32,6 +31,7 @@ class ReelsCell: UITableViewCell, Identifiable {
     
     private lazy var heartNumberLabel = UILabel().then {
         $0.text = "5.0k"
+        $0.textAlignment = .center
         $0.textColor = .white
     }
     
@@ -42,6 +42,7 @@ class ReelsCell: UITableViewCell, Identifiable {
     
     private lazy var commentNumberLabel = UILabel().then {
         $0.text = "25"
+        $0.textAlignment = .center
         $0.textColor = .white
     }
     
@@ -143,19 +144,33 @@ class ReelsCell: UITableViewCell, Identifiable {
             $0.trailing.equalTo(thumbnailImageView.snp.trailing)
             $0.bottom.equalTo(thumbnailImageView.snp.bottom)
         }
-        
+                
         heartImageView.snp.makeConstraints {
-            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-200)
+            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-400)
             $0.leading.equalTo(thumbnailImageView.snp.trailing).offset(-60)
             $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-20)
-            $0.bottom.equalTo(thumbnailImageView.snp.bottom).offset(-160)
+            $0.bottom.equalTo(thumbnailImageView.snp.bottom).offset(-360)
         }
         
         heartNumberLabel.snp.makeConstraints {
-            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-160)
-            $0.leading.equalTo(thumbnailImageView.snp.trailing).offset(-60)
-            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-20)
-            $0.bottom.equalTo(thumbnailImageView.snp.bottom).offset(-120)
+            $0.top.equalTo(heartImageView.snp.bottom).offset(0)
+            $0.leading.equalTo(heartImageView.snp.leading)
+            $0.trailing.equalTo(heartImageView.snp.trailing)
+            $0.bottom.equalTo(heartImageView.snp.bottom).offset(40)
+        }
+        
+        commentImageView.snp.makeConstraints {
+            $0.top.equalTo(heartNumberLabel.snp.bottom).offset(40)
+            $0.leading.equalTo(heartImageView.snp.leading)
+            $0.trailing.equalTo(heartImageView.snp.trailing)
+            $0.bottom.equalTo(heartNumberLabel.snp.bottom).offset(80)
+        }
+        
+        commentNumberLabel.snp.makeConstraints {
+            $0.top.equalTo(commentImageView.snp.bottom).offset(0)
+            $0.leading.equalTo(heartImageView.snp.leading)
+            $0.trailing.equalTo(heartImageView.snp.trailing)
+            $0.bottom.equalTo(commentImageView.snp.bottom).offset(40)
         }
     }
 }
