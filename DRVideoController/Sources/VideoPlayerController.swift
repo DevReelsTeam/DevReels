@@ -107,6 +107,19 @@ public final class VideoPlayerController: NSObject, NSCacheDelegate {
             if self.videoURL == url, let layer = self.currentLayer {
                 self.playVideo(withLayer: layer, url: url)
             }
+            let playerItemDidFinishPlayingObservable = NotificationCenter.default.rx.notification(.AVPlayerItemDidPlayToEndTime, object: videoContainer.player.currentItem)
+            playerItemDidFinishPlayingObservable
+                .subscribe(onNext: { [weak self] _ in
+                    guard let strongSelf = self,
+                          let currentItem = strongSelf.currentVideoContainer()?.player.currentItem,
+                          currentItem == videoContainer.player.currentItem,
+                          strongSelf.currentVideoContainer()?.playOn == true else {
+                        return
+                    }
+                    
+                    strongSelf.currentVideoContainer()?.playOn = true
+                })
+                .disposed(by: self.disposeBag)
         }
     }
     
