@@ -13,8 +13,6 @@ import RxSwift
 import RxCocoa
 
 import Firebase
-import FirebaseAuth
-import FirebaseFirestore
 
 import AuthenticationServices
 import CryptoKit

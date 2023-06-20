@@ -17,48 +17,48 @@ struct FBAuthService: AuthServiceProtocol{
         self.provider = Provider.default
     }
     
-    //    func login(_ request: AppleAuthorizationRequestDTO) -> Observable<AuthorizationResponseDTO> {
-    //        return provider.request(AuthTarget.login(request))
-    //    }
+    func login(_ request: OAuthAuthorizationRequestDTO) -> Observable<AuthorizationResponseDTO> {
+        return provider.request(AuthTarget.login(request))
+    }
 }
-//
-//enum AuthTarget{
-//    case login(AppleAuthorizationRequestDTO)
-//}
 
-//extension AuthTarget: TargetType {
-//    var baseURL: String {
-//        return Network.authBaseURLString
-//    }
-//
-//    var method: HTTPMethod {
-//        switch self {
-//        case .login:
-//            return .post
-//        }
-//    }
-//
-//    var header: HTTPHeaders {
-//        return ["Content-Type": "application/json"]
-//    }
-//
-//    var path: String {
-//        switch self {
-//        case .login:
-//            return "/accounts:signInWithIdp?key=\(Network.webAPIKey)"
-//        }
-//    }
-//
-//    var parameters: RequestParams? {
-//        switch self {
-//        case let .login(request):
-//            return .body(request)
-//        }
-//    }
-//
-//    var encoding: ParameterEncoding {
-//        return JSONEncoding.default
-//    }
-//
-//
-//}
+enum AuthTarget{
+    case login(OAuthAuthorizationRequestDTO)
+}
+
+extension AuthTarget: TargetType {
+    var baseURL: String {
+        return Network.authBaseURLString
+    }
+
+    var method: HTTPMethod {
+        switch self {
+        case .login:
+            return .post
+        }
+    }
+
+    var header: HTTPHeaders {
+        return ["Content-Type": "application/json"]
+    }
+
+    var path: String {
+        switch self {
+        case .login:
+            return "/accounts:signInWithIdp?key=\(Network.webAPIKey)"
+        }
+    }
+
+    var parameters: RequestParams? {
+        switch self {
+        case let .login(request):
+            return .body(request)
+        }
+    }
+
+    var encoding: ParameterEncoding {
+        return JSONEncoding.default
+    }
+
+
+}

@@ -31,6 +31,20 @@ final class LoginViewModel: ViewModel{
     
     func transform(input: Input) -> Output {
         
+        // MARK: - TEST
+//        input.appleCredential
+//            .subscribe(onNext: {
+//                LoginUseCase(authRepository: AuthRepository(authService: FBAuthService()))
+//                    .singIn(with: $0)
+//                    .subscribe{
+//                        print("\n\n\n\n\n\n\n\n")
+//                        print($0)
+//                        print("\n\n\n\n\n\n\n\n")
+//                    }
+//            })
+//            .disposed(by: disposeBag)
+        
+        // MARK: - Bind
         input.appleCredential
             .withUnretained(self)
             .flatMap { viewModel, credential in

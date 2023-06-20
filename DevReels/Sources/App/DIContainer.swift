@@ -30,7 +30,7 @@ final class DIContainer {
     private func registerRepositories() {
         container.register(AuthRepositoryProtocol.self) { resolver in
             var repository = AuthRepository()
-//            repository.authService = resolver.resolve(AuthServiceProtocol.self)
+            repository.authService = resolver.resolve(AuthServiceProtocol.self)
             return repository
         }
         container.register(ReelsRepositoryProtocol.self) { resolver in

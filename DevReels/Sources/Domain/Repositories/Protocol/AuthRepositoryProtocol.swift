@@ -12,6 +12,6 @@ import RxSwift
 import FirebaseAuth
 
 protocol AuthRepositoryProtocol {
-    func signIn(with credential: OAuthCredential) -> Observable<String>
+    func signIn(with credential: OAuthCredential) -> Observable<Authorization>
 }
 

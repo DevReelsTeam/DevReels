@@ -26,7 +26,7 @@ struct LoginUseCase: LoginUseCaseProtocol {
     func singIn(with credential: OAuthCredential) -> Observable<AuthResult>{
         return authRepository?.signIn(with: credential)
             .map{
-                if $0 != ""{
+                if $0 != nil {
                     return AuthResult.success
                 } else {
                     return AuthResult.failure

@@ -10,5 +10,5 @@ import Foundation
 import RxSwift
 
 protocol AuthServiceProtocol {
-//    func login(_ request: AppleAuthorizationRequestDTO) -> Observable<AuthorizationResponseDTO>
+    func login(_ request: OAuthAuthorizationRequestDTO) -> Observable<AuthorizationResponseDTO>
 }

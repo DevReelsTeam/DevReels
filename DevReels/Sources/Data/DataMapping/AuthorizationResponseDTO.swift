@@ -8,7 +8,6 @@
 
 import Foundation
 
-// ex
 struct AuthorizationResponseDTO: Decodable {
     private let idToken: String
     private let email: String
