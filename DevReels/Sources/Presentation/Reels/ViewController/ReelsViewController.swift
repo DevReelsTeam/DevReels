@@ -32,7 +32,7 @@ final class ReelsViewController: UIViewController {
     }
         
     private let viewModel: ReelsViewModel
-    private let videoPlayer = VideoPlayerController.sharedVideoPlayer
+    private let videoController = VideoPlayerController.sharedVideoPlayer
     private let disposeBag = DisposeBag()
     
     // MARK: - Inits
@@ -75,7 +75,7 @@ final class ReelsViewController: UIViewController {
                 
                 if let videoCell = cell as? PlayVideoLayerContainer {
                     if videoCell.videoURL != nil {
-                        videoPlayer.removeLayerFor(cell: videoCell)
+                        videoController.removeLayerFor(cell: videoCell)
                     }
                 }
             })
@@ -85,7 +85,7 @@ final class ReelsViewController: UIViewController {
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 
-                videoPlayer.pausePlayeVideosFor(tableView: tableView)
+                videoController.pausePlayeVideosFor(tableView: tableView)
             })
             .disposed(by: disposeBag)
         
@@ -93,7 +93,7 @@ final class ReelsViewController: UIViewController {
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 
-                videoPlayer.pausePlayeVideosFor(tableView: tableView)
+                videoController.pausePlayeVideosFor(tableView: tableView)
             })
             .disposed(by: disposeBag)
     }

@@ -12,15 +12,43 @@ import SnapKit
 import DRVideoController
 
 class ReelsCell: UITableViewCell, Identifiable {
-    
     // MARK: - Properties
     
     private lazy var titleLabel = UILabel().then {
-        $0.text = "릴스제목"
+        $0.text = "릴스 제목"
+        $0.textColor = .white
     }
     
     private lazy var descriptionLabel = UILabel().then {
         $0.text = "설명"
+        $0.textColor = .white
+    }
+    
+    private lazy var heartImageView = UIImageView().then {
+        $0.image = UIImage(systemName: "heart")
+        $0.tintColor = .white
+    }
+    
+    private lazy var heartNumberLabel = UILabel().then {
+        $0.text = "5.0k"
+        $0.textAlignment = .center
+        $0.textColor = .white
+    }
+    
+    private lazy var commentImageView = UIImageView().then {
+        $0.image = UIImage(systemName: "bubble.left")
+        $0.tintColor = .white
+    }
+    
+    private lazy var commentNumberLabel = UILabel().then {
+        $0.text = "25"
+        $0.textAlignment = .center
+        $0.textColor = .white
+    }
+    
+    private lazy var shareImageView = UIImageView().then {
+        $0.image = UIImage(systemName: "arrow.turn.up.right")
+        $0.tintColor = .white
     }
     
     private lazy var thumbnailImageView = UIImageView().then {
@@ -32,18 +60,18 @@ class ReelsCell: UITableViewCell, Identifiable {
         $0.contentMode = .scaleToFill
     }
     
-    internal lazy var videoLayer = AVPlayerLayer().then {
+    lazy var videoLayer = AVPlayerLayer().then {
         $0.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
         $0.backgroundColor = UIColor.clear.cgColor
         $0.videoGravity = AVLayerVideoGravity.resize
     }
     
-    var playerController: VideoPlayerController?
+    private let videoController = VideoPlayerController.sharedVideoPlayer
     
     var videoURL: String? {
         didSet {
             if let videoURL = videoURL {
-                VideoPlayerController.sharedVideoPlayer.setupVideoFor(url: videoURL)
+                videoController.setupVideoFor(url: videoURL)
             }
             videoLayer.isHidden = videoURL == nil
         }
@@ -71,7 +99,7 @@ class ReelsCell: UITableViewCell, Identifiable {
     override func layoutSubviews() {
         super.layoutSubviews()
         configureGradient()
-        VideoPlayerController.sharedVideoPlayer.playVideo(withLayer: videoLayer, url: videoURL ?? "")
+        videoController.playVideo(withLayer: videoLayer, url: videoURL ?? "")
     }
     
     func configureGradient() {
@@ -90,7 +118,7 @@ class ReelsCell: UITableViewCell, Identifiable {
     
     // MARK: - Layout
     private func layout() {
-        contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel])
+        contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel, heartImageView, heartNumberLabel, commentImageView, commentNumberLabel, shareImageView])
 
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(contentView.snp.bottom).offset(-150)
@@ -107,6 +135,8 @@ class ReelsCell: UITableViewCell, Identifiable {
         thumbnailImageView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
+        
+        thumbnailImageView.layer.addSublayer(videoLayer)
 
         bottomGradientImageView.snp.makeConstraints {
             $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-120)
@@ -114,22 +144,33 @@ class ReelsCell: UITableViewCell, Identifiable {
             $0.trailing.equalTo(thumbnailImageView.snp.trailing)
             $0.bottom.equalTo(thumbnailImageView.snp.bottom)
         }
+                
+        heartImageView.snp.makeConstraints {
+            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-400)
+            $0.leading.equalTo(thumbnailImageView.snp.trailing).offset(-60)
+            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-20)
+            $0.bottom.equalTo(thumbnailImageView.snp.bottom).offset(-360)
+        }
         
-        thumbnailImageView.layer.addSublayer(videoLayer)
-    }
-}
-
-extension ReelsCell: PlayVideoLayerContainer {
-    
-    func visibleVideoHeight() -> CGFloat {
-        let videoFrameInParentSuperView: CGRect? = self.superview?.superview?.convert(
-            thumbnailImageView.frame,
-            from: thumbnailImageView)
-        guard let videoFrame = videoFrameInParentSuperView,
-              let superViewFrame = superview?.frame else {
-                  return 0
-              }
-        let visibleVideoFrame = videoFrame.intersection(superViewFrame)
-        return visibleVideoFrame.size.height
+        heartNumberLabel.snp.makeConstraints {
+            $0.top.equalTo(heartImageView.snp.bottom).offset(0)
+            $0.leading.equalTo(heartImageView.snp.leading)
+            $0.trailing.equalTo(heartImageView.snp.trailing)
+            $0.bottom.equalTo(heartImageView.snp.bottom).offset(40)
+        }
+        
+        commentImageView.snp.makeConstraints {
+            $0.top.equalTo(heartNumberLabel.snp.bottom).offset(40)
+            $0.leading.equalTo(heartImageView.snp.leading)
+            $0.trailing.equalTo(heartImageView.snp.trailing)
+            $0.bottom.equalTo(heartNumberLabel.snp.bottom).offset(80)
+        }
+        
+        commentNumberLabel.snp.makeConstraints {
+            $0.top.equalTo(commentImageView.snp.bottom).offset(0)
+            $0.leading.equalTo(heartImageView.snp.leading)
+            $0.trailing.equalTo(heartImageView.snp.trailing)
+            $0.bottom.equalTo(commentImageView.snp.bottom).offset(40)
+        }
     }
 }

@@ -10,6 +10,10 @@ import Foundation
 import RxSwift
 import RxCocoa
 
+enum ReelsNavigation {
+    case finish
+}
+
 final class ReelsViewModel: ViewModel {
     
     struct Input {
@@ -22,6 +26,7 @@ final class ReelsViewModel: ViewModel {
     
     var disposeBag = DisposeBag()
     var reelsUseCase: ReelsUseCaseProtocol?
+    let navigation = PublishSubject<ReelsNavigation>()
     private let reelsList = BehaviorSubject<[Reels]>(value: [])
     static let reload = PublishSubject<Void>()
     
