@@ -48,8 +48,7 @@ final class LoginViewModel: ViewModel{
         input.appleCredential
             .withUnretained(self)
             .flatMap { viewModel, credential in
-                viewModel.loginUseCase?.singIn(with: credential) ?? .empty()
-            }
+                viewModel.loginUseCase?.singIn(with: credential).asResult() ?? .empty() }
             .withUnretained(self)
             .subscribe { viewModel, result in
                 switch result {
@@ -57,7 +56,7 @@ final class LoginViewModel: ViewModel{
                     print(result)
                     viewModel.navigation.onNext(.finish)
                 case .failure:
-                    break
+                    // MARK: - 로그인 실패 알럿 띄워야함.
                 }
             }
             .disposed(by: disposeBag)

@@ -20,13 +20,11 @@ struct AuthRepository: AuthRepositoryProtocol {
     var authService: AuthServiceProtocol?
     private let disposeBag = DisposeBag()
     
-    func signIn(with credential: OAuthCredential) -> Observable<Authorization>{
+    func signIn(with credential: OAuthCredential) -> Observable<Authorization> {
         let reqeust = OAuthAuthorizationRequestDTO(idToken: credential.idToken ?? "")
         
         return authService?.login(reqeust)
-            .map{ $0.toDomain() } ?? .empty()
-        
-//        return Observable.just(Authorization(idToken: "d", email: "d", refreshToken: "d", localId: "d"))
+            .map { $0.toDomain() } ?? .empty()
     }
     
     // SDK 사용

@@ -9,5 +9,5 @@ import RxSwift
 import FirebaseAuth
 
 protocol LoginUseCaseProtocol {
-    func singIn(with credential: OAuthCredential) -> Observable<AuthResult>
+    func singIn(with credential: OAuthCredential) -> Observable<Void>
 }
