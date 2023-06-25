@@ -46,7 +46,7 @@ final class VideoTrimmerViewController: ViewController {
     var playbackTimeCheckerTimer: Timer?
     var trimmerPositionChangedTimer: Timer?
 
-    private var videoPicker: PHPickerViewController?
+    private var videoPicker: UIImagePickerController?
     private var videoSourceURL: URL?
     private var videoDestinationURL: URL?
     
@@ -123,7 +123,6 @@ final class VideoTrimmerViewController: ViewController {
     private func addVideoPlayer(with asset: AVAsset, playerView: UIView) {
         let playerItem = AVPlayerItem(asset: asset)
         player = AVPlayer(playerItem: playerItem)
-
         let layer = AVPlayerLayer(player: player)
         layer.backgroundColor = UIColor.white.cgColor
         layer.frame = CGRect(x: 0, y: 0, width: playerView.frame.width, height: playerView.frame.height)
@@ -222,39 +221,33 @@ extension VideoTrimmerViewController: TrimmerViewDelegate {
     }
 }
 
-
 // MARK: Picker
 
-extension VideoTrimmerViewController {
+extension VideoTrimmerViewController: UIImagePickerControllerDelegate & UINavigationControllerDelegate {
     private func configurePicker() {
-        var configuration = PHPickerConfiguration()
-        configuration.filter = .videos
-        configuration.selectionLimit = 1
-        videoPicker = PHPickerViewController(configuration: configuration)
+        videoPicker = UIImagePickerController()
         videoPicker?.delegate = self
+        videoPicker?.sourceType = .savedPhotosAlbum
+        videoPicker?.mediaTypes = ["public.movie"]
+        videoPicker?.allowsEditing = false
     }
 
     private func presentPicker() {
         guard let videoPicker else { return }
         present(videoPicker, animated: true)
     }
-}
 
-// MARK: Picker Delegate
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+       self.dismiss(animated: true)
+     }
 
-extension VideoTrimmerViewController: PHPickerViewControllerDelegate {
-    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        picker.dismiss(animated: true)
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        self.dismiss(animated: true)
 
-        guard let provider = results.first?.itemProvider else { return }
-        if provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) {
-            provider.loadItem(forTypeIdentifier: UTType.movie.identifier, options: [:]) { [weak self] videoURL, _ in
-                if let url = videoURL as? URL {
-                    self?.selectedVideoURLSubject.onNext(url)
-                    DispatchQueue.main.async {
-                        self?.loadAsset(AVAsset(url: url))
-                    }
-                }
+        if let url = info[UIImagePickerController.InfoKey.mediaURL] as? URL {
+            DispatchQueue.main.async { [weak self] in
+                self?.selectedVideoURLSubject.onNext(url)
+                self?.loadAsset(AVAsset(url: url))
             }
         }
     }
