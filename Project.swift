@@ -54,7 +54,7 @@ class BaseProjectFactory: ProjectFactory {
     ]
     
     let baseSettings: [String: SettingValue] = [
-        :
+        "OTHER_LDFLAGS": "-ObjC"
     ]
     
     let releaseSetting: [String: SettingValue] = [:]
