@@ -9,6 +9,7 @@
 import Foundation
 import RxSwift
 import RxCocoa
+import Firebase
 
 enum VideoDetailsNavigation {
     case finish
