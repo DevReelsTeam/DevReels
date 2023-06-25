@@ -10,5 +10,5 @@ import Foundation
 import RxSwift
 
 protocol UploadReelsUsecaseProtocol {
-    func upload(title: String, description: String, videoData: Data) -> Observable<Void>
+    func upload(reels: Reels, video: Data, thumbnailImage: Data) -> Observable<Void>
 }

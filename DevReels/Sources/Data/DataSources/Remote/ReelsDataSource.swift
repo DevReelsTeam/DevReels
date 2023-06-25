@@ -13,6 +13,20 @@ import Firebase
 
 struct ReelsDataSource: ReelsDataSourceProtocol {
     
+    enum FileType: String {
+        case video = "videos"
+        case image = "images"
+        
+        var contentTypeString: String {
+            switch self {
+            case .video:
+                return "video/mp4"
+            case .image:
+                return "image/jpeg"
+            }
+        }
+    }
+    
     private let provider: Provider
     
     init() {
@@ -23,24 +37,32 @@ struct ReelsDataSource: ReelsDataSourceProtocol {
         return provider.request(ReelsTarget.list)
     }
     
-    func uploadVideo(uid: String, videoData: Data) -> Observable<URL> {
+    func upload(request: ReelsRequestDTO) -> Observable<Void> {
+        return provider.request(ReelsTarget.upload(request))
+    }
+        
+    func uploadFile(type: FileType, uid: String, file: Data) -> Observable<URL> {
         return Observable.create { emitter in
-            let ref = Storage.storage().reference().child("Videos").child(uid)
-            if let uploadData = videoData as Data? {
-                ref.putData(videoData, metadata: nil) { _, error in
-                    if let error = error {
-                        emitter.onError(error)
+            
+            let fileName = UUID().uuidString + String(Date().timeIntervalSince1970)
+            let metaData = StorageMetadata()
+            metaData.contentType = type.contentTypeString
+            
+            let ref = Storage.storage().reference().child(uid).child(type.rawValue).child(fileName)
+            ref.putData(file, metadata: metaData) { _, error in
+                if let error = error {
+                    emitter.onError(error)
+                    return
+                }
+                ref.downloadURL { url, error in
+                    guard let url else {
+                        if let error = error {
+                            emitter.onError(error)
+                        }
                         return
                     }
-                    ref.downloadURL { url, error in
-                        guard let url else {
-                            if let error = error {
-                                emitter.onError(error)
-                            }
-                            return
-                        }
-                        emitter.onNext(url)
-                    }
+                    emitter.onNext(url)
+                    emitter.onCompleted()
                 }
             }
             return Disposables.create()
@@ -50,6 +72,7 @@ struct ReelsDataSource: ReelsDataSourceProtocol {
 
 enum ReelsTarget {
     case list
+    case upload(ReelsRequestDTO)
 }
 
 extension ReelsTarget: TargetType {
@@ -61,6 +84,8 @@ extension ReelsTarget: TargetType {
         switch self {
         case .list:
             return .get
+        case .upload:
+            return .post
         }
     }
     
@@ -70,6 +95,8 @@ extension ReelsTarget: TargetType {
     
     var path: String {
         switch self {
+        case .upload(let reels):
+            return "/\(reels.uid.value)/\(reels.id.value)"
         default:
             return ""
         }
@@ -79,6 +106,8 @@ extension ReelsTarget: TargetType {
         switch self {
         case .list:
             return nil
+        case .upload(let reels):
+            return .body(reels)
         }
     }
     

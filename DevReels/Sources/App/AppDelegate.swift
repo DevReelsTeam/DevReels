@@ -2,6 +2,7 @@ import UIKit
 import Firebase
 //import DevReelsKit
 //import DevReelsUI
+import FirebaseStorage
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -23,11 +24,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         
-        print("제발좀 열려주세요 앱님아")
-
         return true
     }
-
-    
-    
 }
