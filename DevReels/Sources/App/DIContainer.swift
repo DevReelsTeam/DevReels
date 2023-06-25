@@ -51,6 +51,11 @@ final class DIContainer {
             useCase.reelsRepository = resolver.resolve(ReelsRepositoryProtocol.self)
             return useCase
         }
+        container.register(UploadReelsUsecaseProtocol.self) { resolver in
+            var useCase = UploadReelsUseCase()
+            useCase.reelsRepository = resolver.resolve(ReelsRepositoryProtocol.self)
+            return useCase
+        }
     }
     
     private func registerViewModels() {
@@ -62,6 +67,12 @@ final class DIContainer {
         container.register(ReelsViewModel.self) { resolver in
             let viewModel = ReelsViewModel()
             viewModel.reelsUseCase = resolver.resolve(ReelsUseCaseProtocol.self)
+            return viewModel
+        }
+        container.register(VideoTrimmerViewModel.self) { _ in VideoTrimmerViewModel() }
+        container.register(VideoDetailsViewModel.self) { resolver in
+            let viewModel = VideoDetailsViewModel()
+            viewModel.uploadReelsUsecase = resolver.resolve(UploadReelsUsecaseProtocol.self)
             return viewModel
         }
     }

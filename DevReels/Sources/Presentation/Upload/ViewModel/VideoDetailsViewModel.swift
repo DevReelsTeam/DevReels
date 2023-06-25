@@ -6,7 +6,8 @@
 //  Copyright © 2023 DevReels. All rights reserved.
 //
 
-import Foundation
+import AVFoundation
+import UIKit
 import RxSwift
 import RxCocoa
 
@@ -16,7 +17,7 @@ enum VideoDetailsNavigation {
 }
 
 final class VideoDetailsViewModel: ViewModel {
-
+    
     struct Input {
         let backButtonTapped: Observable<Void>
         let title: Observable<String>
@@ -35,12 +36,8 @@ final class VideoDetailsViewModel: ViewModel {
     var disposeBag = DisposeBag()
     let navigation = PublishSubject<VideoDetailsNavigation>()
     
-    var seletedVideoURL: URL? {
-        didSet {
-            
-        }
-    }
-    
+    var selectedVideoURL: URL?
+        
     private var videoData: Data?
     
     func transform(input: Input) -> Output {
