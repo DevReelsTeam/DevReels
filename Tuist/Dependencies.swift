@@ -15,4 +15,3 @@ let dependencies = Dependencies(
     swiftPackageManager: spm,
     platforms: [.iOS]
 )
-

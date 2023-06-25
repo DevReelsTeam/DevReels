@@ -103,8 +103,10 @@ class VideoDetailsViewController: ViewController {
         let output = viewModel.transform(input: input)
         
         output.uploadButtonEnabled
-            .bind(to: uploadButton.rx.isEnabled)
+            .drive(uploadButton.rx.isEnabled)
             .disposed(by: disposeBag)
+        
+        thumbnailImageView.image = output.thumbnailImage
     }
     
     

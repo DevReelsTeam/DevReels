@@ -7,9 +7,11 @@
 //
 
 import RxSwift
+import Foundation
 
 struct ReelsRepository: ReelsRepositoryProtocol {
 
+    // keychainManager 추가
     var reelsDataSource: ReelsDataSourceProtocol?
     
     func list() -> Observable<[Reels]> {
@@ -18,40 +20,26 @@ struct ReelsRepository: ReelsRepositoryProtocol {
         return reels ?? .empty()
     }
     
-    func upload() -> Observable<Void> {
-        return Observable.empty()
+    func upload(reels: Reels, video: Data, thumbnailImage: Data) -> Observable<Void> {
+        
+        let uid = "tempUID"
+        
+        let videoURLObservable = reelsDataSource?.uploadFile(type: .video, uid: uid, file: video) ?? .empty()
+        let thumbnailURLObservable = reelsDataSource?.uploadFile(type: .image, uid: uid, file: thumbnailImage) ?? .empty()
+        
+        let reelsRequest = Observable.zip(videoURLObservable, thumbnailURLObservable)
+            .map { return ($0.0.absoluteString, $0.1.absoluteString) }
+            .map {
+                let reels = Reels(id: reels.id,
+                                  uid: uid,
+                                  videoURL: $0.0,
+                                  thumbnailURL: $0.1,
+                                  title: reels.title,
+                                  videoDescription: reels.videoDescription)
+                return ReelsRequestDTO(reels: reels)
+            }
+        
+        return reelsRequest
+            .flatMap { reelsDataSource?.upload(request: $0) ?? .empty() }
     }
-    
-//    func create(user: User, reels: Reels) -> Observable<Reels> {
-//        
-//    }
-    
-//    func create(user: User, reels: Reels) -> Observable<Reels> {
-//        return Observable<Study>.create { emitter in
-//
-//            let createStudyRequest = StudyRequestDTO(study: Study(study: study, userIDs: [user.id]))
-//            let createStudy = (studyDataSource?.create(study: createStudyRequest) ?? .empty())
-//
-//            let createChatRoomRequest = CreateChatRoomRequestDTO(id: study.id, studyID: study.id, userIDs: [user.id])
-//            let createChatRoom = (chatRoomDataSource?.create(request: createChatRoomRequest) ?? .empty())
-//                .flatMap {
-//                    pushNotificationService?.subscribeTopic(topic: $0.toDomain().id) ?? .empty()
-//                }
-//
-//            let updateUser = (remoteUserDataSource?.updateIDs(
-//                id: user.id,
-//                request: UpdateStudyIDsRequestDTO(
-//                    chatRoomIDs: user.chatRoomIDs + [study.id],
-//                    studyIDs: user.chatRoomIDs + [study.id]
-//                )
-//            ) ?? .empty())
-//
-//            Observable
-//                .zip(createStudy, createChatRoom, updateUser)
-//                .subscribe { data in emitter.onNext(data.0.toDomain()) }
-//                .disposed(by: self.disposeBag)
-//
-//            return Disposables.create()
-//        }
-//    }
 }

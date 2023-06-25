@@ -11,5 +11,6 @@ import RxSwift
 
 protocol ReelsDataSourceProtocol {
     func list() -> Observable<Documents<[ReelsResponseDTO]>>
-    func uploadVideo(uid: String, videoData: Data) -> Observable<URL>
+    func upload(request: ReelsRequestDTO) -> Observable<Void>
+    func uploadFile(type: ReelsDataSource.FileType, uid: String, file: Data) -> Observable<URL>
 }
