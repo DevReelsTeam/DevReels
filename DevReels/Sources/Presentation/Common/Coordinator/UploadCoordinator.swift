@@ -27,15 +27,13 @@ final class UploadCoordinator: BaseCoordinator<UploadCoordinatorResult> {
     // MARK: - 비디오 트리밍
     
     func showVideoTrimmer() {
-//        guard let viewModel = DIContainer.shared.container.resolve(ProfileViewModel.self) else { return }
-        
-        let viewModel = VideoTrimmerViewModel()
+        guard let viewModel = DIContainer.shared.container.resolve(VideoTrimmerViewModel.self) else { return }
         
         viewModel.navigation
             .subscribe(onNext: { [weak self] in
                 switch $0 {
-                case let .details(seletedVideoURL):
-                    self?.showVideoDetails(seletedVideoURL: seletedVideoURL)
+                case let .details(selectedVideoURL):
+                    self?.showVideoDetails(selectedVideoURL: selectedVideoURL)
                 case .finish:
                     self?.finish.onNext(.finish)
                 }
@@ -48,11 +46,11 @@ final class UploadCoordinator: BaseCoordinator<UploadCoordinatorResult> {
     
     // MARK: - 비디오 상세
     
-    func showVideoDetails(seletedVideoURL: URL) {
+    func showVideoDetails(selectedVideoURL: URL) {
         
-        let viewModel = VideoDetailsViewModel()
-        
-        viewModel.seletedVideoURL = seletedVideoURL
+        guard let viewModel = DIContainer.shared.container.resolve(VideoDetailsViewModel.self) else { return }
+
+        viewModel.selectedVideoURL = selectedVideoURL
         
         viewModel.navigation
             .subscribe(onNext: { [weak self] in

@@ -7,8 +7,9 @@
 //
 
 import RxSwift
+import Foundation
 
 protocol ReelsRepositoryProtocol {
     func list() -> Observable<[Reels]>
-    func upload() -> Observable<Void>
+    func upload(reels: Reels, video: Data, thumbnailImage: Data) -> Observable<Void>
 }

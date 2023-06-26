@@ -9,12 +9,11 @@
 import Foundation
 import RxSwift
 
-struct UploadReelsUseCase {
-        
+struct UploadReelsUseCase: UploadReelsUsecaseProtocol {
+    
     var reelsRepository: ReelsRepositoryProtocol?
-
-    func upload(title: String, description: String, videoData: Data) -> Observable<Void> {
-        print("업로드")
-        return Observable.empty()
+    
+    func upload(reels: Reels, video: Data, thumbnailImage: Data) -> Observable<Void> {
+        return reelsRepository?.upload(reels: reels, video: video, thumbnailImage: thumbnailImage) ?? .empty()
     }
 }
