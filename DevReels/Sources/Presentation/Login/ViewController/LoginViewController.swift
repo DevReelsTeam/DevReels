@@ -124,7 +124,6 @@ final class LoginViewController: ViewController {
         self.navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.devReelsColor.primaryP90]
         self.backButton.isHidden = true
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightButton)
-        
     }
     
     private func layoutLogo() {
