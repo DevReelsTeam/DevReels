@@ -114,7 +114,6 @@ final class LoginViewController: ViewController {
     }
     
     override func bind() {
-        
         let credential = appleLoginButton.rx.tap
             .flatMap {
                 ASAuthorizationAppleIDProvider().rx.login(scope: [.email])
@@ -131,10 +130,7 @@ final class LoginViewController: ViewController {
         
         let _ = viewModel.transform(input: input)
     }
-    
-    
-    
-    
+
     func startGitHubLogin() {
     }
     
