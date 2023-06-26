@@ -47,14 +47,16 @@ final class LoginViewController: ViewController {
     
     // MARK: - Properties
     
-    private let logoView = LogoView()
-    
-    private let guideTextLabel = UILabel().then {
-        $0.text = "간단한 회원가입 후 이용해주세요"
-        $0.textAlignment = .center
+    let rightButton = UIButton().then {
+        $0.setTitle("둘러보기", for: .normal)
+        $0.setTitleColor(UIColor.devReelsColor.natureDarkN500, for: .normal)
     }
     
+    let logoView = LogoView()
+    
     private let appleLoginButton = LoginButton().then {
+        $0.setTitleColor(.white, for: .normal)
+        $0.setBackgroundColor(UIColor.devReelsColor.primaryP90 ?? UIColor.orange, for: .normal)
         $0.setTitle("애플 로그인", for: .normal)
         $0.snp.makeConstraints {
             $0.height.equalTo(Layout.LoginButtonHeight)
@@ -63,13 +65,8 @@ final class LoginViewController: ViewController {
     
     private let githubLoginButton = LoginButton().then {
         $0.setTitle("깃허브 로그인", for: .normal)
-        $0.snp.makeConstraints {
-            $0.height.equalTo(Layout.LoginButtonHeight)
-        }
-    }
-    
-    private let testButton = UIButton(type: .system).then {
-        $0.setTitle("testButton", for: .normal)
+        $0.setTitleColor(.white, for: .normal)
+        $0.setBackgroundColor(UIColor.devReelsColor.primaryP90 ?? UIColor.orange, for: .normal)
         $0.snp.makeConstraints {
             $0.height.equalTo(Layout.LoginButtonHeight)
         }
@@ -90,23 +87,11 @@ final class LoginViewController: ViewController {
     // MARK: - Method
     
     override func layout() {
+        view.backgroundColor = UIColor.devReelsColor.natureDarkN10
+        attribute()
         layoutLogo()
-        layoutGuideLabel()
         layoutLoginButton()
-        testButton.addTarget(self, action: #selector(testButtonTap), for: .touchUpInside)
-    }
-    
-    @objc func testButtonTap() {
-        let clientID = "088431dfc535a571f124"
-        let redirectURI = "https://devreels.firebaseapp.com/__/auth/handler"
-        let scope = "user:email" // 요청할 권한 범위
-//
-        let urlString = "https://github.com/login/oauth/authorize?client_id=\(clientID)&scope=\(scope)&redirect_uri=\(redirectURI)"
-               if let url = URL(string: urlString), UIApplication.shared.canOpenURL(url) {
-                   UIApplication.shared.open(url)
-                   // redirect to scene(_:openURLContexts:) if user authorized
-               }
-        
+
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -134,21 +119,21 @@ final class LoginViewController: ViewController {
     func startGitHubLogin() {
     }
     
+    private func attribute() {
+        self.title = "{DevReels}"
+        self.navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.devReelsColor.primaryP90]
+        self.backButton.isHidden = true
+        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightButton)
+        
+    }
+    
     private func layoutLogo() {
         view.addSubview(logoView)
         
         logoView.snp.makeConstraints {
-            $0.left.right.equalTo(self.view.safeAreaLayoutGuide).inset(Constant.padding)
-            $0.top.equalTo(self.view.safeAreaLayoutGuide).offset(100)
-        }
-    }
-    
-    private func layoutGuideLabel() {
-        view.addSubview(guideTextLabel)
-        
-        guideTextLabel.snp.makeConstraints{
-            $0.top.equalTo(logoView.snp.bottom).offset(Constant.padding)
-            $0.left.right.equalTo(logoView)
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top).inset(67)
+            $0.leading.trailing.equalToSuperview().inset(89)
+            $0.height.equalTo(212)
         }
     }
     
@@ -158,15 +143,15 @@ final class LoginViewController: ViewController {
         view.addSubview(buttonStackView)
         
         buttonStackView.snp.makeConstraints{
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).inset(Constant.padding)
+            $0.top.equalTo(logoView.snp.bottom).offset(67)
             $0.left.right.equalToSuperview().inset(Constant.padding)
         }
     }
     
     private func createButtonStackView() -> UIStackView {
-        return UIStackView(arrangedSubviews: [appleLoginButton, githubLoginButton, testButton]).then {
+        return UIStackView(arrangedSubviews: [appleLoginButton, githubLoginButton]).then {
             $0.axis = .vertical
-            $0.spacing = 10
+            $0.spacing = 16
         }
     }
 }

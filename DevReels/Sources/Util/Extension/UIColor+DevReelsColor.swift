@@ -9,15 +9,16 @@
 import UIKit
 
 extension UIColor {
-    static let DevReelsColor = DevReelsColor()
+    static let devReelsColor = DevReelsColor()
 }
 
 struct DevReelsColor {
     // NatureDark
-    let NatureDarkN10 = UIColor(named: "Nature(Dark)N10")
-    let NatureDarkN200 = UIColor(named: "Nature(Dark)N200")
-    let NatureDarkN500 = UIColor(named: "Nature(Dark)N500")
-    
+    let natureDarkN10 = UIColor(named: "Nature(Dark)N10")
+    let natureDarkN30 = UIColor(named: "Nature(Dark)N30")
+    let natureDarkN200 = UIColor(named: "Nature(Dark)N200")
+    let natureDarkN500 = UIColor(named: "Nature(Dark)N500")
+
     // Primary
-    let PrimaryP90 = UIColor(named: "PrimaryP90")
+    let primaryP90 = UIColor(named: "PrimaryP90")
 }

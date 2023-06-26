@@ -32,7 +32,7 @@ final class AppCoordinator: BaseCoordinator<Void> {
     }
     
     private func showLogin() {
-        navigationController.setNavigationBarHidden(true, animated: true)
+        navigationController.setNavigationBarHidden(false, animated: true)
         let login = LoginCoordinator(navigationController)
         coordinate(to: login)
             .subscribe(onNext: { [weak self] in
