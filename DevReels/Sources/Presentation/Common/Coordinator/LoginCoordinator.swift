@@ -16,9 +16,7 @@ enum LoginCoordinatorResult {
     case finish
 }
 
-
-
-final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult>{
+final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
     
     let finish = PublishSubject<LoginCoordinatorResult>()
     
@@ -27,7 +25,7 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult>{
         return finish
     }
     
-    func showLogin(){
+    func showLogin() {
         guard let viewModel = DIContainer.shared.container.resolve(LoginViewModel.self) else { return }
         
         viewModel.navigation
@@ -41,7 +39,7 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult>{
         push(viewController, animated: true, isRoot: true)
     }
     
-    func showReels(){
+    func showReels() {
         let profile = ProfileCoordinator(navigationController)
         
         push(ProfileViewController(viewModel: ProfileViewModel()), animated: true)

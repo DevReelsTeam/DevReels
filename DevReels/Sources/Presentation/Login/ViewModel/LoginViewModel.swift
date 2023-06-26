@@ -15,14 +15,14 @@ enum LoginNavigation{
     case finish
 }
 
-final class LoginViewModel: ViewModel{
+final class LoginViewModel: ViewModel {
     
-    struct Input{
+    struct Input {
         let appleCredential: Observable<OAuthCredential>
         let githupLoginButtonTap: Observable<Void>
     }
     
-    struct Output{
+    struct Output {
     }
     
     let navigation = PublishSubject<LoginNavigation>()
@@ -30,19 +30,6 @@ final class LoginViewModel: ViewModel{
     var disposeBag = DisposeBag()
     
     func transform(input: Input) -> Output {
-        
-        // MARK: - TEST
-//        input.appleCredential
-//            .subscribe(onNext: {
-//                LoginUseCase(authRepository: AuthRepository(authService: FBAuthService()))
-//                    .singIn(with: $0)
-//                    .subscribe{
-//                        print("\n\n\n\n\n\n\n\n")
-//                        print($0)
-//                        print("\n\n\n\n\n\n\n\n")
-//                    }
-//            })
-//            .disposed(by: disposeBag)
         
         // MARK: - Bind
         input.appleCredential
@@ -57,6 +44,7 @@ final class LoginViewModel: ViewModel{
                     viewModel.navigation.onNext(.finish)
                 case .failure:
                     // MARK: - 로그인 실패 알럿 띄워야함.
+                    break
                 }
             }
             .disposed(by: disposeBag)

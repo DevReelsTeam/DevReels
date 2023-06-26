@@ -12,4 +12,5 @@ import RxSwift
 protocol TokenRepositoryProtocol {
     func save(_ auth: Authorization) -> Observable<Authorization>
     func load() -> Observable<Authorization>
+    func delete() -> Observable<Void>
 }

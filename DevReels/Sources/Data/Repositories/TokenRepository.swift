@@ -48,4 +48,16 @@ struct TokenRepository: TokenRepositoryProtocol {
             return Disposables.create()
         }
     }
+    
+    func delete() -> Observable<Void> {
+        return Observable.create { emitter in
+            if keychainManager?.delete(key: .authorization) ?? false {
+                emitter.onNext(())
+            } else {
+                emitter.onError(TokenError.deleteFail)
+            }
+            
+            return Disposables.create()
+        }
+    }
 }

@@ -33,15 +33,15 @@ struct Credential {
     let rawNonce: String
 }
 
-final class LoginViewController: ViewController{
+final class LoginViewController: ViewController {
     
     fileprivate var currentNonce: String?
     
-    enum Constant{
+    enum Constant {
         static let padding: CGFloat = 40
     }
     
-    struct Layout{
+    struct Layout {
         static let LoginButtonHeight: CGFloat = 50
     }
     
@@ -54,23 +54,23 @@ final class LoginViewController: ViewController{
         $0.textAlignment = .center
     }
     
-    private let appleLoginButton = LoginButton().then{
+    private let appleLoginButton = LoginButton().then {
         $0.setTitle("애플 로그인", for: .normal)
-        $0.snp.makeConstraints{
+        $0.snp.makeConstraints {
             $0.height.equalTo(Layout.LoginButtonHeight)
         }
     }
     
-    private let githubLoginButton = LoginButton().then{
+    private let githubLoginButton = LoginButton().then {
         $0.setTitle("깃허브 로그인", for: .normal)
-        $0.snp.makeConstraints{
+        $0.snp.makeConstraints {
             $0.height.equalTo(Layout.LoginButtonHeight)
         }
     }
     
-    private let testButton = UIButton(type: .system).then{
+    private let testButton = UIButton(type: .system).then {
         $0.setTitle("testButton", for: .normal)
-        $0.snp.makeConstraints{
+        $0.snp.makeConstraints {
             $0.height.equalTo(Layout.LoginButtonHeight)
         }
     }
@@ -96,7 +96,16 @@ final class LoginViewController: ViewController{
         testButton.addTarget(self, action: #selector(testButtonTap), for: .touchUpInside)
     }
     
-    @objc func testButtonTap(){
+    @objc func testButtonTap() {
+        let clientID = "088431dfc535a571f124"
+        let redirectURI = "https://devreels.firebaseapp.com/__/auth/handler"
+        let scope = "user:email" // 요청할 권한 범위
+//
+        let urlString = "https://github.com/login/oauth/authorize?client_id=\(clientID)&scope=\(scope)&redirect_uri=\(redirectURI)"
+               if let url = URL(string: urlString), UIApplication.shared.canOpenURL(url) {
+                   UIApplication.shared.open(url)
+                   // redirect to scene(_:openURLContexts:) if user authorized
+               }
         
     }
     
@@ -107,7 +116,7 @@ final class LoginViewController: ViewController{
     override func bind() {
         
         let credential = appleLoginButton.rx.tap
-            .flatMap{
+            .flatMap {
                 ASAuthorizationAppleIDProvider().rx.login(scope: [.email])
             }
             .withUnretained(self)
@@ -120,83 +129,25 @@ final class LoginViewController: ViewController{
             githupLoginButtonTap: githubLoginButton.rx.tap.asObservable()
         )
         
-        let output = viewModel.transform(input: input)
+        let _ = viewModel.transform(input: input)
     }
     
-    func startAppleLogin(){
-        
-        let request = createAppleIDRequest()
-        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
-
-        func createAppleIDRequest() -> ASAuthorizationAppleIDRequest {
-            let appleIDProvider = ASAuthorizationAppleIDProvider()
-            let request = appleIDProvider.createRequest()
-            // 애플로그인은 사용자에게서 2가지 정보를 요구함
-            request.requestedScopes = [.fullName, .email]
-            
-            let nonce = randomNonceString()
-            request.nonce = sha256(nonce)
-            currentNonce = nonce
-            
-            return request
-        }
-        
-        func sha256(_ input: String) -> String {
-            let inputData = Data(input.utf8)
-            let hashedData = SHA256.hash(data: inputData)
-            let hashString = hashedData.compactMap {
-                return String(format: "%02x", $0)
-            }.joined()
-            
-            return hashString
-        }
+    
+    
+    
+    func startGitHubLogin() {
     }
     
-    private func randomNonceString(length: Int = 32) -> String {
-        precondition(length > 0)
-        let charset: Array<Character> =
-        Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
-        var result = ""
-        var remainingLength = length
-        
-        while remainingLength > 0 {
-            let randoms: [UInt8] = (0 ..< 16).map { _ in
-                var random: UInt8 = 0
-                let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
-                if errorCode != errSecSuccess {
-                    fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
-                }
-                return random
-            }
-            
-            randoms.forEach { random in
-                if remainingLength == 0 {
-                    return
-                }
-                
-                if random < charset.count {
-                    result.append(charset[Int(random)])
-                    remainingLength -= 1
-                }
-            }
-        }
-        
-        return result
-    }
-    
-    func startGitHubLogin(){
-    }
-    
-    private func layoutLogo(){
+    private func layoutLogo() {
         view.addSubview(logoView)
         
-        logoView.snp.makeConstraints{
+        logoView.snp.makeConstraints {
             $0.left.right.equalTo(self.view.safeAreaLayoutGuide).inset(Constant.padding)
             $0.top.equalTo(self.view.safeAreaLayoutGuide).offset(100)
         }
     }
     
-    private func layoutGuideLabel(){
+    private func layoutGuideLabel() {
         view.addSubview(guideTextLabel)
         
         guideTextLabel.snp.makeConstraints{
@@ -205,7 +156,7 @@ final class LoginViewController: ViewController{
         }
     }
     
-    private func layoutLoginButton(){
+    private func layoutLoginButton() {
         let buttonStackView = createButtonStackView()
         
         view.addSubview(buttonStackView)
@@ -284,41 +235,4 @@ extension LoginViewController{
         
         return result
     }
-}
-
-extension LoginViewController: SFSafariViewControllerDelegate{
-    // Handle callback from GitHub login
-    func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
-        // User dismissed the login screen
-        // Handle any necessary actions or UI updates
-    }
-    
-    
-    func safariViewController(_ controller: SFSafariViewController, initialURL URL: URL?) {
-        guard let currentURL = URL?.absoluteString else {
-            return
-        }
-        
-        if currentURL.hasPrefix("YOUR_REDIRECT_URI") {
-            // Extract the authorization code from the callback URL
-            let code = extractCodeFromURL(url: currentURL)
-            
-            // TODO: Exchange the code for an access token or perform further actions
-            
-            // Dismiss the SafariViewController
-            controller.dismiss(animated: true, completion: nil)
-        }
-    }
-    
-    // Helper method to extract the authorization code from the URL
-    private func extractCodeFromURL(url: String) -> String? {
-        // Logic to extract the code from the URL
-        // Implement your own parsing or use URL query parameter parsing library
-        
-        // Return the extracted code
-        return nil
-    }
-    
-    // Other methods and code...
-    
 }

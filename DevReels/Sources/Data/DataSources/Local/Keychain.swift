@@ -14,7 +14,7 @@ struct Keychain: KeychainProtocol {
     // query: Keychain에 추가할 항목에 대한 쿼리 파라미터
     // return: 작업의 성공 여부
     func add(_ query: [String: Any]) -> OSStatus {
-        // Keychain에 항목을 추가하는 메섣,.. query 정보를 기반으로 keychain에 새로운 항목이 추가된다.
+        // Keychain에 항목을 추가하는 메서드.. query 정보를 기반으로 keychain에 새로운 항목이 추가된다.
         return SecItemAdd(query as CFDictionary, nil)
     }
     
@@ -22,7 +22,8 @@ struct Keychain: KeychainProtocol {
     // 리턴은 Data or nil
     func search(_ query: [String: Any]) -> Data? {
         var item: CFTypeRef? // keychain에서 검색된 항목을 담을 변수
-        let status = SecItemCopyMatching(query as CFDictionary, &item) // query를 기반으로 keychain에 서 검색, &item을 전달하여 검색 결과를 item에 저장, status에는 검색의 성공 여부와 관련된 상태코드가 담긴다.
+        // query를 기반으로 keychain에서 검색, &item을 전달하여 검색 결과를 item에 저장, status에는 검색의 성공 여부와 관련된 상태코드가 담긴다.
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
         return status == noErr ? (item as? Data) : nil // status가 성공이라면 item을 Data타입으로 캐스팅하여 리턴.
     }
     

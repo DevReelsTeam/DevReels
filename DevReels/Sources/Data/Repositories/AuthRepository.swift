@@ -26,25 +26,5 @@ struct AuthRepository: AuthRepositoryProtocol {
         return authService?.login(reqeust)
             .map { $0.toDomain() } ?? .empty()
     }
-    
-    // SDK 사용
-//    func signIn(with credential: OAuthCredential) -> Observable<String> {
-//        return Observable.create { emitter in
-//            Auth.auth().signIn(with: credential) { authResult, error in
-//                if let error = error {
-//                    emitter.onError(error)
-//                    return
-//                }
-//
-//                guard let uid = authResult?.user.uid else {
-//                    emitter.onError(AuthError.signInError)
-//                    return
-//                }
-//
-//                emitter.onNext(uid)
-//                emitter.onCompleted()
-//            }
-//            return Disposables.create()
-//        }
-//    }
+
 }

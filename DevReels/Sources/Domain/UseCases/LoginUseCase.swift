@@ -10,8 +10,6 @@ import Foundation
 import RxSwift
 import FirebaseAuth
 
-
-
 struct LoginUseCase: LoginUseCaseProtocol {
     
     // MARK: - Properties
