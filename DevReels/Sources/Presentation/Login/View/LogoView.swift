@@ -22,7 +22,7 @@ final class LogoView: UIView{
     }
     
     private func layout(){
-        backgroundColor = UIColor.devReelsColor.natureDarkN30
+        backgroundColor = UIColor.devReelsColor.neutral30
     }
     
 }

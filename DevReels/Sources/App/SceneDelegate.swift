@@ -21,10 +21,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         _ scene: UIScene,
         willConnectTo session: UISceneSession,
         options connectionOptions: UIScene.ConnectionOptions
-    ) {
+    ) {        
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
-        
 //        window?.rootViewController = ReelsViewController(viewModel: ReelsViewModel())
 //        window?.makeKeyAndVisible()
         appCoordinator = AppCoordinator(window)
