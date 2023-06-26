@@ -12,21 +12,9 @@ import Then
 
 final class LogoView: UIView{
     
-    private let titleLabel = UILabel().then {
-        $0.text = "DevReels"
-        $0.textAlignment = .center
-    }
-    
-    private let subtitleLabel = UILabel().then {
-        $0.text = "개발자의 릴스"
-        $0.textAlignment = .center
-    }
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         layout()
-        setupTitle()
-        
     }
     
     required init?(coder: NSCoder) {
@@ -34,19 +22,7 @@ final class LogoView: UIView{
     }
     
     private func layout(){
-        addSubViews([titleLabel, subtitleLabel])
-        
-        titleLabel.snp.makeConstraints{
-            $0.top.left.right.equalToSuperview()
-        }
-        subtitleLabel.snp.makeConstraints{
-            $0.bottom.left.right.equalToSuperview()
-            $0.top.equalTo(titleLabel.snp.bottom).offset(10)
-        }
+        backgroundColor = UIColor.devReelsColor.natureDarkN30
     }
     
-    private func setupTitle(){
-        let subtitlesize = subtitleLabel.font.pointSize
-        titleLabel.font = .systemFont(ofSize: subtitlesize + 30)
-    }
 }

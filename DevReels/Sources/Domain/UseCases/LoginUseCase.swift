@@ -10,27 +10,19 @@ import Foundation
 import RxSwift
 import FirebaseAuth
 
-enum AuthResult{
-    case success
-    case failure
-}
-
 struct LoginUseCase: LoginUseCaseProtocol {
     
     // MARK: - Properties
     
     var authRepository: AuthRepositoryProtocol?
-    
+    var tokenRepository: TokenRepositoryProtocol?
     // MARK: - Method
     
-    func singIn(with credential: OAuthCredential) -> Observable<AuthResult>{
-        return authRepository?.signIn(with: credential)
-            .map{
-                if $0 != nil {
-                    return AuthResult.success
-                } else {
-                    return AuthResult.failure
-                }
-            } ?? .empty()
+    func singIn(with credential: OAuthCredential) -> Observable<Void> {
+        return (authRepository?.signIn(with: credential) ?? .empty())
+            .map {
+                tokenRepository?.save($0)
+            }
+            .map { _ in () }
     }
 }
