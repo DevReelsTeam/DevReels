@@ -23,9 +23,9 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
 
         var title: String {
             switch self {
-            case .reels: return "릴스"
-            case .upload: return "업로드"
-            case .profile: return "프로필"
+            case .reels: return ""
+            case .upload: return ""
+            case .profile: return ""
             }
         }
 

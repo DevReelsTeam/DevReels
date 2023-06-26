@@ -49,14 +49,14 @@ final class LoginViewController: ViewController {
     
     let rightButton = UIButton().then {
         $0.setTitle("둘러보기", for: .normal)
-        $0.setTitleColor(UIColor.devReelsColor.natureDarkN500, for: .normal)
+        $0.setTitleColor(UIColor.devReelsColor.neutral500, for: .normal)
     }
     
     let logoView = LogoView()
     
     private let appleLoginButton = LoginButton().then {
         $0.setTitleColor(.white, for: .normal)
-        $0.setBackgroundColor(UIColor.devReelsColor.primaryP90 ?? UIColor.orange, for: .normal)
+        $0.setBackgroundColor(UIColor.devReelsColor.primary90 ?? UIColor.orange, for: .normal)
         $0.setTitle("애플 로그인", for: .normal)
         $0.snp.makeConstraints {
             $0.height.equalTo(Layout.LoginButtonHeight)
@@ -66,7 +66,7 @@ final class LoginViewController: ViewController {
     private let githubLoginButton = LoginButton().then {
         $0.setTitle("깃허브 로그인", for: .normal)
         $0.setTitleColor(.white, for: .normal)
-        $0.setBackgroundColor(UIColor.devReelsColor.primaryP90 ?? UIColor.orange, for: .normal)
+        $0.setBackgroundColor(UIColor.devReelsColor.primary90 ?? UIColor.orange, for: .normal)
         $0.snp.makeConstraints {
             $0.height.equalTo(Layout.LoginButtonHeight)
         }
@@ -87,7 +87,7 @@ final class LoginViewController: ViewController {
     // MARK: - Method
     
     override func layout() {
-        view.backgroundColor = UIColor.devReelsColor.natureDarkN10
+        view.backgroundColor = UIColor.devReelsColor.neutral30
         attribute()
         layoutLogo()
         layoutLoginButton()
@@ -121,7 +121,7 @@ final class LoginViewController: ViewController {
     
     private func attribute() {
         self.title = "{DevReels}"
-        self.navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.devReelsColor.primaryP90]
+        self.navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.devReelsColor.primary90]
         self.backButton.isHidden = true
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightButton)
     }

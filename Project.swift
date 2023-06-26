@@ -50,7 +50,8 @@ class BaseProjectFactory: ProjectFactory {
         ],
         "NSAppTransportSecurity": [
             "NSAllowsArbitraryLoads": true
-        ]
+        ],
+        "UIUserInterfaceStyle": "Dark"
     ]
     
     let baseSettings: [String: SettingValue] = [

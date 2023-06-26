@@ -13,12 +13,22 @@ extension UIColor {
 }
 
 struct DevReelsColor {
-    // NatureDark
-    let natureDarkN10 = UIColor(named: "Nature(Dark)N10")
-    let natureDarkN30 = UIColor(named: "Nature(Dark)N30")
-    let natureDarkN200 = UIColor(named: "Nature(Dark)N200")
-    let natureDarkN500 = UIColor(named: "Nature(Dark)N500")
+    // NeutralDark
+    let backgroundDefault = UIColor(named: "BackgroundDefault")
+    let neutral100 = UIColor(named: "Neutral100")
+    let neutral1000 = UIColor(named: "Neutral1000")
+    let neutral20 = UIColor(named: "Neutral20")
+    let neutral200 = UIColor(named: "Neutral200")
+    let neutral30 = UIColor(named: "Neutral30")
+    let neutral300 = UIColor(named: "Neutral300")
+    let neutral40 = UIColor(named: "Neutral40")
+    let neutral400 = UIColor(named: "Neutral400")
+    let neutral50 = UIColor(named: "Neutral50")
+    let neutral500 = UIColor(named: "Neutral500")
+    let neutral60 = UIColor(named: "Neutral60")
 
     // Primary
-    let primaryP90 = UIColor(named: "PrimaryP90")
+    let primary70 = UIColor(named: "Primary70")
+    let primary80 = UIColor(named: "Primary80")
+    let primary90 = UIColor(named: "Primary90")
 }
