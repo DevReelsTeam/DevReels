@@ -88,5 +88,6 @@ final class DIContainer {
             viewModel.uploadReelsUsecase = resolver.resolve(UploadReelsUsecaseProtocol.self)
             return viewModel
         }
+        container.register(ProfileViewModel.self) { _ in ProfileViewModel() }
     }
 }

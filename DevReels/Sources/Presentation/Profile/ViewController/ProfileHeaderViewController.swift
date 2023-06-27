@@ -93,6 +93,8 @@ final class ProfileHeaderViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        layout()
     }
     
     // MARK: - Layout
