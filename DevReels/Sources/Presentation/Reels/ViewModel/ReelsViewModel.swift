@@ -27,6 +27,7 @@ final class ReelsViewModel: ViewModel {
     var disposeBag = DisposeBag()
     var reelsUseCase: ReelsUseCaseProtocol?
     let navigation = PublishSubject<ReelsNavigation>()
+    let currentReels = PublishSubject<Reels>()
     private let reelsList = BehaviorSubject<[Reels]>(value: [])
     static let reload = PublishSubject<Void>()
     

@@ -57,9 +57,9 @@ final class ReelsViewController: UIViewController {
             viewWillAppear: rx.viewWillAppear.map { _ in () }
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance)
         )
-        let ouput = viewModel.transform(input: input)
+        let output = viewModel.transform(input: input)
         
-        ouput.reelsList
+        output.reelsList
             .drive(tableView.rx.items(
                 cellIdentifier: ReelsCell.identifier,
                 cellType: ReelsCell.self
