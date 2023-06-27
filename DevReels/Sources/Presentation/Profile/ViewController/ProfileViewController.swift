@@ -22,6 +22,8 @@ class ProfileViewController: UIViewController {
         self.profileHeader = ProfileHeaderViewController()
         super.init(nibName: nil, bundle: nil)
         bindViewModel()
+        self.view.backgroundColor = .white
+        layout()
     }
     
     required init?(coder: NSCoder) {

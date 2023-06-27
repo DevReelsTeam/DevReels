@@ -57,7 +57,7 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
             switch $0 {
             case .reels: showReels(navigationController)
             case .upload: showUpload(navigationController)
-//            case .profile: showProfile(navigationController)
+            case .profile: showProfile(navigationController)
             default: break
             }
         }
@@ -95,6 +95,18 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
             .subscribe(onNext: { [weak self] in
                 switch $0 {
                 case .finish:
+                    self?.finish.onNext(.finish)
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func showProfile(_ root: UINavigationController) {
+        let child = ProfileCoordinator(root)
+        coordinate(to: child)
+            .subscribe(onNext: { [weak self] in
+                switch $0 {
+                case .finish, .back:
                     self?.finish.onNext(.finish)
                 }
             })
