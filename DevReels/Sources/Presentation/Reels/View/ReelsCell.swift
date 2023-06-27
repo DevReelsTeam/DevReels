@@ -11,7 +11,7 @@ import AVFoundation
 import SnapKit
 import DRVideoController
 
-class ReelsCell: UITableViewCell, Identifiable {
+final class ReelsCell: UITableViewCell, Identifiable {
     // MARK: - Properties
     
     private lazy var titleLabel = UILabel().then {
@@ -68,7 +68,9 @@ class ReelsCell: UITableViewCell, Identifiable {
     
     private let videoController = VideoPlayerController.sharedVideoPlayer
     
-    var videoURL: String? {
+    var reels: Reels?
+    
+    private var videoURL: String? {
         didSet {
             if let videoURL = videoURL {
                 videoController.setupVideoFor(url: videoURL)
@@ -83,6 +85,7 @@ class ReelsCell: UITableViewCell, Identifiable {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.selectionStyle = .none
         layout()
+        self.layoutIfNeeded()
     }
     
     required init?(coder: NSCoder) {
@@ -100,6 +103,7 @@ class ReelsCell: UITableViewCell, Identifiable {
         super.layoutSubviews()
         configureGradient()
         videoController.playVideo(withLayer: videoLayer, url: videoURL ?? "")
+        print(self.reels?.id)
     }
     
     func configureGradient() {
@@ -114,6 +118,7 @@ class ReelsCell: UITableViewCell, Identifiable {
         self.videoURL = data.videoURL
         self.titleLabel.text = data.title
         self.descriptionLabel.text = data.videoDescription
+        self.reels = data
     }
     
     // MARK: - Layout

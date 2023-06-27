@@ -56,10 +56,18 @@ public final class VideoPlayerController: NSObject, NSCacheDelegate {
         super.init()
         videoCache.delegate = self
     }
-    
-    /// URL에 해당하는 Video Container가 없을 경우 asset을 다운로드합니다.
-    /// asset을 이용하여 새로운 플레이어 목록을 만듭니다.
-    public func setupVideoFor(url: String) {
+
+    deinit {
+        print("DEBUG:: 비디오레이어 해제 - 리테인 사이클, 메모리 릭 없음")
+    }
+}
+
+// MARK: - Public Method
+
+public extension VideoPlayerController {
+    /// URL에 해당하는 Video Container가 없을 경우 asset을 다운로드
+    /// asset을 이용하여 새로운 플레이어 목록을 만들어줌
+    func setupVideoFor(url: String) {
         guard videoCache.object(forKey: url as NSString) == nil else {
             return
         }
@@ -82,21 +90,13 @@ public final class VideoPlayerController: NSObject, NSCacheDelegate {
             case .loaded:
                 strongSelf.setupPlayer(with: asset, url: url)
             case .failed, .cancelled:
-                print("DEBUG: Failed to load asset.")
+                print("DEBUG:: Failed to load asset.")
             default:
-                print("DEBUG: Unknown status of asset.")
+                print("DEBUG:: Unknown status of asset.")
             }
         }
     }
-
-    deinit {
-        print("DEBUG:: 비디오레이어 해제 - 리테인 사이클, 메모리 릭 없음")
-    }
-}
-
-// MARK: - Public Method
-
-public extension VideoPlayerController {
+    
     // url과 layer를 받아 Video 재생
     func playVideo(withLayer layer: AVPlayerLayer, url: String) {
         videoURL = url
