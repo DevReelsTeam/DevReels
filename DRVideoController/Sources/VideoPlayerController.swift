@@ -52,7 +52,7 @@ public final class VideoPlayerController: NSObject, NSCacheDelegate {
     
     private var playerItemStatusObservation: NSKeyValueObservation?
     
-    override init() {
+    private override init() {
         super.init()
         videoCache.delegate = self
     }
@@ -89,6 +89,104 @@ public final class VideoPlayerController: NSObject, NSCacheDelegate {
         }
     }
 
+    deinit {
+        print("DEBUG:: 비디오레이어 해제 - 리테인 사이클, 메모리 릭 없음")
+    }
+}
+
+// MARK: - Public Method
+
+public extension VideoPlayerController {
+    // url과 layer를 받아 Video 재생
+    func playVideo(withLayer layer: AVPlayerLayer, url: String) {
+        videoURL = url
+        currentLayer = layer
+        
+        if let videoContainer = self.videoCache.object(forKey: url as NSString) {
+            layer.player = videoContainer.player
+            videoContainer.playOn = true
+            addObservers(url: url, videoContainer: videoContainer)
+        }
+        
+        DispatchQueue.main.async {
+            if let videoContainer = self.videoCache.object(forKey: url as NSString),
+               videoContainer.player.currentItem?.status == .readyToPlay {
+                videoContainer.playOn = true
+            }
+        }
+    }
+    
+    // Layer 제거
+    func removeLayerFor(cell: PlayVideoLayerContainer) {
+        if let url = cell.videoURL {
+            removeFromSuperLayer(layer: cell.videoLayer, url: url)
+        }
+    }
+    
+    // 재생종료 후 실행
+    @objc func playerDidFinishPlaying(note: NSNotification) {
+        guard let playerItem = note.object as? AVPlayerItem,
+              let currentPlayer = currentVideoContainer()?.player
+        else {
+            return
+        }
+        
+        if let currentItem = currentPlayer.currentItem, currentItem == playerItem {
+            currentPlayer.seek(to: CMTime.zero)
+            currentPlayer.play()
+        }
+    }
+    
+    /// 스크롤이 멈출 때 최대로 보이는 비디오 레이어 높이를 가진 UITableViewCell의 비디오 플레이어를 재생
+    func pausePlayeVideosFor(tableView: UITableView, appEnteredFromBackground: Bool = false) {
+        
+        let visisbleCells = tableView.visibleCells
+        
+        var videoCellContainer: PlayVideoLayerContainer?
+        
+        var maxHeight: CGFloat = 0.0
+        
+        for cellView in visisbleCells {
+            guard let containerCell = cellView as? PlayVideoLayerContainer,
+                  let videoCellURL = containerCell.videoURL else {
+                continue
+            }
+            let height = containerCell.visibleVideoHeight()
+            if maxHeight < height {
+                maxHeight = height
+                videoCellContainer = containerCell
+            }
+            pauseRemoveLayer(layer: containerCell.videoLayer, url: videoCellURL, layerHeight: height)
+        }
+        
+        guard let videoCell = videoCellContainer,
+              let videoCellURL = videoCell.videoURL else {
+            return
+        }
+        
+        let minCellLayerHeight = videoCell.videoLayer.bounds.size.height * 0.5
+
+        let minimumVideoLayerVisibleHeight = max(minCellLayerHeight, minimumLayerHeightToPlay)
+        
+        if maxHeight > minimumVideoLayerVisibleHeight {
+            if appEnteredFromBackground {
+                setupVideoFor(url: videoCellURL)
+            }
+            playVideo(withLayer: videoCell.videoLayer, url: videoCellURL)
+        }
+    }
+    
+    /// 캐시에서 객체가 제거될 때, 관찰 대상 URL을 false로 설정
+    func cache(_ cache: NSCache<AnyObject, AnyObject>, willEvictObject obj: Any) {
+        if let videoObject = obj as? VideoContainer {
+            observingURLs[videoObject.url] = false
+        }
+    }
+}
+
+// MARK: - Private Method
+
+private extension VideoPlayerController {
     private func getStatus(for asset: AVURLAsset) -> AVKeyValueStatus {
         var error: NSError?
         let status = asset.statusOfValue(forKey: "playable", error: &error)
@@ -123,24 +221,6 @@ public final class VideoPlayerController: NSObject, NSCacheDelegate {
         }
     }
     
-    public func playVideo(withLayer layer: AVPlayerLayer, url: String) {
-        videoURL = url
-        currentLayer = layer
-        
-        if let videoContainer = self.videoCache.object(forKey: url as NSString) {
-            layer.player = videoContainer.player
-            videoContainer.playOn = true
-            addObservers(url: url, videoContainer: videoContainer)
-        }
-        
-        DispatchQueue.main.async {
-            if let videoContainer = self.videoCache.object(forKey: url as NSString),
-               videoContainer.player.currentItem?.status == .readyToPlay {
-                videoContainer.playOn = true
-            }
-        }
-    }
-    
     private func pauseVideo(forLayer layer: AVPlayerLayer, url: String) {
         videoURL = nil
         currentLayer = nil
@@ -148,12 +228,6 @@ public final class VideoPlayerController: NSObject, NSCacheDelegate {
         if let videoContainer = self.videoCache.object(forKey: url as NSString) {
             videoContainer.playOn = false
             removeObserverFor(url: url)
-        }
-    }
-    
-    public func removeLayerFor(cell: PlayVideoLayerContainer) {
-        if let url = cell.videoURL {
-            removeFromSuperLayer(layer: cell.videoLayer, url: url)
         }
     }
     
@@ -171,19 +245,6 @@ public final class VideoPlayerController: NSObject, NSCacheDelegate {
     
     private func pauseRemoveLayer(layer: AVPlayerLayer, url: String, layerHeight: CGFloat) {
         pauseVideo(forLayer: layer, url: url)
-    }
-    
-    @objc func playerDidFinishPlaying(note: NSNotification) {
-        guard let playerItem = note.object as? AVPlayerItem,
-              let currentPlayer = currentVideoContainer()?.player
-        else {
-            return
-        }
-        
-        if let currentItem = currentPlayer.currentItem, currentItem == playerItem {
-            currentPlayer.seek(to: CMTime.zero)
-            currentPlayer.play()
-        }
     }
     
     private func currentVideoContainer() -> VideoContainer? {
@@ -261,56 +322,5 @@ public final class VideoPlayerController: NSObject, NSCacheDelegate {
             .disposed(by: disposeBag)
         
         playerItemStatusObservation = nil
-    }
-
-    
-    /// 스크롤이 멈출 때 최대로 보이는 비디오 레이어 높이를 가진 UITableViewCell의 비디오 플레이어를 재생합니다.
-    public func pausePlayeVideosFor(tableView: UITableView, appEnteredFromBackground: Bool = false) {
-        
-        let visisbleCells = tableView.visibleCells
-        
-        var videoCellContainer: PlayVideoLayerContainer?
-        
-        var maxHeight: CGFloat = 0.0
-        
-        for cellView in visisbleCells {
-            guard let containerCell = cellView as? PlayVideoLayerContainer,
-                  let videoCellURL = containerCell.videoURL else {
-                continue
-            }
-            let height = containerCell.visibleVideoHeight()
-            if maxHeight < height {
-                maxHeight = height
-                videoCellContainer = containerCell
-            }
-            pauseRemoveLayer(layer: containerCell.videoLayer, url: videoCellURL, layerHeight: height)
-        }
-        
-        guard let videoCell = videoCellContainer,
-              let videoCellURL = videoCell.videoURL else {
-            return
-        }
-        
-        let minCellLayerHeight = videoCell.videoLayer.bounds.size.height * 0.5
-
-        let minimumVideoLayerVisibleHeight = max(minCellLayerHeight, minimumLayerHeightToPlay)
-        
-        if maxHeight > minimumVideoLayerVisibleHeight {
-            if appEnteredFromBackground {
-                setupVideoFor(url: videoCellURL)
-            }
-            playVideo(withLayer: videoCell.videoLayer, url: videoCellURL)
-        }
-    }
-    
-    /// 캐시에서 객체가 제거될 때, 관찰 대상 URL을 false로 설정합니다.
-    public func cache(_ cache: NSCache<AnyObject, AnyObject>, willEvictObject obj: Any) {
-        if let videoObject = obj as? VideoContainer {
-            observingURLs[videoObject.url] = false
-        }
-    }
-
-    deinit {
-        print("DEBUG:: 비디오레이어 해제 - 리테인 사이클, 메모리 릭 없음")
     }
 }
