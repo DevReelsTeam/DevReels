@@ -36,6 +36,8 @@ final class ReelsCoordinator: BaseCoordinator<ReelsCoordinatorResult> {
                 switch $0 {
                 case .finish:
                     self?.finish.onNext(.finish)
+                case .comments:
+                    break
                 }
             })
             .disposed(by: disposeBag)

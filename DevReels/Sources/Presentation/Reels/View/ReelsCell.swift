@@ -10,6 +10,8 @@ import UIKit
 import AVFoundation
 import SnapKit
 import DRVideoController
+import RxSwift
+import RxCocoa
 
 final class ReelsCell: UITableViewCell, Identifiable {
     // MARK: - Properties
@@ -35,7 +37,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         $0.textColor = .white
     }
     
-    private lazy var commentImageView = UIImageView().then {
+    private lazy var commentImageView = RxUIImageView(frame: .zero).then {
         $0.image = UIImage(systemName: "bubble.left")
         $0.tintColor = .white
     }

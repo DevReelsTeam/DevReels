@@ -12,6 +12,7 @@ import RxCocoa
 
 enum ReelsNavigation {
     case finish
+    case comments
 }
 
 final class ReelsViewModel: ViewModel {
