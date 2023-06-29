@@ -76,7 +76,6 @@ final class ReelsCell: UITableViewCell, Identifiable {
     
     lazy var videoLayer = AVPlayerLayer().then {
         $0.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-        $0.backgroundColor = UIColor.clear.cgColor
         $0.videoGravity = AVLayerVideoGravity.resize
     }
     

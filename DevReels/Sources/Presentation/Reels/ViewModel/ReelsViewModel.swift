@@ -20,6 +20,7 @@ final class ReelsViewModel: ViewModel {
     struct Input {
         let viewWillAppear: Observable<Void>
         let reelsTapped: Observable<Void>
+        let reelsChanged: Observable<Void>
     }
     
     struct Output {
@@ -72,6 +73,17 @@ final class ReelsViewModel: ViewModel {
                     viewModel.isPlaying.accept(true)
                 }
             }
+            .disposed(by: disposeBag)
+        
+        input.reelsChanged
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, _ in
+                print("Reels가 바뀌었음")
+                if let layer = viewModel.videoController.currentLayer, let url = viewModel.currentReels?.videoURL {
+                    viewModel.videoController.playVideo(withLayer: layer, url: url)
+                    viewModel.isPlaying.accept(true)
+                }
+            })
             .disposed(by: disposeBag)
         
         isPlaying.asObservable()

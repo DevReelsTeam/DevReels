@@ -118,12 +118,20 @@ public extension VideoPlayerController {
     
     // url과 layer를 받아 Video 일시정지
     func pauseVideo(forLayer layer: AVPlayerLayer, url: String) {
-        videoURL = nil
-        currentLayer = nil
-        
         if let videoContainer = self.videoCache.object(forKey: url as NSString) {
             videoContainer.playOn = false
             removeObserverFor(url: url)
+        }
+
+        if let currentItem = layer.player?.currentItem {
+            currentItem.seek(to: .zero, completionHandler: { _ in
+                layer.player?.pause()
+            })
+        }
+
+        if let currentURL = videoURL, currentURL == url {
+            videoURL = nil
+            currentLayer = nil
         }
     }
     

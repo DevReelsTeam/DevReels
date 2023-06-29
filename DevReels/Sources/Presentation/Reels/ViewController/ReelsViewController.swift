@@ -57,7 +57,8 @@ final class ReelsViewController: UIViewController {
             viewWillAppear: rx.viewWillAppear.map { _ in () }
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
             reelsTapped: tableView.rx.itemSelected.map { _ in () }
-                .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance)
+                .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
+            reelsChanged: tableView.rx.didEndDisplayingCell.map { _ in }
         )
         let output = viewModel.transform(input: input)
         
@@ -77,7 +78,7 @@ final class ReelsViewController: UIViewController {
                 
                 if let videoCell = cell as? PlayVideoLayerContainer {
                     if videoCell.videoURL != nil {
-                        videoController.removeLayerFor(cell: videoCell)
+//                        videoController.removeLayerFor(cell: videoCell)
                     }
                 }
             })
@@ -87,7 +88,7 @@ final class ReelsViewController: UIViewController {
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 
-                videoController.pausePlayeVideosFor(tableView: tableView)
+//                videoController.pausePlayeVideosFor(tableView: tableView)
             })
             .disposed(by: disposeBag)
         
@@ -95,7 +96,7 @@ final class ReelsViewController: UIViewController {
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 
-                videoController.pausePlayeVideosFor(tableView: tableView)
+//                videoController.pausePlayeVideosFor(tableView: tableView)
             })
             .disposed(by: disposeBag)
     }
