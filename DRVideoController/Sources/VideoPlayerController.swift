@@ -42,13 +42,13 @@ public final class VideoPlayerController: NSObject, NSCacheDelegate {
     /// 동영상 URL을 키로 저장하고 플레이어 항목이 URL에 연결될 때 True로 저장합니다
     /// 상태 변경에 대해 관찰 중입니다.
     /// 재생되지 않는 플레이어 항목에 대한 관찰자를 제거하는 데 도움이 됩니다.
-    private var observingURLs: [String: Bool] = [:]
+    public var observingURLs: [String: Bool] = [:]
 
     private var videoCache = NSCache<NSString, VideoContainer>()
     
     private var videoLayers = VideoLayers()
 
-    private var currentLayer: AVPlayerLayer?
+    public var currentLayer: AVPlayerLayer?
     
     private var playerItemStatusObservation: NSKeyValueObservation?
     

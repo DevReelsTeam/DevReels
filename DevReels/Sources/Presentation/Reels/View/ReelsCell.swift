@@ -117,7 +117,6 @@ final class ReelsCell: UITableViewCell, Identifiable {
         super.layoutSubviews()
         configureGradient()
         videoController.playVideo(withLayer: videoLayer, url: videoURL ?? "")
-        print(self.reels?.id)
     }
     
     func configureGradient() {

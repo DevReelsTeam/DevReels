@@ -9,6 +9,7 @@
 import Foundation
 import RxSwift
 import RxCocoa
+import DRVideoController
 
 enum ReelsNavigation {
     case finish
@@ -18,6 +19,7 @@ final class ReelsViewModel: ViewModel {
     
     struct Input {
         let viewWillAppear: Observable<Void>
+        let reelsTapped: Observable<Void>
     }
     
     struct Output {
@@ -27,17 +29,20 @@ final class ReelsViewModel: ViewModel {
     var disposeBag = DisposeBag()
     var reelsUseCase: ReelsUseCaseProtocol?
     let navigation = PublishSubject<ReelsNavigation>()
+    private let videoController = VideoPlayerController.sharedVideoPlayer
     private let reelsList = BehaviorSubject<[Reels]>(value: [])
+    private var currentReels: Reels?
+    let isPlaying = BehaviorRelay<Bool>(value: true)
     static let reload = PublishSubject<Void>()
     
     func transform(input: Input) -> Output {
-        bindRefresh(input: input)
+        bind(input: input)
         return Output(
             reelsList: reelsList.asDriver(onErrorJustReturn: [])
         )
     }
     
-    func bindRefresh(input: Input) {
+    func bind(input: Input) {
         input.viewWillAppear
             .withUnretained(self)
             .flatMap { viewModel, _ in
@@ -48,8 +53,43 @@ final class ReelsViewModel: ViewModel {
                 switch result {
                 case let .success(reelsList):
                     viewModel.reelsList.onNext(reelsList)
+                    guard let firstReels = reelsList.first else { return }
+                    viewModel.currentReels = firstReels
                 case .failure:
                     viewModel.reelsList.onNext([])
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        input.reelsTapped
+            .withUnretained(self)
+            .subscribe { viewModel, _ in
+                print("ReelsView가 클릭되었음")
+                switch viewModel.isPlaying.value {
+                case true:
+                    viewModel.isPlaying.accept(false)
+                case false:
+                    viewModel.isPlaying.accept(true)
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        isPlaying.asObservable()
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, isPlaying in
+                switch isPlaying {
+                case true:
+                    print("일시정지")
+                    if let layer = viewModel.videoController.currentLayer, let url = viewModel.currentReels?.videoURL {
+                        viewModel.videoController.pauseVideo(forLayer: layer, url: url)
+                        print(layer, url)
+                    }
+                case false:
+                    print("재생")
+                    if let layer = viewModel.videoController.currentLayer, let url = viewModel.currentReels?.videoURL {
+                        viewModel.videoController.playVideo(withLayer: layer, url: url)
+                        print(layer, url)
+                    }
                 }
             })
             .disposed(by: disposeBag)

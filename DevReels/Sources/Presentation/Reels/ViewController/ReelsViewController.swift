@@ -55,6 +55,8 @@ final class ReelsViewController: UIViewController {
     func bind() {
         let input = ReelsViewModel.Input(
             viewWillAppear: rx.viewWillAppear.map { _ in () }
+                .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
+            reelsTapped: tableView.rx.itemSelected.map { _ in () }
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance)
         )
         let output = viewModel.transform(input: input)
