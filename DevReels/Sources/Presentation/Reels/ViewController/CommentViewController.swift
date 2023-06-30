@@ -67,20 +67,20 @@ final class CommentViewController: ViewController {
             })
             .disposed(by: disposeBag)
         
-        commentInputView.textField.rx
-            .controlEvent(.editingDidEndOnExit)
-            .subscribe(onNext: { [unowned self] in
-            self.resignFirstResponder()
-        })
-        
         commentInputView.inputButton.rx
             .tap
             .subscribe(onNext: {
+                let repository = DIContainer.shared.container.resolve(CommentRepositoryProtocol.self)
                 
-//                let request = CommentRequestDTO(reelsID: "wBlUVJotbpl8LwDiLJvy", writerID: "현준", content: "재밌어요", date: 1234)
-//                CommentDataSource().upload(reelsID: "wBlUVJotbpl8LwDiLJvy", request: request)
+//                repository?.upload(reelsID: "wBlUVJotbpl8LwDiLJvy", comment: Comment(commentID: "123", reelsID: "wBlUVJotbpl8LwDiLJvy", writerID: "강현준", content: "재밌다재밌어", date: 1234, likes: 120))
+//                    .subscribe(onNext: {
+//                        print( $0 )
+//                    })
                 
-                CommentDataSource().read(reelsID: "wBlUVJotbpl8LwDiLJvy")
+//                repository?.fetch(reelsID: "wBlUVJotbpl8LwDiLJvy")
+//                    .subscribe(onNext: {
+//                        print($0)
+//                    })
             })
             .disposed(by: disposeBag)
     }

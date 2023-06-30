@@ -24,4 +24,15 @@ struct CommentResponseDTO: Encodable {
         self.date = IntegerValue(value: "\(comment.date)")
         self.likes = IntegerValue(value: "\(comment.likes)")
     }
+    
+    func toDomain() -> Comment {
+        return Comment(
+            commentID: commentID.value,
+            reelsID: reelsID.value,
+            writerID: writerID.value,
+            content: content.value,
+            date: Int(date.value) ?? 0,
+            likes: Int(likes.value) ?? 0
+        )
+    }
 }

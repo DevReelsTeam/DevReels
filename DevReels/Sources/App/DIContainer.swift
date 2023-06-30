@@ -51,6 +51,12 @@ final class DIContainer {
             repository.keychainManager = resolver.resolve(KeychainManagerProtocol.self)
             return repository
         }
+        
+        container.register(CommentRepositoryProtocol.self) { resolver in
+            var repository = CommentRepository()
+            repository.commentDataSource = resolver.resolve(CommentDataSourceProtocol.self)
+            return repository
+        }
     }
     
     private func registerUseCases() {

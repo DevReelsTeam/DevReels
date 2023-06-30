@@ -16,12 +16,12 @@ struct CommentRequestDTO: Encodable {
     let date: Int
     let likes: Int
 
-    init(reelsID: String, writerID: String, content: String, date: Int, likes: Int) {
+    init(comment: Comment) {
         self.commentID = UUID().uuidString
-        self.reelsID = reelsID
-        self.writerID = writerID
-        self.content = content
-        self.date = date
-        self.likes = likes
+        self.reelsID = comment.reelsID
+        self.writerID = comment.writerID
+        self.content = comment.content
+        self.date = comment.date
+        self.likes = comment.likes
     }
 }
