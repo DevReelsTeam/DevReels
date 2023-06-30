@@ -63,8 +63,6 @@ final class ReelsViewController: UIViewController {
         )
         let output = viewModel.transform(input: input)
         
-       
-        
         output.reelsList
             .drive(tableView.rx.items(
                 cellIdentifier: ReelsCell.identifier,

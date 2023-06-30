@@ -42,6 +42,7 @@ final class ReelsViewModel: ViewModel {
     
     func bindRefresh(input: Input) {
         input.viewWillAppear
+            .take(1) // viewWillAppear가 전달되는 횟수만큼 댓글화면이 중첩되어 push되어 수정했습니다 - 현준
             .withUnretained(self)
             .flatMap { viewModel, _ in
                 viewModel.reelsUseCase?.list().asResult() ?? .empty()
@@ -58,8 +59,9 @@ final class ReelsViewModel: ViewModel {
             .disposed(by: disposeBag)
         
         input.commentButtonTap
-            .subscribe(onNext: {
-                print("뷰모델 \($0)")
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, reelsID in
+                viewModel.navigation.onNext(.comments)
             })
             .disposed(by: disposeBag)
     }

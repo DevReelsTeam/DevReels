@@ -88,7 +88,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.selectionStyle = .none
-        commentImageView.tapEvent.asObservable()
+        commentImageView.tapEvent
             .subscribe(onNext: { [weak self] in
                 self?.commentButtonTap
                     .onNext(self?.reels?.id ?? "")
