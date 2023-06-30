@@ -31,6 +31,7 @@ final class DIContainer {
             dataSource.keychain = resolver.resolve(KeychainProtocol.self)
             return dataSource
         }
+        container.register(CommentDataSourceProtocol.self) { _ in CommentDataSource()}
     }
     
     private func registerRepositories() {
