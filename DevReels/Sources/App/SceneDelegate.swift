@@ -24,12 +24,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {        
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
-//        window?.rootViewController = ReelsViewController(viewModel: ReelsViewModel())
-//        window?.makeKeyAndVisible()
-        appCoordinator = AppCoordinator(window)
-        appCoordinator?.start()
-            .subscribe()
-            .disposed(by: disposeBag)
+        window?.rootViewController = UINavigationController(rootViewController: CommentViewController())
+        window?.makeKeyAndVisible()
+//        appCoordinator = AppCoordinator(window)
+//        appCoordinator?.start()
+//            .subscribe()
+//            .disposed(by: disposeBag)
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {

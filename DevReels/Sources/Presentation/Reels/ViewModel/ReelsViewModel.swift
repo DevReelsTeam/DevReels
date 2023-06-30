@@ -19,6 +19,7 @@ final class ReelsViewModel: ViewModel {
     
     struct Input {
         let viewWillAppear: Observable<Void>
+        let commentButtonTap: PublishSubject<String>
     }
     
     struct Output {
@@ -53,6 +54,12 @@ final class ReelsViewModel: ViewModel {
                 case .failure:
                     viewModel.reelsList.onNext([])
                 }
+            })
+            .disposed(by: disposeBag)
+        
+        input.commentButtonTap
+            .subscribe(onNext: {
+                print("뷰모델 \($0)")
             })
             .disposed(by: disposeBag)
     }

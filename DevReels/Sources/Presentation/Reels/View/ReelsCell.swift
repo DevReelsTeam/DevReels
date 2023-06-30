@@ -71,6 +71,8 @@ final class ReelsCell: UITableViewCell, Identifiable {
     private let videoController = VideoPlayerController.sharedVideoPlayer
     
     var reels: Reels?
+    var commentButtonTap = PublishSubject<String>()
+    var disposeBag = DisposeBag()
     
     private var videoURL: String? {
         didSet {
@@ -86,6 +88,12 @@ final class ReelsCell: UITableViewCell, Identifiable {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.selectionStyle = .none
+        commentImageView.tapEvent.asObservable()
+            .subscribe(onNext: { [weak self] in
+                self?.commentButtonTap
+                    .onNext(self?.reels?.id ?? "")
+            })
+            .disposed(by: disposeBag)
         layout()
         self.layoutIfNeeded()
     }
@@ -105,7 +113,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         super.layoutSubviews()
         configureGradient()
         videoController.playVideo(withLayer: videoLayer, url: videoURL ?? "")
-        print(self.reels?.id)
+        print("\(self.reels?.id)")
     }
     
     func configureGradient() {

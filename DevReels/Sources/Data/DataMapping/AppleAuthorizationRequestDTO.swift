@@ -18,7 +18,7 @@ import Foundation
  
  */
 
-//struct AppleAuthorizationRequestDTO: Encodable {
+// struct AppleAuthorizationRequestDTO: Encodable {
 //    struct PostBody: Encodable{
 //        let idtoken: String
 //        let providerId: String
@@ -28,10 +28,10 @@ import Foundation
 //
 //
 //    init(appleLogin: AuthProps){
-//        // MARK: - 수정필요(requestUri 가 이게 맞나?)
+//        // MARK: - 삭제필요
 //        self.requestUri = "https://devreels.firebaseapp.com/__/auth/handler"
 //        self.postBody = "id_token=\(appleLogin.idToken)&providerId=apple.com&nonce=\(appleLogin.nonce)"
 //        self.returnSecureToken = true
 //        self.returnIdpCredential = true
 //    }
-//}
+// }
