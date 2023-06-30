@@ -7,3 +7,8 @@
 //
 
 import Foundation
+import RxSwift
+
+protocol CommentListUseCaseProtocol {
+    func commentList(reelsID: String) -> Observable<[Comment]>
+}

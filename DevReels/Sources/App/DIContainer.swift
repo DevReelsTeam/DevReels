@@ -66,14 +66,22 @@ final class DIContainer {
             useCase.tokenRepository = resolver.resolve(TokenRepositoryProtocol.self)
             return useCase
         }
+        
         container.register(ReelsUseCaseProtocol.self) { resolver in
             var useCase = ReelsUseCase()
             useCase.reelsRepository = resolver.resolve(ReelsRepositoryProtocol.self)
             return useCase
         }
+        
         container.register(UploadReelsUsecaseProtocol.self) { resolver in
             var useCase = UploadReelsUseCase()
             useCase.reelsRepository = resolver.resolve(ReelsRepositoryProtocol.self)
+            return useCase
+        }
+        
+        container.register(CommentListUseCaseProtocol.self) { resolver in
+            var useCase = CommentListUseCase()
+            useCase.commentRepository = resolver.resolve(CommentRepositoryProtocol.self)
             return useCase
         }
     }

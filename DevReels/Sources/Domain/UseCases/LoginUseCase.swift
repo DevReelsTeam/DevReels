@@ -11,13 +11,10 @@ import RxSwift
 import FirebaseAuth
 
 struct LoginUseCase: LoginUseCaseProtocol {
-    
-    // MARK: - Properties
-    
+        
     var authRepository: AuthRepositoryProtocol?
     var tokenRepository: TokenRepositoryProtocol?
-    // MARK: - Method
-    
+       
     func singIn(with credential: OAuthCredential) -> Observable<Void> {
         return (authRepository?.signIn(with: credential) ?? .empty())
             .map {
