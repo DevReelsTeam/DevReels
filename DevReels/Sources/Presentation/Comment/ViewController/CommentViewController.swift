@@ -18,22 +18,28 @@ final class CommentViewController: ViewController {
     
     // MARK: - Properties
     
-    lazy var tableView = UITableView().then {
+    private lazy var tableView = UITableView().then {
         $0.register(CommentCell.self, forCellReuseIdentifier: CommentCell.identifier)
         $0.rowHeight = UITableView.automaticDimension
     }
-    
-    let commentInputView = CommentInputView(frame: .zero)
-    
-    var dommyData = [Comment(commentID: "123", reelsID: "1233", writerID: "124", content: "안녕하세요", date: 123, likes: 12),
-        Comment(commentID: "123", reelsID: "1233", writerID: "124", content: "반갑습니다", date: 123, likes: 12),
-        Comment(commentID: "123", reelsID: "1233", writerID: "124", content: "빼애애액", date: 123, likes: 12),
-        Comment(commentID: "123", reelsID: "1233", writerID: "124", content: "빼애애액빼애애액빼애애액빼애애액빼애애액빼애애액빼애애액빼애애액빼애애액빼애애액빼애애액", date: 123, likes: 12),
-        Comment(commentID: "123", reelsID: "1233", writerID: "124", content: "배고파배고파배고파배고파배고파배고파배고파 배고파배고파배고파배고파", date: 123, likes: 12),
-        Comment(commentID: "123", reelsID: "1233", writerID: "124", content: "개굴 개굴 개구리개굴 개굴 개구리개굴 개굴 개구리개굴 개굴 개구리개굴 개굴 개구리개굴 개굴 개구리개굴 개굴 개구리", date: 123, likes: 12)]
-    
-    lazy var dommy = BehaviorSubject(value: dommyData).asDriver(onErrorJustReturn: [Comment(commentID: "", reelsID: "", writerID: "", content: "", date: 1, likes: 12)])
+    private let commentInputView = CommentInputView(frame: .zero)
+    private let tmpBackButton = UIButton(type: .system).then {
+        $0.setTitle("Back", for: .normal)
+    }
 
+    private let viewModel: CommentViewModel
+    
+    // MARK: - Inits
+    
+    init(viewModel: CommentViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - LifeCycle
     
     override func viewDidLoad() {
@@ -44,43 +50,48 @@ final class CommentViewController: ViewController {
     // MARK: - Methods
     
     override func bind() {
-        dommy
-            .drive(tableView.rx.items) { tableView, index, item in
-                guard let cell = tableView.dequeueReusableCell(
-                    withIdentifier: CommentCell.identifier,
-                    for: IndexPath(row: index, section: 0)) as? CommentCell else {
-                    return UITableViewCell() }
-                
-                cell.selectionStyle = .none
-                cell.textView.text = item.content
-                
-                return cell
-            }
-            .disposed(by: disposeBag)
         
-        RxKeyboard.instance.visibleHeight
-            .drive(onNext: { [weak self] keyboardHeight in
-                self?.commentInputView.snp.updateConstraints {
-                    $0.bottom.equalTo(self?.view ?? UIView()).offset(-keyboardHeight)
-                }
-                self?.view.layoutIfNeeded()
-            })
-            .disposed(by: disposeBag)
+        let input = CommentViewModel.Input(
+            viewWillAppear: rx.viewWillAppear.map { _ in ()}.asObservable(),
+            backButtonTapped: tmpBackButton.rx.tap
+                .throttle(.seconds(1), scheduler: MainScheduler.instance)
+        )
+        
+        let output = viewModel.transform(input: input)
+        
         
         commentInputView.inputButton.rx
             .tap
             .subscribe(onNext: {
                 let repository = DIContainer.shared.container.resolve(CommentRepositoryProtocol.self)
                 
-//                repository?.upload(reelsID: "wBlUVJotbpl8LwDiLJvy", comment: Comment(commentID: "123", reelsID: "wBlUVJotbpl8LwDiLJvy", writerID: "강현준", content: "재밌다재밌어", date: 1234, likes: 120))
-//                    .subscribe(onNext: {
-//                        print( $0 )
-//                    })
-                
-//                repository?.fetch(reelsID: "wBlUVJotbpl8LwDiLJvy")
-//                    .subscribe(onNext: {
-//                        print($0)
-//                    })
+
+            })
+            .disposed(by: disposeBag)
+        
+        bindInputView()
+        bindTableView(output: output)
+    }
+    
+    func bindTableView(output: CommentViewModel.Output) {
+        
+        output.commentList
+            .drive(tableView.rx.items(
+                cellIdentifier: CommentCell.identifier,
+                cellType: CommentCell.self)) { _, comment, cell in
+                    cell.prepareForReuse()
+                    cell.configureCell(data: comment)
+                    cell.selectionStyle = .none }
+                .disposed(by: disposeBag)
+    }
+    
+    func bindInputView() {
+        RxKeyboard.instance.visibleHeight
+            .drive(onNext: { [weak self] keyboardHeight in
+                self?.commentInputView.snp.updateConstraints {
+                    $0.bottom.equalTo(self?.view ?? UIView()).offset(-keyboardHeight)
+                }
+                self?.view.layoutIfNeeded()
             })
             .disposed(by: disposeBag)
     }
@@ -97,11 +108,27 @@ final class CommentViewController: ViewController {
         
         commentInputView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalTo(60)
+            $0.height.equalTo(80)
+        }
+        
+        view.addSubview(tmpBackButton)
+        
+        tmpBackButton.snp.makeConstraints {
+            $0.bottom.equalTo(commentInputView.snp.top)
+            $0.leading.equalToSuperview()
         }
     }
     
+    // TODO: - navigation Item 표시 안됨
     func attribute() {
-        title = "댓글"
+        self.navigationController?.navigationItem.title = "댓글"
+        self.navigationItem.title = "댓글"
+        self.title = "댓글"
+        self.navigationController?.tabBarController?.navigationController?.title = title
+        self.navigationController?.tabBarController?.navigationController?.navigationItem.title = title
+        print("@@@@@@@@@@@@@")
+        print(navigationItem.leftBarButtonItem?.title)
+        print(navigationItem.title)
+        print("@@@@@@@@@@@@@")
     }
 }

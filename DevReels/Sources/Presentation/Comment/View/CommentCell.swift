@@ -22,7 +22,6 @@ final class CommentCell: UITableViewCell, Identifiable {
     private let nameLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 12)
         $0.textColor = .white
-        $0.text = "사용자 본인 "
     }
     
     private let timeLabel = UILabel().then {
@@ -65,28 +64,41 @@ final class CommentCell: UITableViewCell, Identifiable {
         $0.image = UIImage(systemName: "heart")
     }
     
+    // MARK: - Initializer
+    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         layout()
+        layoutIfNeeded()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Methods
+    
+    override func prepareForReuse() {
+        profileImageView.image = nil
+    }
+    
+
+    func configureCell(data: Comment) {
+        self.nameLabel.text = data.writerID
+        self.textView.text = data.content
+        self.likenumberLabel.text = data.likes.toString
+    }
+    
+    // MARK: - Layout
+    
     override func layoutIfNeeded() {
         super.layoutIfNeeded()
         
         profileImageView.clipsToBounds = true
         profileImageView.layer.cornerRadius = profileImageView.frame.width / 2
-        
-//        let fixedWidth = textView.frame.size.width
-//        let newSize = textView.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
-//        textView.frame.size = CGSize(width: max(newSize.width, fixedWidth), height: newSize.height)
     }
     
     func layout() {
-        
         addSubview(profileImageView)
         
         profileImageView.snp.makeConstraints {
@@ -131,26 +143,22 @@ final class CommentCell: UITableViewCell, Identifiable {
             $0.leading.equalTo(nameLabel)
             $0.trailing.equalTo(dotdotdot.snp.trailing)
             $0.top.equalTo(nameLabel.snp.bottom).offset(5)
-            $0.height.greaterThanOrEqualTo(50)
             $0.bottom.equalToSuperview()
         }
-        
+
         addSubview(likenumberLabel)
 
         likenumberLabel.snp.makeConstraints {
             $0.trailing.equalTo(dotdotdot.snp.trailing)
-            $0.top.equalTo(textView.snp.bottom).offset(15)
             $0.bottom.equalToSuperview().inset(17)
         }
 
         addSubview(likeImageView)
 
         likeImageView.snp.makeConstraints {
-            $0.top.equalTo(likenumberLabel)
             $0.trailing.equalTo(likenumberLabel.snp.leading).inset(-3)
             $0.height.width.equalTo(14)
             $0.bottom.equalTo(likenumberLabel)
         }
     }
-
 }

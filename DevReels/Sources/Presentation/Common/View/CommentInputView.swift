@@ -87,9 +87,6 @@ final class CommentInputView: UIView {
     
     func attribute() {
         backgroundColor = .devReelsColor.neutral40
-        self.snp.makeConstraints {
-            $0.height.equalTo(60)
-        }
     }
 
 }

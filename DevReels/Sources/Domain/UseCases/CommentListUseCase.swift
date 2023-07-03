@@ -7,3 +7,12 @@
 //
 
 import Foundation
+import RxSwift
+
+struct CommentListUseCase: CommentListUseCaseProtocol {
+    var commentRepository: CommentRepositoryProtocol?
+    
+    func commentList(reelsID: String) -> Observable<[Comment]> {
+        return commentRepository?.fetch(reelsID: reelsID) ?? .empty()
+    }
+}

@@ -19,6 +19,8 @@ final class ReelsCoordinator: BaseCoordinator<ReelsCoordinatorResult> {
     
     override func start() -> Observable<ReelsCoordinatorResult> {
         showReels()
+//        return Observable.never()
+//        showReels()
         return finish
             .do(onNext: { [weak self] in
                 switch $0 {
@@ -37,11 +39,30 @@ final class ReelsCoordinator: BaseCoordinator<ReelsCoordinatorResult> {
                 case .finish:
                     self?.finish.onNext(.finish)
                 case .comments:
-                    break
+                    self?.showComment()
                 }
             })
             .disposed(by: disposeBag)
         let viewController = ReelsViewController(viewModel: viewModel)
         push(viewController, animated: true, isRoot: true)
+    }
+    
+    func showComment() {
+        let viewModel = CommentViewModel()
+        
+        viewModel.navigation
+            .subscribe(onNext: { [weak self] in
+                switch $0 {
+                case .back:
+                    self?.pop(animated: true)
+                    self?.setTabBarHidden(false)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        let viewController = CommentViewController(viewModel: viewModel)
+        self.setNavigationBarHidden(false, animated: false)
+        self.setTabBarHidden(true)
+        push(viewController, animated: true)
     }
 }
