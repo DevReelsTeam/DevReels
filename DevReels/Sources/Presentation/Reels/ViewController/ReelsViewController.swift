@@ -52,19 +52,6 @@ final class ReelsViewController: UIViewController {
         super.viewDidLoad()
         layout()
         bind()
-        
-        let rp = UserRepository()
-//        let request = UserRequestDTO(identifire: "khjj9865@naver.com", profileImageURLString: "", nickName: "", introduce: "", uid: "12345")
-
-        rp.fetch(uid: "123")
-            .subscribe(onNext: {
-                print("\n\n\n\n\n")
-                print($0)
-                print("\n\n\n\n\n")
-            })
-        
-        
-        
     }
     
     func bind() {
