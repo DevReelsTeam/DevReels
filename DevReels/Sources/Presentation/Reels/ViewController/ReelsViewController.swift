@@ -31,7 +31,7 @@ final class ReelsViewController: UIViewController {
         $0.contentMode = .scaleToFill
     }
     
-    var commentButtonTapped = PublishSubject<String>()
+    var commentButtonTapped = PublishSubject<Reels>()
         
     private let viewModel: ReelsViewModel
     private let videoController = VideoPlayerController.sharedVideoPlayer
@@ -52,6 +52,19 @@ final class ReelsViewController: UIViewController {
         super.viewDidLoad()
         layout()
         bind()
+        
+        let rp = UserRepository()
+//        let request = UserRequestDTO(identifire: "khjj9865@naver.com", profileImageURLString: "", nickName: "", introduce: "", uid: "12345")
+
+        rp.fetch(uid: "123")
+            .subscribe(onNext: {
+                print("\n\n\n\n\n")
+                print($0)
+                print("\n\n\n\n\n")
+            })
+        
+        
+        
     }
     
     func bind() {

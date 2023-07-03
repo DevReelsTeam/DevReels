@@ -12,14 +12,14 @@ import RxCocoa
 
 enum ReelsNavigation {
     case finish
-    case comments
+    case comments(Reels)
 }
 
 final class ReelsViewModel: ViewModel {
     
     struct Input {
         let viewWillAppear: Observable<Void>
-        let commentButtonTap: PublishSubject<String>
+        let commentButtonTap: PublishSubject<Reels>
     }
     
     struct Output {
@@ -60,8 +60,8 @@ final class ReelsViewModel: ViewModel {
         
         input.commentButtonTap
             .withUnretained(self)
-            .subscribe(onNext: { viewModel, reelsID in
-                viewModel.navigation.onNext(.comments)
+            .subscribe(onNext: { viewModel, reels in
+                viewModel.navigation.onNext(.comments(reels))
             })
             .disposed(by: disposeBag)
     }

@@ -19,23 +19,25 @@ final class CommentViewModel: ViewModel {
     struct Input {
         let viewWillAppear: Observable<Void>
         let backButtonTapped: Observable<Void>
+//        let uploadButtonDidTap: Observable<Void>
+//        let inputViewText: Observable<String>
     }
     
     struct Output {
         let commentList: Driver<[Comment]>
     }
     
-    var commentListUseCase = DIContainer.shared.container.resolve(CommentListUseCaseProtocol.self)
+    private let commentListUseCase = DIContainer.shared.container.resolve(CommentListUseCaseProtocol.self)
     let navigation = PublishSubject<CommentNavigation>()
     private let commentList = PublishSubject<[Comment]>()
+    var reels: Reels?
     var disposeBag = DisposeBag()
     
     func transform(input: Input) -> Output {
-        
         input.viewWillAppear
             .withUnretained(self)
             .flatMap { viewModel, _ in
-                viewModel.commentListUseCase?.commentList(reelsID: "wBlUVJotbpl8LwDiLJvy").asResult() ?? .empty()
+                viewModel.commentListUseCase?.commentList(reelsID: viewModel.reels?.id ?? "").asResult() ?? .empty()
             }
             .withUnretained(self)
             .subscribe(onNext: { viewModel, result in

@@ -13,13 +13,19 @@ struct UserDataSource: UserDataSourceProtocol {
     
     let fireStore = Firestore.firestore().collection("users")
     
-    // 유저 생성 - 작동 확인
+    // 유저 생성
     func create(request: UserRequestDTO) -> Observable<Void> {
         return Observable.create { emitter in
-            fireStore.document(request.uid ?? "" )
-                .setData(request.toDictionary()) { _ in
+            fireStore.document(request.uid).getDocument { snapshot, _ in
+                if snapshot?.data() == nil {
+                    self.fireStore.document(request.uid)
+                        .setData(request.toDictionary()) { _ in
+                            emitter.onNext(())
+                        }
+                } else {
                     emitter.onNext(())
                 }
+            }
             return Disposables.create()
         }
     }
