@@ -19,7 +19,7 @@ public protocol PlayVideoLayerContainer {
 
 public final class VideoPlayerController: NSObject, NSCacheDelegate {
     
-    var shouldPlay = true {
+    public var shouldPlay = true {
         didSet {
             self.currentVideoContainer()?.shouldPlay = shouldPlay
         }
@@ -122,18 +122,8 @@ public extension VideoPlayerController {
             videoContainer.playOn = false
             removeObserverFor(url: url)
         }
-
-        if let currentItem = layer.player?.currentItem {
-            currentItem.seek(to: .zero, completionHandler: { _ in
-                layer.player?.pause()
-            })
-        }
-
-        if let currentURL = videoURL, currentURL == url {
-            videoURL = nil
-            currentLayer = nil
-        }
     }
+
     
     // Layer 제거
     func removeLayerFor(cell: PlayVideoLayerContainer) {
@@ -273,7 +263,7 @@ private extension VideoPlayerController {
         
         guard let currentItem = videoContainer.player.currentItem else { return }
         
-        videoContainer.player.currentItem?.rx.observe(AVPlayerItem.Status.self, "status")
+        currentItem.rx.observe(AVPlayerItem.Status.self, "status")
             .compactMap { $0 }
             .filter { $0 == .readyToPlay }
             .take(1)
@@ -309,6 +299,8 @@ private extension VideoPlayerController {
 
     
     private func removeObserverFor(url: String) {
+        print("Removing observer for URL: \(url)")
+
         guard let videoContainer = self.videoCache.object(forKey: url as NSString),
               let currentItem = videoContainer.player.currentItem,
               observingURLs[url] == true else {

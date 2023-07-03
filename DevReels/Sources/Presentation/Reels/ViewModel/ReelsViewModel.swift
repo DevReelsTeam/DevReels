@@ -20,7 +20,7 @@ final class ReelsViewModel: ViewModel {
     struct Input {
         let viewWillAppear: Observable<Void>
         let reelsTapped: Observable<Void>
-        let reelsChanged: Observable<Void>
+        let reelsChanged: Observable<IndexPath>
     }
     
     struct Output {
@@ -33,7 +33,7 @@ final class ReelsViewModel: ViewModel {
     private let videoController = VideoPlayerController.sharedVideoPlayer
     private let reelsList = BehaviorSubject<[Reels]>(value: [])
     private var currentReels: Reels?
-    let isPlaying = BehaviorRelay<Bool>(value: true)
+    let isPlaying = BehaviorRelay<Bool>(value: false)
     static let reload = PublishSubject<Void>()
     
     func transform(input: Input) -> Output {
@@ -77,12 +77,9 @@ final class ReelsViewModel: ViewModel {
         
         input.reelsChanged
             .withUnretained(self)
-            .subscribe(onNext: { viewModel, _ in
+            .subscribe(onNext: { viewModel, indexPath in
                 print("Reels가 바뀌었음")
-                if let layer = viewModel.videoController.currentLayer, let url = viewModel.currentReels?.videoURL {
-                    viewModel.videoController.playVideo(withLayer: layer, url: url)
-                    viewModel.isPlaying.accept(true)
-                }
+                
             })
             .disposed(by: disposeBag)
         
@@ -92,16 +89,10 @@ final class ReelsViewModel: ViewModel {
                 switch isPlaying {
                 case true:
                     print("일시정지")
-                    if let layer = viewModel.videoController.currentLayer, let url = viewModel.currentReels?.videoURL {
-                        viewModel.videoController.pauseVideo(forLayer: layer, url: url)
-                        print(layer, url)
-                    }
+                    viewModel.videoController.shouldPlay = false
                 case false:
                     print("재생")
-                    if let layer = viewModel.videoController.currentLayer, let url = viewModel.currentReels?.videoURL {
-                        viewModel.videoController.playVideo(withLayer: layer, url: url)
-                        print(layer, url)
-                    }
+                    viewModel.videoController.shouldPlay = true
                 }
             })
             .disposed(by: disposeBag)

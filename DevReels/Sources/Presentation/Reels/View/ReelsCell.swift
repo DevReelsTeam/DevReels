@@ -74,10 +74,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         $0.tintColor = .systemGray5
     }
     
-    lazy var videoLayer = AVPlayerLayer().then {
-        $0.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-        $0.videoGravity = AVLayerVideoGravity.resize
-    }
+    var videoLayer = AVPlayerLayer()
     
     private let videoController = VideoPlayerController.sharedVideoPlayer
     
@@ -99,6 +96,10 @@ final class ReelsCell: UITableViewCell, Identifiable {
         self.selectionStyle = .none
         layout()
         self.layoutIfNeeded()
+        videoLayer.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        videoLayer.videoGravity = AVLayerVideoGravity.resize
+        
+        print("This will be work")
     }
     
     required init?(coder: NSCoder) {
@@ -115,7 +116,6 @@ final class ReelsCell: UITableViewCell, Identifiable {
     override func layoutSubviews() {
         super.layoutSubviews()
         configureGradient()
-        videoController.playVideo(withLayer: videoLayer, url: videoURL ?? "")
     }
     
     func configureGradient() {
@@ -131,6 +131,8 @@ final class ReelsCell: UITableViewCell, Identifiable {
         self.titleLabel.text = data.title
         self.descriptionLabel.text = data.videoDescription
         self.reels = data
+        
+        videoController.playVideo(withLayer: videoLayer, url: data.videoURL ?? "")
     }
     
     // MARK: - Layout
