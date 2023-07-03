@@ -14,7 +14,7 @@ final class VideoContainer {
     
     var url: String
     
-    var shouldPlay = false {
+    var shouldPlay = true {
         didSet {
             if shouldPlay {
                 player.play()
@@ -30,8 +30,12 @@ final class VideoContainer {
             playerItem.preferredPeakBitRate = VideoPlayerController.sharedVideoPlayer.preferredPeakBitRate
             if playOn && playerItem.status == .readyToPlay {
                 player.play()
+                shouldPlay = true
+                print("PLAY")
             } else {
                 player.pause()
+                shouldPlay = false
+                print("PAUSE")
             }
         }
     }

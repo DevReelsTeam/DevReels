@@ -59,6 +59,13 @@ final class ReelsViewController: UIViewController {
         let input = ReelsViewModel.Input(
             viewWillAppear: rx.viewWillAppear.map { _ in () }
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
+            viewWillDisAppear: rx.viewWillDisappear.map { _ in () }
+                .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
+            reelsTapped: tableView.rx.itemSelected.map { _ in () }
+                .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
+            reelsChanged: tableView.rx.didEndDisplayingCell.map { $0.indexPath },
+            reelsWillBeginDragging: tableView.rx.willBeginDragging.map { _ in },
+            reelsDidEndDragging: tableView.rx.didEndDragging.map { _ in }
             commentButtonTap: commentButtonTapped
         )
         let output = viewModel.transform(input: input)
@@ -78,7 +85,7 @@ final class ReelsViewController: UIViewController {
                 cell.configureCell(data: reels)
             }
             .disposed(by: disposeBag)
-        
+
 
         
         tableView.rx.didEndDisplayingCell
