@@ -81,7 +81,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
     private let videoController = VideoPlayerController.sharedVideoPlayer
     
     var reels: Reels?
-    var commentButtonTap = PublishSubject<String>()
+    var commentButtonTap = PublishSubject<Reels>()
     var disposeBag = DisposeBag()
     
     private var videoURL: String? {
@@ -99,12 +99,14 @@ final class ReelsCell: UITableViewCell, Identifiable {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.selectionStyle = .none
+        
         commentImageView.tapEvent
             .subscribe(onNext: { [weak self] in
                 self?.commentButtonTap
-                    .onNext(self?.reels?.id ?? "")
+                    .onNext(self?.reels ?? Reels(id: "", uid: "", videoURL: "", thumbnailURL: "", title: "", videoDescription: ""))
             })
             .disposed(by: disposeBag)
+        
         layout()
         self.layoutIfNeeded()
         videoLayer.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)

@@ -38,8 +38,8 @@ final class ReelsCoordinator: BaseCoordinator<ReelsCoordinatorResult> {
                 switch $0 {
                 case .finish:
                     self?.finish.onNext(.finish)
-                case .comments:
-                    self?.showComment()
+                case .comments(let data):
+                    self?.showComment(data)
                 }
             })
             .disposed(by: disposeBag)
@@ -47,15 +47,17 @@ final class ReelsCoordinator: BaseCoordinator<ReelsCoordinatorResult> {
         push(viewController, animated: true, isRoot: true)
     }
     
-    func showComment() {
+    func showComment(_ reels: Reels) {
         let viewModel = CommentViewModel()
+        viewModel.reels = reels
         
         viewModel.navigation
             .subscribe(onNext: { [weak self] in
                 switch $0 {
                 case .back:
-                    self?.pop(animated: true)
                     self?.setTabBarHidden(false)
+                    self?.setNavigationBarHidden(true, animated: false)
+                    self?.pop(animated: true)
                 }
             })
             .disposed(by: disposeBag)

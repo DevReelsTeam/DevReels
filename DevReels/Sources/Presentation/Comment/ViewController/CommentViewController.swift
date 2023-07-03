@@ -64,7 +64,7 @@ final class CommentViewController: ViewController {
             .tap
             .subscribe(onNext: {
                 let repository = DIContainer.shared.container.resolve(CommentRepositoryProtocol.self)
-                
+               // MARK: - text를 위해 임시로 작성
 
             })
             .disposed(by: disposeBag)
@@ -81,7 +81,8 @@ final class CommentViewController: ViewController {
                 cellType: CommentCell.self)) { _, comment, cell in
                     cell.prepareForReuse()
                     cell.configureCell(data: comment)
-                    cell.selectionStyle = .none }
+                    cell.selectionStyle = .none
+                }
                 .disposed(by: disposeBag)
     }
     

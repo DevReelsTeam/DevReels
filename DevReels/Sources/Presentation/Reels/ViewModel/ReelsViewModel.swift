@@ -13,7 +13,7 @@ import DRVideoController
 
 enum ReelsNavigation {
     case finish
-    case comments
+    case comments(Reels)
 }
 
 final class ReelsViewModel: ViewModel {
@@ -25,7 +25,7 @@ final class ReelsViewModel: ViewModel {
         let reelsChanged: Observable<IndexPath>
         let reelsWillBeginDragging: Observable<Void>
         let reelsDidEndDragging: Observable<Void>
-        let commentButtonTap: PublishSubject<String>
+        let commentButtonTap: PublishSubject<Reels>
     }
     
     struct Output {
@@ -133,8 +133,8 @@ final class ReelsViewModel: ViewModel {
             .disposed(by: self.disposeBag)
         input.commentButtonTap
             .withUnretained(self)
-            .subscribe(onNext: { viewModel, reelsID in
-                viewModel.navigation.onNext(.comments)
+            .subscribe(onNext: { viewModel, reels in
+                viewModel.navigation.onNext(.comments(reels))
             })
             .disposed(by: self.disposeBag)
         }

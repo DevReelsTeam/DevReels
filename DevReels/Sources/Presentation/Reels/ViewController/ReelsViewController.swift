@@ -31,7 +31,7 @@ final class ReelsViewController: UIViewController {
         $0.contentMode = .scaleToFill
     }
     
-    var commentButtonTapped = PublishSubject<String>()
+    var commentButtonTapped = PublishSubject<Reels>()
         
     private let viewModel: ReelsViewModel
     private let videoController = VideoPlayerController.sharedVideoPlayer
@@ -85,7 +85,7 @@ final class ReelsViewController: UIViewController {
                 cell.configureCell(data: reels)
             }
             .disposed(by: disposeBag)
-
+        
 
         
         tableView.rx.didEndDisplayingCell
