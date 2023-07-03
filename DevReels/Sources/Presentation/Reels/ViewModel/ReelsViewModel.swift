@@ -129,11 +129,14 @@ final class ReelsViewModel: ViewModel {
                     print("재생")
                     viewModel.videoController.shouldPlay = true
                 }
+            })
+            .disposed(by: self.disposeBag)
         input.commentButtonTap
             .withUnretained(self)
             .subscribe(onNext: { viewModel, reelsID in
                 viewModel.navigation.onNext(.comments)
             })
-            .disposed(by: disposeBag)
-    }
+            .disposed(by: self.disposeBag)
+        }
 }
+
