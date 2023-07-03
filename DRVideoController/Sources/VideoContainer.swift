@@ -30,8 +30,12 @@ final class VideoContainer {
             playerItem.preferredPeakBitRate = VideoPlayerController.sharedVideoPlayer.preferredPeakBitRate
             if playOn && playerItem.status == .readyToPlay {
                 player.play()
+                shouldPlay = true
+                print("PLAY")
             } else {
                 player.pause()
+                shouldPlay = false
+                print("PAUSE")
             }
         }
     }

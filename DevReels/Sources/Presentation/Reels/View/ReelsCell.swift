@@ -84,6 +84,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         didSet {
             if let videoURL = videoURL {
                 videoController.setupVideoFor(url: videoURL)
+                print("dd")
             }
             videoLayer.isHidden = videoURL == nil
         }
@@ -133,6 +134,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         self.reels = data
         
         videoController.playVideo(withLayer: videoLayer, url: data.videoURL ?? "")
+        print("configureCell - called")
     }
     
     // MARK: - Layout
