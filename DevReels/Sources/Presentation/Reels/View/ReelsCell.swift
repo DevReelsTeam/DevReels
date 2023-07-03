@@ -62,11 +62,21 @@ final class ReelsCell: UITableViewCell, Identifiable {
         $0.contentMode = .scaleToFill
     }
     
-    lazy var videoLayer = AVPlayerLayer().then {
-        $0.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-        $0.backgroundColor = UIColor.clear.cgColor
-        $0.videoGravity = AVLayerVideoGravity.resize
+    private lazy var playImageView = UIImageView().then {
+        $0.adjustsImageSizeForAccessibilityContentSizeCategory = true
+        $0.image = UIImage(systemName: "play.circle.fill")
+        $0.image = $0.image?.withRenderingMode(.alwaysTemplate)
+        $0.tintColor = .systemGray5
     }
+    
+    private lazy var pauseImageView = UIImageView().then {
+        $0.adjustsImageSizeForAccessibilityContentSizeCategory = true
+        $0.image = UIImage(systemName: "pause.circle.fill")
+        $0.image = $0.image?.withRenderingMode(.alwaysTemplate)
+        $0.tintColor = .systemGray5
+    }
+    
+    var videoLayer = AVPlayerLayer()
     
     private let videoController = VideoPlayerController.sharedVideoPlayer
     
@@ -78,6 +88,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         didSet {
             if let videoURL = videoURL {
                 videoController.setupVideoFor(url: videoURL)
+                print("dd")
             }
             videoLayer.isHidden = videoURL == nil
         }
@@ -98,6 +109,10 @@ final class ReelsCell: UITableViewCell, Identifiable {
         
         layout()
         self.layoutIfNeeded()
+        videoLayer.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        videoLayer.videoGravity = AVLayerVideoGravity.resize
+        
+        print("This will be work")
     }
     
     required init?(coder: NSCoder) {
@@ -114,8 +129,6 @@ final class ReelsCell: UITableViewCell, Identifiable {
     override func layoutSubviews() {
         super.layoutSubviews()
         configureGradient()
-        videoController.playVideo(withLayer: videoLayer, url: videoURL ?? "")
-        print("\(self.reels?.id)")
     }
     
     func configureGradient() {
@@ -131,11 +144,14 @@ final class ReelsCell: UITableViewCell, Identifiable {
         self.titleLabel.text = data.title
         self.descriptionLabel.text = data.videoDescription
         self.reels = data
+        
+        videoController.playVideo(withLayer: videoLayer, url: data.videoURL ?? "")
+        print("configureCell - called")
     }
     
     // MARK: - Layout
     private func layout() {
-        contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel, heartImageView, heartNumberLabel, commentImageView, commentNumberLabel, shareImageView])
+        contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel, heartImageView, heartNumberLabel, commentImageView, commentNumberLabel, shareImageView, playImageView, pauseImageView])
 
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(contentView.snp.bottom).offset(-150)
@@ -188,6 +204,18 @@ final class ReelsCell: UITableViewCell, Identifiable {
             $0.leading.equalTo(heartImageView.snp.leading)
             $0.trailing.equalTo(heartImageView.snp.trailing)
             $0.bottom.equalTo(commentImageView.snp.bottom).offset(40)
+        }
+        
+        playImageView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(50)
+        }
+        
+        pauseImageView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(50)
         }
     }
 }

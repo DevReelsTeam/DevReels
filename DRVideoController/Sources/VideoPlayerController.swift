@@ -19,7 +19,7 @@ public protocol PlayVideoLayerContainer {
 
 public final class VideoPlayerController: NSObject, NSCacheDelegate {
     
-    var shouldPlay = true {
+    public var shouldPlay = true {
         didSet {
             self.currentVideoContainer()?.shouldPlay = shouldPlay
         }
@@ -42,13 +42,13 @@ public final class VideoPlayerController: NSObject, NSCacheDelegate {
     /// 동영상 URL을 키로 저장하고 플레이어 항목이 URL에 연결될 때 True로 저장합니다
     /// 상태 변경에 대해 관찰 중입니다.
     /// 재생되지 않는 플레이어 항목에 대한 관찰자를 제거하는 데 도움이 됩니다.
-    private var observingURLs: [String: Bool] = [:]
+    public var observingURLs: [String: Bool] = [:]
 
     private var videoCache = NSCache<NSString, VideoContainer>()
     
     private var videoLayers = VideoLayers()
 
-    private var currentLayer: AVPlayerLayer?
+    public var currentLayer: AVPlayerLayer?
     
     private var playerItemStatusObservation: NSKeyValueObservation?
     
@@ -115,6 +115,15 @@ public extension VideoPlayerController {
             }
         }
     }
+    
+    // url과 layer를 받아 Video 일시정지
+    func pauseVideo(forLayer layer: AVPlayerLayer, url: String) {
+        if let videoContainer = self.videoCache.object(forKey: url as NSString) {
+            videoContainer.playOn = false
+            removeObserverFor(url: url)
+        }
+    }
+
     
     // Layer 제거
     func removeLayerFor(cell: PlayVideoLayerContainer) {
@@ -221,16 +230,6 @@ private extension VideoPlayerController {
         }
     }
     
-    private func pauseVideo(forLayer layer: AVPlayerLayer, url: String) {
-        videoURL = nil
-        currentLayer = nil
-        
-        if let videoContainer = self.videoCache.object(forKey: url as NSString) {
-            videoContainer.playOn = false
-            removeObserverFor(url: url)
-        }
-    }
-    
     private func removeFromSuperLayer(layer: AVPlayerLayer, url: String) {
         videoURL = nil
         currentLayer = nil
@@ -264,7 +263,7 @@ private extension VideoPlayerController {
         
         guard let currentItem = videoContainer.player.currentItem else { return }
         
-        videoContainer.player.currentItem?.rx.observe(AVPlayerItem.Status.self, "status")
+        currentItem.rx.observe(AVPlayerItem.Status.self, "status")
             .compactMap { $0 }
             .filter { $0 == .readyToPlay }
             .take(1)
@@ -300,6 +299,8 @@ private extension VideoPlayerController {
 
     
     private func removeObserverFor(url: String) {
+        print("Removing observer for URL: \(url)")
+
         guard let videoContainer = self.videoCache.object(forKey: url as NSString),
               let currentItem = videoContainer.player.currentItem,
               observingURLs[url] == true else {
