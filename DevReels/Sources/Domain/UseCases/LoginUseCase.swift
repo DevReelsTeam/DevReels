@@ -13,13 +13,15 @@ import FirebaseAuth
 struct LoginUseCase: LoginUseCaseProtocol {
         
     var authRepository: AuthRepositoryProtocol?
+    var userRepository: UserRepositoryProtocol?
     var tokenRepository: TokenRepositoryProtocol?
        
     func singIn(with credential: OAuthCredential) -> Observable<Void> {
         return (authRepository?.signIn(with: credential) ?? .empty())
-            .map {
-                tokenRepository?.save($0)
-            }
+            .flatMap { tokenRepository?.save($0) ?? .empty() }
+            .compactMap { $0 }
+            .map { ($0.localId, $0.email) }
+            .flatMap { userRepository?.create(uid: $0.0, email: $0.1) ?? .empty() }
             .map { _ in () }
     }
 }
