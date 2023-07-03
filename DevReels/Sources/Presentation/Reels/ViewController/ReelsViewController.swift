@@ -30,6 +30,8 @@ final class ReelsViewController: UIViewController {
     private lazy var topGradientImageView = UIImageView().then {
         $0.contentMode = .scaleToFill
     }
+    
+    var commentButtonTapped = PublishSubject<String>()
         
     private let viewModel: ReelsViewModel
     private let videoController = VideoPlayerController.sharedVideoPlayer
@@ -53,9 +55,11 @@ final class ReelsViewController: UIViewController {
     }
     
     func bind() {
+        
         let input = ReelsViewModel.Input(
             viewWillAppear: rx.viewWillAppear.map { _ in () }
-                .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance)
+                .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
+            commentButtonTap: commentButtonTapped
         )
         let output = viewModel.transform(input: input)
         
@@ -64,10 +68,18 @@ final class ReelsViewController: UIViewController {
                 cellIdentifier: ReelsCell.identifier,
                 cellType: ReelsCell.self
             )) { _, reels, cell in
+                cell.commentButtonTap
+                    .subscribe(onNext: { [weak self] in
+                        self?.commentButtonTapped.onNext($0)
+                    })
+                    .disposed(by: cell.disposeBag)
+                
                 cell.prepareForReuse()
                 cell.configureCell(data: reels)
             }
             .disposed(by: disposeBag)
+        
+
         
         tableView.rx.didEndDisplayingCell
             .subscribe(onNext: { [weak self] cell, _ in

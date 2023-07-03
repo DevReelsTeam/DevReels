@@ -23,9 +23,9 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
 
         var title: String {
             switch self {
-            case .reels: return ""
-            case .upload: return ""
-            case .profile: return ""
+            case .reels: return "릴스"
+            case .upload: return "업로드"
+            case .profile: return "프로필"
             }
         }
 
@@ -112,17 +112,4 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
             })
             .disposed(by: disposeBag)
     }
-    
-//    private func showStudyList(_ root: UINavigationController) {
-//        let child = StudyListCoordinator(root)
-//        coordinate(to: child)
-//            .subscribe(onNext: { [weak self] in
-//                switch $0 {
-//                case .finish:
-//                    self?.finish.onNext(.finish)
-//                }
-//            })
-//            .disposed(by: disposeBag)
-//    }
-
 }

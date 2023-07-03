@@ -19,7 +19,7 @@ final class LoginViewModel: ViewModel {
     
     struct Input {
         let appleCredential: Observable<OAuthCredential>
-        let githupLoginButtonTap: Observable<Void>
+        let righButtonTap: Observable<Void>
     }
     
     struct Output {
@@ -48,6 +48,13 @@ final class LoginViewModel: ViewModel {
                 }
             }
             .disposed(by: disposeBag)
+        
+        input.righButtonTap
+            .subscribe(onNext: { [weak self] in
+                self?.navigation.onNext(.finish)
+            })
+            .disposed(by: DisposeBag())
+
         
         return Output()
     }

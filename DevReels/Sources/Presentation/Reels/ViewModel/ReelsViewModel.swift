@@ -12,12 +12,14 @@ import RxCocoa
 
 enum ReelsNavigation {
     case finish
+    case comments
 }
 
 final class ReelsViewModel: ViewModel {
     
     struct Input {
         let viewWillAppear: Observable<Void>
+        let commentButtonTap: PublishSubject<String>
     }
     
     struct Output {
@@ -40,6 +42,7 @@ final class ReelsViewModel: ViewModel {
     
     func bindRefresh(input: Input) {
         input.viewWillAppear
+            .take(1)
             .withUnretained(self)
             .flatMap { viewModel, _ in
                 viewModel.reelsUseCase?.list().asResult() ?? .empty()
@@ -52,6 +55,13 @@ final class ReelsViewModel: ViewModel {
                 case .failure:
                     viewModel.reelsList.onNext([])
                 }
+            })
+            .disposed(by: disposeBag)
+        
+        input.commentButtonTap
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, reelsID in
+                viewModel.navigation.onNext(.comments)
             })
             .disposed(by: disposeBag)
     }

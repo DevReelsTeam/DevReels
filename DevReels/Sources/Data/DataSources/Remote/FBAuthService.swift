@@ -10,10 +10,10 @@ import Foundation
 import RxSwift
 import RxDevReelsYa
 
-struct FBAuthService: AuthServiceProtocol{
+struct FBAuthService: AuthServiceProtocol {
     private let provider: Provider
     
-    init(){
+    init() {
         self.provider = Provider.default
     }
     

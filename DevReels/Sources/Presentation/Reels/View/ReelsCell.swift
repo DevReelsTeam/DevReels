@@ -10,6 +10,8 @@ import UIKit
 import AVFoundation
 import SnapKit
 import DRVideoController
+import RxSwift
+import RxCocoa
 
 final class ReelsCell: UITableViewCell, Identifiable {
     // MARK: - Properties
@@ -35,7 +37,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         $0.textColor = .white
     }
     
-    private lazy var commentImageView = UIImageView().then {
+    private lazy var commentImageView = RxUIImageView(frame: .zero).then {
         $0.image = UIImage(systemName: "bubble.left")
         $0.tintColor = .white
     }
@@ -69,6 +71,8 @@ final class ReelsCell: UITableViewCell, Identifiable {
     private let videoController = VideoPlayerController.sharedVideoPlayer
     
     var reels: Reels?
+    var commentButtonTap = PublishSubject<String>()
+    var disposeBag = DisposeBag()
     
     private var videoURL: String? {
         didSet {
@@ -84,6 +88,12 @@ final class ReelsCell: UITableViewCell, Identifiable {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.selectionStyle = .none
+        commentImageView.tapEvent
+            .subscribe(onNext: { [weak self] in
+                self?.commentButtonTap
+                    .onNext(self?.reels?.id ?? "")
+            })
+            .disposed(by: disposeBag)
         layout()
         self.layoutIfNeeded()
     }
@@ -103,7 +113,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         super.layoutSubviews()
         configureGradient()
         videoController.playVideo(withLayer: videoLayer, url: videoURL ?? "")
-        print(self.reels?.id)
+        print("\(self.reels?.id)")
     }
     
     func configureGradient() {

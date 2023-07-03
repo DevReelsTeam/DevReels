@@ -18,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         FirebaseApp.configure()
         //        DevReelsKit.hello()
         //        DevReelsUI.hello()
-        self.window?.overrideUserInterfaceStyle = .dark
+//        self.window?.overrideUserInterfaceStyle = .dark
         appearance()
         return true
     }
@@ -32,17 +32,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         navigationBarAppearance()
         tabBarAppearance()
     }
-    
+
     private func navigationBarAppearance() {
         let navigationBarAppearance = UINavigationBarAppearance()
         navigationBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.devReelsColor.neutral1000 ?? UIColor.white]
         navigationBarAppearance.backgroundColor = .clear
-        
+
         UINavigationBar.appearance().standardAppearance = navigationBarAppearance
         UINavigationBar.appearance().compactAppearance = navigationBarAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
     }
-    
+
     private func tabBarAppearance() {
         UITabBar.appearance().tintColor = .devReelsColor.primary70
         UITabBar.appearance().barTintColor = .devReelsColor.neutral30

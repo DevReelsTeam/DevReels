@@ -31,4 +31,7 @@ struct DevReelsColor {
     let primary70 = UIColor(named: "Primary70")
     let primary80 = UIColor(named: "Primary80")
     let primary90 = UIColor(named: "Primary90")
+    
+    // Grayscale
+    let grayscale50 = UIColor(named: "Grayscale50")
 }
