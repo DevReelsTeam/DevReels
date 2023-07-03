@@ -13,6 +13,7 @@ import DRVideoController
 
 enum ReelsNavigation {
     case finish
+    case comments
 }
 
 final class ReelsViewModel: ViewModel {
@@ -24,6 +25,7 @@ final class ReelsViewModel: ViewModel {
         let reelsChanged: Observable<IndexPath>
         let reelsWillBeginDragging: Observable<Void>
         let reelsDidEndDragging: Observable<Void>
+        let commentButtonTap: PublishSubject<String>
     }
     
     struct Output {
@@ -48,6 +50,7 @@ final class ReelsViewModel: ViewModel {
     
     func bind(input: Input) {
         input.viewWillAppear
+            .take(1)
             .withUnretained(self)
             .flatMap { viewModel, _ in
                 viewModel.reelsUseCase?.list().asResult() ?? .empty()
@@ -126,6 +129,10 @@ final class ReelsViewModel: ViewModel {
                     print("재생")
                     viewModel.videoController.shouldPlay = true
                 }
+        input.commentButtonTap
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, reelsID in
+                viewModel.navigation.onNext(.comments)
             })
             .disposed(by: disposeBag)
     }
