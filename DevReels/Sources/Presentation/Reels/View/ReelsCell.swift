@@ -131,8 +131,6 @@ final class ReelsCell: UITableViewCell, Identifiable {
         self.titleLabel.text = data.title
         self.descriptionLabel.text = data.videoDescription
         self.reels = data
-        
-        print("configureCell - called")
     }
     
     // MARK: - Layout
