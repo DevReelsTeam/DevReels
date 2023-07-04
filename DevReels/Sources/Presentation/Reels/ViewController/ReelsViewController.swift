@@ -12,6 +12,7 @@ import Then
 import RxSwift
 import RxCocoa
 import DRVideoController
+import AVFoundation
 
 final class ReelsViewController: UIViewController {
     
@@ -31,11 +32,16 @@ final class ReelsViewController: UIViewController {
         $0.contentMode = .scaleToFill
     }
     
+    var videoLayer = AVPlayerLayer()
+    
     var commentButtonTapped = PublishSubject<Reels>()
-        
+    
     private let viewModel: ReelsViewModel
-    private let videoController = VideoPlayerController.sharedVideoPlayer
+    private var videoController: VideoPlayerController {
+        viewModel.videoController
+    }
     private let disposeBag = DisposeBag()
+    private var currentReels: Reels?
     
     // MARK: - Inits
     init(viewModel: ReelsViewModel) {
@@ -55,7 +61,6 @@ final class ReelsViewController: UIViewController {
     }
     
     func bind() {
-        
         let input = ReelsViewModel.Input(
             viewWillAppear: rx.viewWillAppear.map { _ in () }
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
@@ -74,27 +79,39 @@ final class ReelsViewController: UIViewController {
             .drive(tableView.rx.items(
                 cellIdentifier: ReelsCell.identifier,
                 cellType: ReelsCell.self
-            )) { _, reels, cell in
+            )) { [weak self] _, reels, cell in
+                guard let self = self else { return }
+                
                 cell.commentButtonTap
-                    .subscribe(onNext: { [weak self] in
-                        self?.commentButtonTapped.onNext($0)
+                    .subscribe(onNext: {
+                        self.commentButtonTapped.onNext($0)
                     })
                     .disposed(by: cell.disposeBag)
                 
+                self.currentReels = reels
+                
                 cell.prepareForReuse()
                 cell.configureCell(data: reels)
+                
+                guard let url = reels.videoURL else { return }
+                
+                videoController.setupVideoFor(url: url)
+                videoController.playVideo(withLayer: cell.videoLayer, url: url)
             }
             .disposed(by: disposeBag)
         
-
+        /// 구현해야하는 것
+        /// Cell이 didEndDisplayingCell 일때 videoLayer와 videoURL을 받아서 playVideo 메서드를 호출
+        /// Cell이 willBeginDragging 일때 videoLayer와 videoURL을 받아서 pauseVideo 메서드 호출
         
-        tableView.rx.didEndDisplayingCell
-            .subscribe(onNext: { [weak self] cell, _ in
+        Observable.combineLatest(viewModel.reelsList, tableView.rx.didEndDisplayingCell)
+            .subscribe(onNext: { [weak self] reelsList, didEndDisplayingCell in
                 guard let self = self else { return }
                 
-                if let videoCell = cell as? PlayVideoLayerContainer {
+                if let videoCell = didEndDisplayingCell.cell as? PlayVideoLayerContainer {
                     if videoCell.videoURL != nil {
                         videoController.removeLayerFor(cell: videoCell)
+                        videoController.setupVideoFor(url: reelsList[didEndDisplayingCell.indexPath.row].videoURL ?? "")
                     }
                 }
             })
@@ -109,10 +126,11 @@ final class ReelsViewController: UIViewController {
             .disposed(by: disposeBag)
         
         tableView.rx.didEndDragging
-            .subscribe(onNext: { [weak self] _ in
+            .subscribe(onNext: { [weak self] decelerate in
                 guard let self = self else { return }
-                
-                videoController.pausePlayeVideosFor(tableView: tableView)
+                if !decelerate {
+                    videoController.pausePlayeVideosFor(tableView: tableView)
+                }
             })
             .disposed(by: disposeBag)
     }

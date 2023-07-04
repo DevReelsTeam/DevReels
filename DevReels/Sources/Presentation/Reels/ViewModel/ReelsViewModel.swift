@@ -35,10 +35,9 @@ final class ReelsViewModel: ViewModel {
     var disposeBag = DisposeBag()
     var reelsUseCase: ReelsUseCaseProtocol?
     let navigation = PublishSubject<ReelsNavigation>()
-    private let videoController = VideoPlayerController.sharedVideoPlayer
-    private let reelsList = BehaviorSubject<[Reels]>(value: [])
+    let videoController = VideoPlayerController.sharedVideoPlayer
+    let reelsList = BehaviorSubject<[Reels]>(value: [])
     private var currentIndexPath: IndexPath?
-    let isPlaying = BehaviorRelay<Bool>(value: true)
     static let reload = PublishSubject<Void>()
     
     func transform(input: Input) -> Output {
@@ -65,72 +64,7 @@ final class ReelsViewModel: ViewModel {
                 }
             })
             .disposed(by: disposeBag)
-        
-        input.viewWillDisAppear
-            .withUnretained(self)
-            .subscribe(onNext: { viewModel, _ in
-                viewModel.isPlaying.accept(false)
-            })
-            .disposed(by: disposeBag)
-        
-        input.reelsTapped
-            .withUnretained(self)
-            .subscribe { viewModel, _ in
-                print("ReelsView가 클릭되었음")
-                switch viewModel.isPlaying.value {
-                case true:
-                    viewModel.isPlaying.accept(false)
-                case false:
-                    viewModel.isPlaying.accept(true)
-                }
-            }
-            .disposed(by: disposeBag)
-        
-        input.reelsChanged
-            .withUnretained(self)
-            .subscribe(onNext: { viewModel, indexPath in
-                
-                print("Reels가 바뀌었음")
-                
-                guard let currentIdxPath = viewModel.currentIndexPath else { return }
-                                
-                if currentIdxPath != indexPath {
-                    
-                    viewModel.currentIndexPath = indexPath
-                    self.isPlaying.accept(false)
-                }
-            })
-            .disposed(by: disposeBag)
-        
-        input.reelsWillBeginDragging
-            .withUnretained(self)
-            .subscribe(onNext: { viewModel, _ in
-                print("ReelsWillBeginDragging")
-                viewModel.videoController.shouldPlay = false
-            })
-            .disposed(by: disposeBag)
-        
-        input.reelsDidEndDragging
-            .withUnretained(self)
-            .subscribe(onNext: { viewModel, _ in
-                print("ReelsDidEndDragging")
-                viewModel.videoController.shouldPlay = true
-            })
-            .disposed(by: disposeBag)
-        
-        isPlaying.asObservable()
-            .withUnretained(self)
-            .subscribe(onNext: { viewModel, isPlaying in
-                switch isPlaying {
-                case false:
-                    print("일시정지")
-                    viewModel.videoController.shouldPlay = false
-                case true:
-                    print("재생")
-                    viewModel.videoController.shouldPlay = true
-                }
-            })
-            .disposed(by: self.disposeBag)
+
         input.commentButtonTap
             .withUnretained(self)
             .subscribe(onNext: { viewModel, reels in
