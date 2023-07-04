@@ -21,6 +21,7 @@ final class ReelsViewModel: ViewModel {
     struct Input {
         let viewWillAppear: Observable<Void>
         let viewWillDisAppear: Observable<Void>
+        let viewDidAppear: Observable<Void>
         let reelsTapped: Observable<Void>
         let reelsChanged: Observable<IndexPath>
         let reelsWillBeginDragging: Observable<Void>
@@ -65,6 +66,27 @@ final class ReelsViewModel: ViewModel {
             })
             .disposed(by: disposeBag)
 
+        input.reelsTapped
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                videoController.shouldPlay.toggle()
+            })
+            .disposed(by: disposeBag)
+        
+        input.viewWillDisAppear
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                videoController.shouldPlay = false
+            })
+            .disposed(by: disposeBag)
+        
+        input.viewDidAppear
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                videoController.shouldPlay = true
+            })
+            .disposed(by: disposeBag)
+        
         input.commentButtonTap
             .withUnretained(self)
             .subscribe(onNext: { viewModel, reels in

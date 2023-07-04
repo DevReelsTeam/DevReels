@@ -66,6 +66,8 @@ final class ReelsViewController: UIViewController {
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
             viewWillDisAppear: rx.viewWillDisappear.map { _ in () }
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
+            viewDidAppear: rx.viewDidAppear.map { _ in }
+                .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
             reelsTapped: tableView.rx.itemSelected.map { _ in () }
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
             reelsChanged: tableView.rx.didEndDisplayingCell.map { $0.indexPath },
@@ -111,7 +113,6 @@ final class ReelsViewController: UIViewController {
                 if let videoCell = didEndDisplayingCell.cell as? PlayVideoLayerContainer {
                     if videoCell.videoURL != nil {
                         videoController.removeLayerFor(cell: videoCell)
-                        videoController.setupVideoFor(url: reelsList[didEndDisplayingCell.indexPath.row].videoURL ?? "")
                     }
                 }
             })

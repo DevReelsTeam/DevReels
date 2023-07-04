@@ -14,7 +14,7 @@ final class VideoContainer {
     
     var url: String
     
-    var shouldPlay = true {
+    var shouldPlay = false {
         didSet {
             if shouldPlay {
                 player.play()
