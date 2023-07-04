@@ -32,8 +32,6 @@ final class ReelsViewController: UIViewController {
         $0.contentMode = .scaleToFill
     }
     
-    var videoLayer = AVPlayerLayer()
-    
     var commentButtonTapped = PublishSubject<Reels>()
     
     private let viewModel: ReelsViewModel
@@ -102,15 +100,11 @@ final class ReelsViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
-        /// 구현해야하는 것
-        /// Cell이 didEndDisplayingCell 일때 videoLayer와 videoURL을 받아서 playVideo 메서드를 호출
-        /// Cell이 willBeginDragging 일때 videoLayer와 videoURL을 받아서 pauseVideo 메서드 호출
-        
-        Observable.combineLatest(viewModel.reelsList, tableView.rx.didEndDisplayingCell)
-            .subscribe(onNext: { [weak self] reelsList, didEndDisplayingCell in
+        tableView.rx.didEndDisplayingCell
+            .subscribe(onNext: { [weak self] cell, _ in
                 guard let self = self else { return }
                 
-                if let videoCell = didEndDisplayingCell.cell as? PlayVideoLayerContainer {
+                if let videoCell = cell as? PlayVideoLayerContainer {
                     if videoCell.videoURL != nil {
                         videoController.removeLayerFor(cell: videoCell)
                     }
