@@ -13,7 +13,7 @@ import RxCocoa
 import RxKeyboard
 import Then
 
-class VideoDetailsViewController: ViewController {
+final class VideoDetailsViewController: ViewController {
     
     // MARK: - Properties
     
@@ -25,30 +25,29 @@ class VideoDetailsViewController: ViewController {
     private let contentView = UIView()
     
     private let thumbnailImageView = UIImageView().then {
-        $0.contentMode = .scaleAspectFill
-        $0.backgroundColor = .darkGray
+        $0.contentMode = .scaleAspectFit
+        $0.backgroundColor = .black
     }
     
-    private let titleTextField = CountTextField().then {
-        $0.placeholder = "영상의 제목을 입력해주세요"
+    private let titleTextField = TextField().then {
+        $0.placeholder = "제목을 입력하세요"
         $0.title = "제목"
     }
     
     private let descriptionTextView = CountTextView().then {
-        $0.placeholder = "상세 설명을 추가해주세요"
-        $0.title = "설명"
+        $0.placeholder = "내용을 입력하세요"
+        $0.title = "내용"
+        $0.maxCount = 100
     }
     
-    private let linkTextField = UrlTextField().then {
+    private let linkTextField = TextField(inputType: .url).then {
         $0.placeholder = "영상 관련 링크를 입력해주세요"
         $0.title = "링크"
     }
     
     private let uploadButton = ValidationButton().then {
         $0.isEnabled = false
-        $0.layer.cornerRadius = 8.0
-        $0.layer.masksToBounds = true
-        $0.setTitle("업로드", for: .normal)
+        $0.setTitle("< Upload >", for: .normal)
     }
     
     private var viewModel: VideoDetailsViewModel
@@ -68,6 +67,7 @@ class VideoDetailsViewController: ViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         hideKeyboardWhenTappedAround()
+        configureNavigationBar()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -75,11 +75,47 @@ class VideoDetailsViewController: ViewController {
         navigationController?.isNavigationBarHidden = false
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
         navigationController?.isNavigationBarHidden = true
     }
     
+    private let githubToggleBar = ToggleBar().then {
+        $0.image = UIImage(systemName: "square.and.arrow.up")
+        $0.title = "Github 링크 추가하기"
+    }
+    
+    private lazy var stackView = UIStackView().then {
+        $0.addArrangedSubview(githubToggleBar)
+        $0.axis = .vertical
+        $0.spacing = 4
+    }
+    
+    private func addTextField() {
+        guard let toggleBar = stackView.arrangedSubviews.last else { return }
+        let nextEntryIndex = stackView.arrangedSubviews.count
+                
+        let offset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + toggleBar.bounds.size.height)
+        
+        let newEntryView = linkTextField
+        newEntryView.isHidden = true
+        
+        stackView.insertArrangedSubview(newEntryView, at: nextEntryIndex)
+        
+        UIView.animate(withDuration: 0.25) {
+            newEntryView.isHidden = false
+            self.scrollView.contentOffset = offset
+        }
+    }
+    
+    private func removeTextField() {
+        
+        UIView.animate(withDuration: 0.25, animations: {
+            self.linkTextField.isHidden = true
+        }, completion: { _ in
+            self.linkTextField.removeFromSuperview()
+        })
+    }
     
     // MARK: - binds
     
@@ -87,6 +123,12 @@ class VideoDetailsViewController: ViewController {
         RxKeyboard.instance.visibleHeight
             .drive(onNext: { [weak self] keyboardVisibleHeight in
                 self?.scrollView.contentInset.bottom = keyboardVisibleHeight
+            })
+            .disposed(by: disposeBag)
+        
+        githubToggleBar.rx.isOn
+            .subscribe(onNext: { [weak self] in
+                $0 ? self?.addTextField() : self?.removeTextField()
             })
             .disposed(by: disposeBag)
         
@@ -99,7 +141,6 @@ class VideoDetailsViewController: ViewController {
             uploadButtonTapped: uploadButton.rx.tap.asObservable()
             )
             
-        
         let output = viewModel.transform(input: input)
         
         output.uploadButtonEnabled
@@ -113,14 +154,22 @@ class VideoDetailsViewController: ViewController {
     // MARK: - Methods
     
     private func configureNavigationBar() {
-        navigationItem.title = "비디오 상세 정보"
+        navigationItem.title = "세부정보 입력하기"
     }
     
     override func layout() {
         
+        view.addSubview(uploadButton)
+        uploadButton.snp.makeConstraints {
+            $0.bottom.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.height.equalTo(49)
+        }
+        
         view.addSubview(scrollView)
         scrollView.snp.makeConstraints {
-            $0.edges.equalTo(view.safeAreaLayoutGuide)
+            $0.leading.trailing.top.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.equalTo(uploadButton.snp.top)
         }
         
         scrollView.addSubview(contentView)
@@ -139,35 +188,27 @@ class VideoDetailsViewController: ViewController {
         contentView.addSubview(titleTextField)
         titleTextField.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(16.0)
-            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(20)
+            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(18)
         }
         
         contentView.addSubview(descriptionTextView)
         descriptionTextView.snp.makeConstraints {
             $0.leading.trailing.equalToSuperview().inset(16.0)
-            $0.top.equalTo(titleTextField.snp.bottom).offset(20)
+            $0.top.equalTo(titleTextField.snp.bottom).offset(18)
             $0.height.equalTo(150)
         }
         
-        contentView.addSubview(linkTextField)
-        linkTextField.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(16.0)
-            $0.top.equalTo(descriptionTextView.snp.bottom).offset(20)
+        contentView.addSubview(stackView)
+        stackView.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview().inset(16.0)
+            make.top.equalTo(descriptionTextView.snp.bottom).offset(18)
         }
-
-        contentView.addSubview(uploadButton)
-        uploadButton.snp.makeConstraints {
-            $0.width.equalToSuperview().multipliedBy(0.4)
-            $0.centerX.equalToSuperview()
-            $0.top.equalTo(linkTextField.snp.bottom).offset(20)
-            $0.height.equalTo(34)
-        }
-        
+    
         let marginView = UIView()
         contentView.addSubview(marginView)
         marginView.snp.makeConstraints {
             $0.leading.trailing.bottom.equalToSuperview()
-            $0.top.equalTo(uploadButton.snp.bottom)
+            $0.top.equalTo(stackView.snp.bottom)
         }
     }
 }

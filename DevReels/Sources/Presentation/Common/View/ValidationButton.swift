@@ -28,21 +28,21 @@ final class ValidationButton: UIButton {
     }
     
     private func configureFont() {
-        titleLabel?.font = .boldSystemFont(ofSize: 20)
+        titleLabel?.font = .systemFont(ofSize: 16)
     }
     
     private func configureRadius() {
         clipsToBounds = true
-        layer.cornerRadius = 8
+        layer.cornerRadius = 6
     }
     
     private func configureEnableColor() {
-        setBackgroundColor(.darkGray, for: .normal)
-        setTitleColor(UIColor.orange, for: .normal)
+        setBackgroundColor(.devReelsColor.primary90 ?? .orange, for: .normal)
+        setTitleColor(.white, for: .normal)
     }
     
     private func configureDisableColor() {
-        setBackgroundColor(.lightGray, for: .disabled)
-        setTitleColor(UIColor.white, for: .disabled)
+        setBackgroundColor(.devReelsColor.neutral50 ?? .darkGray, for: .disabled)
+        setTitleColor(.devReelsColor.neutral300, for: .disabled)
     }
 }

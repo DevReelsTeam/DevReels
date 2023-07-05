@@ -96,7 +96,7 @@ extension ReelsTarget: TargetType {
     var path: String {
         switch self {
         case .upload(let reels):
-            return "/\(reels.uid.value)/\(reels.id.value)"
+            return "/?documentId=\(reels.id.value)"
         default:
             return ""
         }
