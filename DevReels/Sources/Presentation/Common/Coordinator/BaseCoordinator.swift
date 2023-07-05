@@ -90,4 +90,8 @@ class BaseCoordinator<ResultType> {
             animated: animated
         )
     }
+    
+    func setTabBarHidden(_ hidden: Bool) {
+        navigationController.tabBarController?.tabBar.isHidden = hidden
+    }
 }

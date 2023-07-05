@@ -31,6 +31,8 @@ final class DIContainer {
             dataSource.keychain = resolver.resolve(KeychainProtocol.self)
             return dataSource
         }
+        container.register(CommentDataSourceProtocol.self) { _ in CommentDataSource()}
+        container.register(UserDataSourceProtocol.self) { _ in UserDataSource()}
     }
     
     private func registerRepositories() {
@@ -50,6 +52,18 @@ final class DIContainer {
             repository.keychainManager = resolver.resolve(KeychainManagerProtocol.self)
             return repository
         }
+        
+        container.register(CommentRepositoryProtocol.self) { resolver in
+            var repository = CommentRepository()
+            repository.commentDataSource = resolver.resolve(CommentDataSourceProtocol.self)
+            return repository
+        }
+        
+        container.register(UserRepositoryProtocol.self) { resolver in
+            var repository = UserRepository()
+            repository.userDataSource = resolver.resolve(UserDataSourceProtocol.self)
+            return repository
+        }
     }
     
     private func registerUseCases() {
@@ -57,16 +71,25 @@ final class DIContainer {
             var useCase = LoginUseCase()
             useCase.authRepository = resolver.resolve(AuthRepositoryProtocol.self)
             useCase.tokenRepository = resolver.resolve(TokenRepositoryProtocol.self)
+            useCase.userRepository = resolver.resolve(UserRepositoryProtocol.self)
             return useCase
         }
+        
         container.register(ReelsUseCaseProtocol.self) { resolver in
             var useCase = ReelsUseCase()
             useCase.reelsRepository = resolver.resolve(ReelsRepositoryProtocol.self)
             return useCase
         }
+        
         container.register(UploadReelsUsecaseProtocol.self) { resolver in
             var useCase = UploadReelsUseCase()
             useCase.reelsRepository = resolver.resolve(ReelsRepositoryProtocol.self)
+            return useCase
+        }
+        
+        container.register(CommentListUseCaseProtocol.self) { resolver in
+            var useCase = CommentListUseCase()
+            useCase.commentRepository = resolver.resolve(CommentRepositoryProtocol.self)
             return useCase
         }
     }
@@ -89,5 +112,7 @@ final class DIContainer {
             return viewModel
         }
         container.register(ProfileViewModel.self) { _ in ProfileViewModel() }
+        
+        // TODO: - CommentViewModel 추가
     }
 }

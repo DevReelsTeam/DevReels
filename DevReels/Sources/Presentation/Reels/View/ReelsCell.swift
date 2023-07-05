@@ -7,9 +7,11 @@
 //
 
 import UIKit
-import AVFoundation
 import SnapKit
 import DRVideoController
+import RxSwift
+import RxCocoa
+import AVFoundation
 
 final class ReelsCell: UITableViewCell, Identifiable {
     // MARK: - Properties
@@ -35,7 +37,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         $0.textColor = .white
     }
     
-    private lazy var commentImageView = UIImageView().then {
+    private lazy var commentImageView = RxUIImageView(frame: .zero).then {
         $0.image = UIImage(systemName: "bubble.left")
         $0.tintColor = .white
     }
@@ -60,32 +62,43 @@ final class ReelsCell: UITableViewCell, Identifiable {
         $0.contentMode = .scaleToFill
     }
     
-    lazy var videoLayer = AVPlayerLayer().then {
-        $0.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-        $0.backgroundColor = UIColor.clear.cgColor
-        $0.videoGravity = AVLayerVideoGravity.resize
+    private lazy var playImageView = UIImageView().then {
+        $0.adjustsImageSizeForAccessibilityContentSizeCategory = true
+        $0.image = UIImage(systemName: "play.circle.fill")
+        $0.image = $0.image?.withRenderingMode(.alwaysTemplate)
+        $0.tintColor = .systemGray5
     }
     
-    private let videoController = VideoPlayerController.sharedVideoPlayer
-    
+    private lazy var pauseImageView = UIImageView().then {
+        $0.adjustsImageSizeForAccessibilityContentSizeCategory = true
+        $0.image = UIImage(systemName: "pause.circle.fill")
+        $0.image = $0.image?.withRenderingMode(.alwaysTemplate)
+        $0.tintColor = .systemGray5
+    }
+        
     var reels: Reels?
-    
-    private var videoURL: String? {
-        didSet {
-            if let videoURL = videoURL {
-                videoController.setupVideoFor(url: videoURL)
-            }
-            videoLayer.isHidden = videoURL == nil
-        }
-    }
+    var commentButtonTap = PublishSubject<Reels>()
+    var disposeBag = DisposeBag()
+    var videoLayer = AVPlayerLayer()
+    var videoURL: String?
     
     // MARK: - Inits
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.selectionStyle = .none
+        
+        commentImageView.tapEvent
+            .subscribe(onNext: { [weak self] in
+                self?.commentButtonTap
+                    .onNext(self?.reels ?? Reels(id: "", uid: "", videoURL: "", thumbnailURL: "", title: "", videoDescription: ""))
+            })
+            .disposed(by: disposeBag)
+        
         layout()
         self.layoutIfNeeded()
+        
+        videoLayer.videoGravity = AVLayerVideoGravity.resize
     }
     
     required init?(coder: NSCoder) {
@@ -102,8 +115,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
     override func layoutSubviews() {
         super.layoutSubviews()
         configureGradient()
-        videoController.playVideo(withLayer: videoLayer, url: videoURL ?? "")
-        print(self.reels?.id)
+        videoLayer.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)
     }
     
     func configureGradient() {
@@ -123,7 +135,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
     
     // MARK: - Layout
     private func layout() {
-        contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel, heartImageView, heartNumberLabel, commentImageView, commentNumberLabel, shareImageView])
+        contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel, heartImageView, heartNumberLabel, commentImageView, commentNumberLabel, shareImageView, playImageView, pauseImageView])
 
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(contentView.snp.bottom).offset(-150)
@@ -142,7 +154,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         }
         
         thumbnailImageView.layer.addSublayer(videoLayer)
-
+        
         bottomGradientImageView.snp.makeConstraints {
             $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-120)
             $0.leading.equalTo(thumbnailImageView.snp.leading)
@@ -177,5 +189,31 @@ final class ReelsCell: UITableViewCell, Identifiable {
             $0.trailing.equalTo(heartImageView.snp.trailing)
             $0.bottom.equalTo(commentImageView.snp.bottom).offset(40)
         }
+        
+        playImageView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(50)
+        }
+        
+        pauseImageView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(50)
+        }
+    }
+}
+
+extension ReelsCell: PlayVideoLayerContainer {
+    func visibleVideoHeight() -> CGFloat {
+        let videoFrameInParentSuperView: CGRect? = self.superview?.superview?.convert(
+            thumbnailImageView.frame,
+            from: thumbnailImageView)
+        guard let videoFrame = videoFrameInParentSuperView,
+              let superViewFrame = superview?.frame else {
+                  return 0
+              }
+        let visibleVideoFrame = videoFrame.intersection(superViewFrame)
+        return visibleVideoFrame.size.height
     }
 }

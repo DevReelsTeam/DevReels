@@ -9,15 +9,24 @@
 import Foundation
 import RxSwift
 import RxCocoa
+import DRVideoController
 
 enum ReelsNavigation {
     case finish
+    case comments(Reels)
 }
 
 final class ReelsViewModel: ViewModel {
     
     struct Input {
         let viewWillAppear: Observable<Void>
+        let viewWillDisAppear: Observable<Void>
+        let viewDidAppear: Observable<Void>
+        let reelsTapped: Observable<Void>
+        let reelsChanged: Observable<IndexPath>
+        let reelsWillBeginDragging: Observable<Void>
+        let reelsDidEndDragging: Observable<Void>
+        let commentButtonTap: PublishSubject<Reels>
     }
     
     struct Output {
@@ -27,19 +36,21 @@ final class ReelsViewModel: ViewModel {
     var disposeBag = DisposeBag()
     var reelsUseCase: ReelsUseCaseProtocol?
     let navigation = PublishSubject<ReelsNavigation>()
-    let currentReels = PublishSubject<Reels>()
-    private let reelsList = BehaviorSubject<[Reels]>(value: [])
+    let videoController = VideoPlayerController.sharedVideoPlayer
+    let reelsList = BehaviorSubject<[Reels]>(value: [])
+    private var currentIndexPath: IndexPath?
     static let reload = PublishSubject<Void>()
     
     func transform(input: Input) -> Output {
-        bindRefresh(input: input)
+        bind(input: input)
         return Output(
             reelsList: reelsList.asDriver(onErrorJustReturn: [])
         )
     }
     
-    func bindRefresh(input: Input) {
+    func bind(input: Input) {
         input.viewWillAppear
+            .take(1)
             .withUnretained(self)
             .flatMap { viewModel, _ in
                 viewModel.reelsUseCase?.list().asResult() ?? .empty()
@@ -54,5 +65,34 @@ final class ReelsViewModel: ViewModel {
                 }
             })
             .disposed(by: disposeBag)
-    }
+
+        input.reelsTapped
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                videoController.shouldPlay.toggle()
+            })
+            .disposed(by: disposeBag)
+        
+        input.viewWillDisAppear
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                videoController.shouldPlay = false
+            })
+            .disposed(by: disposeBag)
+        
+        input.viewDidAppear
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                videoController.shouldPlay = true
+            })
+            .disposed(by: disposeBag)
+        
+        input.commentButtonTap
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, reels in
+                viewModel.navigation.onNext(.comments(reels))
+            })
+            .disposed(by: self.disposeBag)
+        }
 }
+

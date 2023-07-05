@@ -8,8 +8,4 @@
 
 import Foundation
 
-struct CommentDTO {
-    private let id: StringValue
-    private let comment: StringValue
-//    private let timestamp = Timestamp
-}
+// MARK: - 삭제필요

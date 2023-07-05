@@ -29,9 +29,9 @@ final class VideoContainer {
             player.isMuted = VideoPlayerController.sharedVideoPlayer.mute
             playerItem.preferredPeakBitRate = VideoPlayerController.sharedVideoPlayer.preferredPeakBitRate
             if playOn && playerItem.status == .readyToPlay {
-                player.play()
+                shouldPlay = true
             } else {
-                player.pause()
+                shouldPlay = false
             }
         }
     }

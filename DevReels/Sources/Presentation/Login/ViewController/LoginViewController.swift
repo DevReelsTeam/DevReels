@@ -110,7 +110,7 @@ final class LoginViewController: ViewController {
         
         let input = LoginViewModel.Input(
             appleCredential: credential,
-            githupLoginButtonTap: githubLoginButton.rx.tap.asObservable()
+            righButtonTap: rightButton.rx.tap.asObservable()
         )
         
         let _ = viewModel.transform(input: input)
