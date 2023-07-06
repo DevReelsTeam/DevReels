@@ -20,9 +20,8 @@ final class UploadCoordinator: BaseCoordinator<UploadCoordinatorResult> {
     
     override func start() -> Observable<UploadCoordinatorResult> {
         showVideoTrimmer()
-        return Observable.never()
+        return finish
     }
-    
     
     // MARK: - 비디오 트리밍
     

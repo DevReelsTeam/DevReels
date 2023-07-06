@@ -18,6 +18,7 @@ final class PreviewVideoViewModel: ViewModel {
     }
     
     struct Output {
+        
     }
     
     func transform(input: Input) -> Output {

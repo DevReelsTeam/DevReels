@@ -35,9 +35,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private func navigationBarAppearance() {
         let navigationBarAppearance = UINavigationBarAppearance()
-        navigationBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.devReelsColor.neutral1000 ?? UIColor.white]
-        navigationBarAppearance.backgroundColor = .clear
 
+        navigationBarAppearance.titleTextAttributes = [.foregroundColor: UIColor.devReelsColor.neutral500 ?? UIColor.white]
+        navigationBarAppearance.backgroundColor = .devReelsColor.backgroundDefault
+        
         UINavigationBar.appearance().standardAppearance = navigationBarAppearance
         UINavigationBar.appearance().compactAppearance = navigationBarAppearance
         UINavigationBar.appearance().scrollEdgeAppearance = navigationBarAppearance
