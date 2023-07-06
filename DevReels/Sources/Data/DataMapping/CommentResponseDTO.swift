@@ -11,7 +11,8 @@ import Foundation
 struct CommentResponseDTO: Encodable {
     let commentID: StringValue
     let reelsID: StringValue
-    let writerID: StringValue
+    let writerUID: StringValue
+    let writerNickName: StringValue
     let writerProfileImageURL: StringValue
     let content: StringValue
     let date: IntegerValue
@@ -20,7 +21,8 @@ struct CommentResponseDTO: Encodable {
     init(comment: Comment) {
         self.commentID = StringValue(value: comment.commentID)
         self.reelsID = StringValue(value: comment.reelsID)
-        self.writerID = StringValue(value: comment.writerID)
+        self.writerUID = StringValue(value: comment.writerUID)
+        self.writerNickName = StringValue(value: comment.writerNickName)
         self.writerProfileImageURL = StringValue(value: comment.writerProfileImageURL)
         self.content = StringValue(value: comment.content)
         self.date = IntegerValue(value: "\(comment.date)")
@@ -31,7 +33,8 @@ struct CommentResponseDTO: Encodable {
         return Comment(
             commentID: commentID.value,
             reelsID: reelsID.value,
-            writerID: writerID.value,
+            writerUID: writerUID.value,
+            writerNickName: writerNickName.value,
             writerProfileImageURL: writerProfileImageURL.value,
             content: content.value,
             date: Int(date.value) ?? 0,

@@ -94,7 +94,7 @@ final class CommentViewModel: ViewModel {
             .withUnretained(self)
             .subscribe(onNext: { _, result in
                 switch result {
-                case .success():
+                case .success:
                    break
                 case .failure:
                     let alert = Alert(title: "로그인이 필요합니다.", message: "댓글을 남기시려면 로그인을 하셔야 합니다. 로그인을 해주세요", observer: nil)
@@ -110,9 +110,10 @@ final class CommentViewModel: ViewModel {
             .map { user, commentString -> Comment in
                 return Comment(
                     reelsID: self.reels?.id ?? "",
-                    writerID: user.identifire,
+                    writerUID: user.uid,
                     writerProfileImageURL: user.profileImageURLString,
-                    content: commentString
+                    content: commentString,
+                    writerNickName: user.nickName
                 )
             }
             .withUnretained(self)
@@ -135,7 +136,7 @@ final class CommentViewModel: ViewModel {
         Observable.combineLatest(input.selectedComment, currentUser)
             .compactMap { $0 }
             .map { comment, user -> Alert? in
-                if comment.writerID == user?.identifire {
+                if comment.writerUID == user?.uid {
                    return Alert(title: "댓글 삭제", message: "댓글을 삭제하시겠습니까?", observer: removeCommentAlertObserver.asObserver())
                 }
                 return nil
@@ -146,7 +147,6 @@ final class CommentViewModel: ViewModel {
                 viewModel.alert.onNext(alert)
             })
             .disposed(by: disposeBag)
-        
         
         removeCommentAlertObserver
             .withLatestFrom(input.selectedComment)

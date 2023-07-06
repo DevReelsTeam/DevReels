@@ -89,10 +89,10 @@ final class CommentCell: UITableViewCell, Identifiable {
     
 
     func configureCell(data: Comment, reels: Reels?) {
-        self.nameLabel.text = data.writerID
+        self.nameLabel.text = data.writerNickName
         self.textView.text = data.content
         self.likenumberLabel.text = data.likes.toString
-        self.timeLabel.text = data.date.toString
+        self.timeLabel.text = data.date.toDateString()
 
         guard let url = URL(string: data.writerProfileImageURL) else { return }
         
@@ -104,7 +104,7 @@ final class CommentCell: UITableViewCell, Identifiable {
             .bind(to: profileImageView.rx.image)
             .disposed(by: disposeBag)
         
-        if data.writerID != reels?.uid {
+        if data.writerUID != reels?.uid {
             writer.isHidden = true
         }
     }
