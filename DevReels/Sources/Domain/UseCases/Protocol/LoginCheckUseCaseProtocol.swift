@@ -6,4 +6,9 @@
 //  Copyright © 2023 DevReels. All rights reserved.
 //
 
-import Foundation
+import RxSwift
+
+protocol LoginCheckUseCaseProtocol {
+    func loginCheck() -> Observable<Authorization>
+    func currentUser() -> Observable<User>
+}

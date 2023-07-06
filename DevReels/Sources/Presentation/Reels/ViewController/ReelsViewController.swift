@@ -35,7 +35,7 @@ final class ReelsViewController: UIViewController {
         
     private let viewModel: ReelsViewModel
     private let videoController = VideoPlayerController.sharedVideoPlayer
-    private let disposeBag = DisposeBag()
+    let disposeBag = DisposeBag()
     
     // MARK: - Inits
     init(viewModel: ReelsViewModel) {

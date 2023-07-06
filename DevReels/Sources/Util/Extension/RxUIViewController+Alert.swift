@@ -19,4 +19,23 @@ extension Reactive where Base: UIViewController {
             base.present(alertController, animated: true)
         }
     }
+    
+    var presentActionSheet: Binder<Alert> {
+        return Binder(base) { base, alert in
+            let alertController = UIAlertController(title: alert.title, message: alert.message, preferredStyle: .actionSheet)
+            let okAction = UIAlertAction(title: "확인", style: .default, handler: { _ in alert.observer?.onNext(true)} )
+            let cancleAction = UIAlertAction(title: "취소", style: .cancel)
+            alertController.addAction(okAction)
+            alertController.addAction(cancleAction)
+            base.present(alertController, animated: true)
+        }
+    }
+}
+
+extension UIViewController {
+    func actionsheet(title: String, message: String, actions: [UIAlertAction]) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .actionSheet)
+        actions.forEach { alert.addAction($0) }
+        present(alert, animated: true, completion: nil)
+    }
 }

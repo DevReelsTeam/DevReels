@@ -7,3 +7,18 @@
 //
 
 import Foundation
+import RxSwift
+
+struct LoginCheckUseCase: LoginCheckUseCaseProtocol {
+    
+    var tokenRepository: TokenRepositoryProtocol?
+    var userRepository: UserRepositoryProtocol?
+    
+    func loginCheck() -> Observable<Authorization> {
+        return tokenRepository?.load() ?? .empty()
+    }
+    
+    func currentUser() -> Observable<User> {
+        return userRepository?.currentUser() ?? .empty()
+    }
+}

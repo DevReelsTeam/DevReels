@@ -13,14 +13,20 @@ struct CommentRepository: CommentRepositoryProtocol {
     var commentDataSource: CommentDataSourceProtocol?
     private let disposeBag = DisposeBag()
     
-    func upload(reelsID: String, comment: Comment) -> Observable<Void> {
+    func upload(comment: Comment) -> Observable<Void> {
         let request = CommentRequestDTO(comment: comment)
         
-        return commentDataSource?.upload(reelsID: reelsID, request: request) ?? .empty()
+        return commentDataSource?.upload(request: request) ?? .empty()
     }
     
     func fetch(reelsID: String) -> Observable<[Comment]> {
         return commentDataSource?.read(reelsID: reelsID)
             .map { $0.map { $0.toDomain() } } ?? .empty()
+    }
+    
+    func delete(comment: Comment) -> Observable<Void> {
+        let request = CommentRequestDTO(deleteComment: comment)
+        
+        return commentDataSource?.delete(request: request) ?? .empty()
     }
 }

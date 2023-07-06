@@ -40,9 +40,9 @@ final class CommentCell: UITableViewCell, Identifiable {
         $0.textAlignment = .center
     }
     
-    private let dotdotdot = RxUIImageView(frame: .zero).then {
+    private let dotdotdot = UIButton(type: .system).then {
+        $0.setImage(UIImage(systemName: "ellipsis"), for: .normal)
         $0.tintColor = .devReelsColor.grayscale50
-        $0.image = UIImage(systemName: "ellipsis")
     }
     
      let textView = UITextView().then {
@@ -64,6 +64,10 @@ final class CommentCell: UITableViewCell, Identifiable {
         $0.image = UIImage(systemName: "heart")
     }
     
+    let disposeBag = DisposeBag()
+    var dotdotdotButtonTap = PublishSubject<Comment>()
+
+    
     // MARK: - Initializer
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -79,14 +83,30 @@ final class CommentCell: UITableViewCell, Identifiable {
     // MARK: - Methods
     
     override func prepareForReuse() {
+        super.prepareForReuse()
         profileImageView.image = nil
     }
     
 
-    func configureCell(data: Comment) {
+    func configureCell(data: Comment, reels: Reels?) {
         self.nameLabel.text = data.writerID
         self.textView.text = data.content
         self.likenumberLabel.text = data.likes.toString
+        self.timeLabel.text = data.date.toString
+
+        guard let url = URL(string: data.writerProfileImageURL) else { return }
+        
+        URLSession.shared.rx
+            .response(request: URLRequest(url: url))
+            .map { data -> UIImage in
+                return UIImage(data: data.data) ?? UIImage()
+            }
+            .bind(to: profileImageView.rx.image)
+            .disposed(by: disposeBag)
+        
+        if data.writerID != reels?.uid {
+            writer.isHidden = true
+        }
     }
     
     // MARK: - Layout

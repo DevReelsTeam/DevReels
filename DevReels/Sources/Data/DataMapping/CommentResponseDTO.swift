@@ -12,6 +12,7 @@ struct CommentResponseDTO: Encodable {
     let commentID: StringValue
     let reelsID: StringValue
     let writerID: StringValue
+    let writerProfileImageURL: StringValue
     let content: StringValue
     let date: IntegerValue
     let likes: IntegerValue
@@ -20,6 +21,7 @@ struct CommentResponseDTO: Encodable {
         self.commentID = StringValue(value: comment.commentID)
         self.reelsID = StringValue(value: comment.reelsID)
         self.writerID = StringValue(value: comment.writerID)
+        self.writerProfileImageURL = StringValue(value: comment.writerProfileImageURL)
         self.content = StringValue(value: comment.content)
         self.date = IntegerValue(value: "\(comment.date)")
         self.likes = IntegerValue(value: "\(comment.likes)")
@@ -30,6 +32,7 @@ struct CommentResponseDTO: Encodable {
             commentID: commentID.value,
             reelsID: reelsID.value,
             writerID: writerID.value,
+            writerProfileImageURL: writerProfileImageURL.value,
             content: content.value,
             date: Int(date.value) ?? 0,
             likes: Int(likes.value) ?? 0

@@ -34,7 +34,6 @@ struct UserDataSource: UserDataSourceProtocol {
     func read(uid: String) -> Observable<UserResponseDTO> {
         return Observable.create { emitter in
             fireStore.document(uid).getDocument { snapshot, _ in
-                
                 if let data = snapshot?.data(),
                    let response = try? JSONSerialization.data(withJSONObject: data),
                    let decoded = try? JSONDecoder().decode(User.self, from: response) {

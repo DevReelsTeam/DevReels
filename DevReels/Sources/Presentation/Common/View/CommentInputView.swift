@@ -20,6 +20,8 @@ final class CommentInputView: UIView {
     }
     
     let textField = UITextField().then {
+        $0.leftViewMode = .always
+        $0.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16.0, height: 0.0))
         $0.backgroundColor = .devReelsColor.neutral20
         $0.textColor = .devReelsColor.grayscale50
         $0.placeholder = "  댓글을 남겨주세요."
@@ -82,11 +84,9 @@ final class CommentInputView: UIView {
             $0.centerY.equalToSuperview()
             $0.leading.equalTo(textField.snp.trailing).offset(8)
         }
-        
     }
     
     func attribute() {
         backgroundColor = .devReelsColor.neutral40
     }
-
 }
