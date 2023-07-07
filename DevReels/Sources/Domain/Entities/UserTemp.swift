@@ -7,3 +7,25 @@
 //
 
 import Foundation
+
+struct UserTemp {
+    let uid: String
+    let identifier: String
+    let fcmToken: String
+    let profileImageURLString: String?
+    let nickName: String?
+    let githubURLString: String?
+    let blogURLString: String?
+    let introduce: String?
+    
+    init(uid: String, identifier: String, fcmToken: String) {
+        self.uid = uid
+        self.identifier = identifier
+        self.fcmToken = fcmToken
+        profileImageURLString = nil
+        nickName = nil
+        githubURLString = nil
+        blogURLString = nil
+        introduce = nil
+    }
+}
