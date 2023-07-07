@@ -7,11 +7,11 @@
 //
 
 import UIKit
-import AVFoundation
 import SnapKit
 import DRVideoController
 import RxSwift
 import RxCocoa
+import AVFoundation
 
 final class ReelsCell: UITableViewCell, Identifiable {
     // MARK: - Properties
@@ -75,24 +75,12 @@ final class ReelsCell: UITableViewCell, Identifiable {
         $0.image = $0.image?.withRenderingMode(.alwaysTemplate)
         $0.tintColor = .systemGray5
     }
-    
-    var videoLayer = AVPlayerLayer()
-    
-    private let videoController = VideoPlayerController.sharedVideoPlayer
-    
+        
     var reels: Reels?
     var commentButtonTap = PublishSubject<Reels>()
     var disposeBag = DisposeBag()
-    
-    private var videoURL: String? {
-        didSet {
-            if let videoURL = videoURL {
-                videoController.setupVideoFor(url: videoURL)
-                print("dd")
-            }
-            videoLayer.isHidden = videoURL == nil
-        }
-    }
+    var videoLayer = AVPlayerLayer()
+    var videoURL: String?
     
     // MARK: - Inits
     
@@ -109,10 +97,8 @@ final class ReelsCell: UITableViewCell, Identifiable {
         
         layout()
         self.layoutIfNeeded()
-        videoLayer.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-        videoLayer.videoGravity = AVLayerVideoGravity.resize
         
-        print("This will be work")
+        videoLayer.videoGravity = AVLayerVideoGravity.resize
     }
     
     required init?(coder: NSCoder) {
@@ -129,6 +115,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
     override func layoutSubviews() {
         super.layoutSubviews()
         configureGradient()
+        videoLayer.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)
     }
     
     func configureGradient() {
@@ -144,9 +131,6 @@ final class ReelsCell: UITableViewCell, Identifiable {
         self.titleLabel.text = data.title
         self.descriptionLabel.text = data.videoDescription
         self.reels = data
-        
-        videoController.playVideo(withLayer: videoLayer, url: data.videoURL ?? "")
-        print("configureCell - called")
     }
     
     // MARK: - Layout
@@ -172,7 +156,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         }
         
         thumbnailImageView.layer.addSublayer(videoLayer)
-
+        
         bottomGradientImageView.snp.makeConstraints {
             $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-120)
             $0.leading.equalTo(thumbnailImageView.snp.leading)
@@ -219,5 +203,19 @@ final class ReelsCell: UITableViewCell, Identifiable {
             $0.centerY.equalToSuperview()
             $0.width.height.equalTo(50)
         }
+    }
+}
+
+extension ReelsCell: PlayVideoLayerContainer {
+    func visibleVideoHeight() -> CGFloat {
+        let videoFrameInParentSuperView: CGRect? = self.superview?.superview?.convert(
+            thumbnailImageView.frame,
+            from: thumbnailImageView)
+        guard let videoFrame = videoFrameInParentSuperView,
+              let superViewFrame = superview?.frame else {
+                  return 0
+              }
+        let visibleVideoFrame = videoFrame.intersection(superViewFrame)
+        return visibleVideoFrame.size.height
     }
 }

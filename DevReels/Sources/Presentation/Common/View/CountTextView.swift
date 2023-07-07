@@ -38,18 +38,23 @@ final class CountTextView: UIView {
     
     fileprivate let textView = TextView()
     
-    private let stackView = UIStackView().then {
-        $0.axis = .horizontal
+    private let containerView = UIView().then {
+        $0.backgroundColor = .devReelsColor.neutral20
+        $0.layer.cornerRadius = 6
+        $0.layer.borderWidth = 1
+        $0.layer.borderColor = UIColor.devReelsColor.neutral40?.cgColor
     }
     
     private let titleLabel = UILabel().then {
-        $0.font = UIFont.systemFont(ofSize: 16)
+        $0.font = UIFont.systemFont(ofSize: 10)
         $0.textAlignment = .left
+        $0.textColor = .devReelsColor.neutral100
     }
     
     private let countLabel = UILabel().then {
-        $0.font = UIFont.systemFont(ofSize: 14)
+        $0.font = UIFont.systemFont(ofSize: 12)
         $0.textAlignment = .right
+        $0.textColor = .devReelsColor.neutral100
     }
     
     private var disposable: Disposable?
@@ -85,27 +90,40 @@ final class CountTextView: UIView {
     }
     
     private func layout() {
-        layoutStackView()
+        layoutContainerView()
+        layoutTitleLabel()
         layoutTextView()
+        layoutCountLabel()
     }
     
-    private func layoutStackView() {
-        [titleLabel, countLabel].forEach {
-            stackView.addArrangedSubview($0)
+    private func layoutContainerView() {
+        addSubview(containerView)
+        containerView.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview()
+            make.bottom.equalToSuperview().inset(24)
         }
-        addSubview(stackView)
-        stackView.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.left.right.equalToSuperview().inset(4)
-            make.height.equalTo(30.0)
+    }
+    
+    private func layoutTitleLabel() {
+        containerView.addSubview(titleLabel)
+        titleLabel.snp.makeConstraints { make in
+            make.top.leading.equalToSuperview().inset(12)
         }
     }
     
     private func layoutTextView() {
-        addSubview(textView)
+        containerView.addSubview(textView)
         textView.snp.makeConstraints { make in
-            make.bottom.left.right.equalToSuperview()
-            make.top.equalTo(stackView.snp.bottom).offset(8)
+            make.horizontalEdges.equalToSuperview()
+            make.top.equalTo(titleLabel.snp.bottom)
+            make.bottom.equalToSuperview()
+        }
+    }
+    
+    private func layoutCountLabel() {
+        addSubview(countLabel)
+        countLabel.snp.makeConstraints { make in
+            make.bottom.trailing.equalToSuperview()
         }
     }
 }

@@ -68,31 +68,45 @@ public extension VideoPlayerController {
     /// URL에 해당하는 Video Container가 없을 경우 asset을 다운로드
     /// asset을 이용하여 새로운 플레이어 목록을 만들어줌
     func setupVideoFor(url: String) {
-        guard videoCache.object(forKey: url as NSString) == nil else {
+        if self.videoCache.object(forKey: url as NSString) != nil {
             return
         }
-        
-        guard let videoURL = URL(string: url) else {
+        guard let URL = URL(string: url) else {
             return
         }
-        
-        let asset = AVURLAsset(url: videoURL)
+        let asset = AVURLAsset(url: URL)
         let requestedKeys = ["playable"]
-        
         asset.loadValuesAsynchronously(forKeys: requestedKeys) { [weak self] in
             guard let strongSelf = self else {
                 return
             }
-            
-            let status = strongSelf.getStatus(for: asset)
-            
+            /*
+             asset이 성공적으로 로드되었는지 확인하고, 성공하지 않은 경우 AVPlayer와 AVPlayerItem을 생성하지 않고 비디오 컨테이너를 캐시하지 않도록 하여, 필요할 때 다시 다운로드를 시도할 수 있도록 해야합니다.
+             */
+            var error: NSError?
+            let status = asset.statusOfValue(forKey: "playable", error: &error)
             switch status {
             case .loaded:
-                strongSelf.setupPlayer(with: asset, url: url)
+                break
             case .failed, .cancelled:
-                print("DEBUG:: Failed to load asset.")
+                print("Failed to load asset successfully")
+                return
             default:
-                print("DEBUG:: Unknown status of asset.")
+                print("Unkown state of asset")
+                return
+            }
+            let player = AVPlayer()
+            let item = AVPlayerItem(asset: asset)
+            DispatchQueue.main.async {
+                let videoContainer = VideoContainer(player: player, item: item, url: url)
+                strongSelf.videoCache.setObject(videoContainer, forKey: url as NSString)
+                videoContainer.player.replaceCurrentItem(with: videoContainer.playerItem)
+                /*
+                 playVideo 메서드가 호출되었지만 asset을 얻지 못한 경우에는 이전 비디오가 실행되지 않았을 것이므로, 비디오를 다시 재생하려고 시도해본다.
+                 */
+                if strongSelf.videoURL == url, let layer = strongSelf.currentLayer {
+                    strongSelf.playVideo(withLayer: layer, url: url)
+                }
             }
         }
     }
@@ -118,6 +132,8 @@ public extension VideoPlayerController {
     
     // url과 layer를 받아 Video 일시정지
     func pauseVideo(forLayer layer: AVPlayerLayer, url: String) {
+        videoURL = nil
+        currentLayer = nil
         if let videoContainer = self.videoCache.object(forKey: url as NSString) {
             videoContainer.playOn = false
             removeObserverFor(url: url)
@@ -150,12 +166,12 @@ public extension VideoPlayerController {
     func pausePlayeVideosFor(tableView: UITableView, appEnteredFromBackground: Bool = false) {
         
         let visisbleCells = tableView.visibleCells
-        
         var videoCellContainer: PlayVideoLayerContainer?
         
         var maxHeight: CGFloat = 0.0
         
         for cellView in visisbleCells {
+            print(cellView)
             guard let containerCell = cellView as? PlayVideoLayerContainer,
                   let videoCellURL = containerCell.videoURL else {
                 continue
@@ -165,6 +181,7 @@ public extension VideoPlayerController {
                 maxHeight = height
                 videoCellContainer = containerCell
             }
+            
             pauseRemoveLayer(layer: containerCell.videoLayer, url: videoCellURL, layerHeight: height)
         }
         
@@ -200,34 +217,6 @@ private extension VideoPlayerController {
         var error: NSError?
         let status = asset.statusOfValue(forKey: "playable", error: &error)
         return status
-    }
-
-    private func setupPlayer(with asset: AVURLAsset, url: String) {
-        let player = AVPlayer()
-        let item = AVPlayerItem(asset: asset)
-        
-        DispatchQueue.main.async {
-            let videoContainer = VideoContainer(player: player, item: item, url: url)
-            self.videoCache.setObject(videoContainer, forKey: url as NSString)
-            videoContainer.player.replaceCurrentItem(with: videoContainer.playerItem)
-            
-            if self.videoURL == url, let layer = self.currentLayer {
-                self.playVideo(withLayer: layer, url: url)
-            }
-            let playerItemDidFinishPlayingObservable = NotificationCenter.default.rx.notification(.AVPlayerItemDidPlayToEndTime, object: videoContainer.player.currentItem)
-            playerItemDidFinishPlayingObservable
-                .subscribe(onNext: { [weak self] _ in
-                    guard let strongSelf = self,
-                          let currentItem = strongSelf.currentVideoContainer()?.player.currentItem,
-                          currentItem == videoContainer.player.currentItem,
-                          strongSelf.currentVideoContainer()?.playOn == true else {
-                        return
-                    }
-                    
-                    strongSelf.currentVideoContainer()?.playOn = true
-                })
-                .disposed(by: self.disposeBag)
-        }
     }
     
     private func removeFromSuperLayer(layer: AVPlayerLayer, url: String) {

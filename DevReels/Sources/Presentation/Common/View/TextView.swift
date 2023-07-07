@@ -25,6 +25,7 @@ class TextView: UITextView {
     // MARK: Private
     
     private var label = UILabel().then {
+        $0.textColor = .devReelsColor.neutral60
         $0.numberOfLines = 0
     }
     
@@ -46,10 +47,8 @@ class TextView: UITextView {
     // MARK: Methods
     
     private func setup() {
-        backgroundColor = .secondarySystemBackground
-        layer.cornerRadius = 8
-        layer.borderColor = UIColor.systemGray.cgColor
-        textContainerInset = .init(top: 16, left: 16, bottom: 16, right: 16)
+        backgroundColor = .clear
+        textContainerInset = .init(top: 4, left: 12, bottom: 12, right: 12)
         textContainer.lineFragmentPadding = 0
         showsHorizontalScrollIndicator = false
         showsVerticalScrollIndicator = false
@@ -61,7 +60,7 @@ class TextView: UITextView {
         style.lineSpacing = 4
         let attributes = [
             NSAttributedString.Key.paragraphStyle: style,
-            NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)
+            NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)
         ]
         typingAttributes = attributes
     }
@@ -73,7 +72,8 @@ class TextView: UITextView {
         
         addSubview(label)
         label.snp.makeConstraints {
-            $0.top.leading.trailing.equalToSuperview().inset(16)
+            $0.leading.trailing.equalToSuperview().inset(12)
+            $0.top.equalToSuperview().offset(4)
         }
     }
     

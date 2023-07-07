@@ -12,6 +12,7 @@ import Then
 import RxSwift
 import RxCocoa
 import DRVideoController
+import AVFoundation
 
 final class ReelsViewController: UIViewController {
     
@@ -32,10 +33,12 @@ final class ReelsViewController: UIViewController {
     }
     
     var commentButtonTapped = PublishSubject<Reels>()
-        
     private let viewModel: ReelsViewModel
-    private let videoController = VideoPlayerController.sharedVideoPlayer
-    let disposeBag = DisposeBag()
+       private var videoController: VideoPlayerController {
+           viewModel.videoController
+       }
+       private let disposeBag = DisposeBag()
+       private var currentReels: Reels?
     
     // MARK: - Inits
     init(viewModel: ReelsViewModel) {
@@ -55,11 +58,12 @@ final class ReelsViewController: UIViewController {
     }
     
     func bind() {
-        
         let input = ReelsViewModel.Input(
             viewWillAppear: rx.viewWillAppear.map { _ in () }
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
             viewWillDisAppear: rx.viewWillDisappear.map { _ in () }
+                .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
+            viewDidAppear: rx.viewDidAppear.map { _ in }
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
             reelsTapped: tableView.rx.itemSelected.map { _ in () }
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
@@ -74,19 +78,26 @@ final class ReelsViewController: UIViewController {
             .drive(tableView.rx.items(
                 cellIdentifier: ReelsCell.identifier,
                 cellType: ReelsCell.self
-            )) { _, reels, cell in
+            )) { [weak self] _, reels, cell in
+                guard let self = self else { return }
+                
                 cell.commentButtonTap
-                    .subscribe(onNext: { [weak self] in
-                        self?.commentButtonTapped.onNext($0)
+                    .subscribe(onNext: {
+                        self.commentButtonTapped.onNext($0)
                     })
                     .disposed(by: cell.disposeBag)
                 
+                self.currentReels = reels
+                
                 cell.prepareForReuse()
                 cell.configureCell(data: reels)
+                
+                guard let url = reels.videoURL else { return }
+                
+                videoController.setupVideoFor(url: url)
+                videoController.playVideo(withLayer: cell.videoLayer, url: url)
             }
             .disposed(by: disposeBag)
-        
-
         
         tableView.rx.didEndDisplayingCell
             .subscribe(onNext: { [weak self] cell, _ in
@@ -109,10 +120,11 @@ final class ReelsViewController: UIViewController {
             .disposed(by: disposeBag)
         
         tableView.rx.didEndDragging
-            .subscribe(onNext: { [weak self] _ in
+            .subscribe(onNext: { [weak self] decelerate in
                 guard let self = self else { return }
-                
-                videoController.pausePlayeVideosFor(tableView: tableView)
+                if !decelerate {
+                    videoController.pausePlayeVideosFor(tableView: tableView)
+                }
             })
             .disposed(by: disposeBag)
     }
