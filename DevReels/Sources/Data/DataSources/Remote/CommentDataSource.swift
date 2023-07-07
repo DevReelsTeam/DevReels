@@ -13,10 +13,10 @@ struct CommentDataSource: CommentDataSourceProtocol {
     
     let fireStore = Firestore.firestore().collection("reels")
     
-    func upload(reelsID: String, request: CommentRequestDTO) -> Observable<Void> {
+    func upload(request: CommentRequestDTO) -> Observable<Void> {
         
         return Observable.create { emitter in
-            fireStore.document(reelsID)
+            fireStore.document(request.reelsID)
                 .collection("comments")
                 .document(request.commentID)
                 .setData(request.toDictionary()) { _ in
@@ -42,6 +42,18 @@ struct CommentDataSource: CommentDataSourceProtocol {
                         emitter.onNext(comments)
                     }
                 })
+            return Disposables.create()
+        }
+    }
+    
+    func delete(request: CommentRequestDTO) -> Observable<Void> {
+        return Observable.create { emitter in
+            fireStore.document(request.reelsID)
+                .collection("comments")
+                .document(request.commentID)
+                .delete { _ in
+                    emitter.onNext(())
+                }
             return Disposables.create()
         }
     }

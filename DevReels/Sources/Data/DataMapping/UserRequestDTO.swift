@@ -12,6 +12,7 @@ struct UserRequestDTO: Encodable {
     let identifire: String
     let profileImageURLString: String
     let nickName: String
+    let profileLink: String
     let introduce: String
     let uid: String
     
@@ -19,6 +20,7 @@ struct UserRequestDTO: Encodable {
         self.identifire = user.identifire
         self.profileImageURLString = user.profileImageURLString
         self.nickName = user.nickName
+        self.profileLink = user.profileLink
         self.introduce = user.introduce
         self.uid = user.uid
     }
@@ -27,6 +29,7 @@ struct UserRequestDTO: Encodable {
         self.identifire = email
         self.profileImageURLString = ""
         self.nickName = ""
+        self.profileLink = ""
         self.introduce = ""
         self.uid = uid
     }

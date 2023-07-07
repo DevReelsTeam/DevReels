@@ -12,6 +12,7 @@ struct UserResponseDTO: Decodable {
     let identifire: String
     let profileImageURLString: String
     let nickName: String
+    let profileLink: String
     let introduce: String
     let uid: String
     
@@ -19,15 +20,16 @@ struct UserResponseDTO: Decodable {
         self.identifire = user.identifire
         self.profileImageURLString = user.profileImageURLString
         self.nickName = user.nickName
+        self.profileLink = user.profileLink
         self.introduce = user.introduce
         self.uid = user.uid
     }
     
     func toDomain() -> User {
-        
         return User(identifire: identifire,
                     profileImageURLString: profileImageURLString,
                     nickName: nickName,
+                    profileLink: profileLink,
                     introduce: introduce,
                     uid: uid)
     }

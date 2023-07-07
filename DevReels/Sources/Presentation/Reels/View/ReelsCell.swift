@@ -135,7 +135,9 @@ final class ReelsCell: UITableViewCell, Identifiable {
     
     // MARK: - Layout
     private func layout() {
-        contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel, heartImageView, heartNumberLabel, commentImageView, commentNumberLabel, shareImageView, playImageView, pauseImageView])
+        contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel, heartImageView, heartNumberLabel])
+        
+        contentView.addSubViews([commentImageView, commentNumberLabel, shareImageView, playImageView, pauseImageView])
 
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(contentView.snp.bottom).offset(-150)

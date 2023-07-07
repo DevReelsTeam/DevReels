@@ -10,6 +10,7 @@ import Foundation
 import RxSwift
 
 protocol CommentDataSourceProtocol {
-    func upload(reelsID: String, request: CommentRequestDTO) -> Observable<Void>
+    func upload(request: CommentRequestDTO) -> Observable<Void>
     func read(reelsID: String) -> Observable<[CommentResponseDTO]>
+    func delete(request: CommentRequestDTO) -> Observable<Void>
 }

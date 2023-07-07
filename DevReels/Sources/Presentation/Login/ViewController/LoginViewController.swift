@@ -27,12 +27,6 @@ struct Alert {
     let observer: AnyObserver<Bool>?
 }
 
-struct Credential {
-    let withProviderID: String
-    let idToken: String
-    let rawNonce: String
-}
-
 final class LoginViewController: ViewController {
     
     fileprivate var currentNonce: String?
