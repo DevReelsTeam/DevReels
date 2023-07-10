@@ -61,20 +61,6 @@ final class ReelsCell: UITableViewCell, Identifiable {
     private lazy var bottomGradientImageView = UIImageView().then {
         $0.contentMode = .scaleToFill
     }
-    
-    private lazy var playImageView = UIImageView().then {
-        $0.adjustsImageSizeForAccessibilityContentSizeCategory = true
-        $0.image = UIImage(systemName: "play.circle.fill")
-        $0.image = $0.image?.withRenderingMode(.alwaysTemplate)
-        $0.tintColor = .systemGray5
-    }
-    
-    private lazy var pauseImageView = UIImageView().then {
-        $0.adjustsImageSizeForAccessibilityContentSizeCategory = true
-        $0.image = UIImage(systemName: "pause.circle.fill")
-        $0.image = $0.image?.withRenderingMode(.alwaysTemplate)
-        $0.tintColor = .systemGray5
-    }
         
     var reels: Reels?
     var commentButtonTap = PublishSubject<Reels>()
@@ -135,9 +121,10 @@ final class ReelsCell: UITableViewCell, Identifiable {
     
     // MARK: - Layout
     private func layout() {
-        contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel, heartImageView, heartNumberLabel])
+        contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel, heartImageView])
         
-        contentView.addSubViews([commentImageView, commentNumberLabel, shareImageView, playImageView, pauseImageView])
+        contentView.addSubViews([heartNumberLabel, commentImageView, commentNumberLabel, shareImageView])
+
 
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(contentView.snp.bottom).offset(-150)
@@ -190,18 +177,6 @@ final class ReelsCell: UITableViewCell, Identifiable {
             $0.leading.equalTo(heartImageView.snp.leading)
             $0.trailing.equalTo(heartImageView.snp.trailing)
             $0.bottom.equalTo(commentImageView.snp.bottom).offset(40)
-        }
-        
-        playImageView.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.centerY.equalToSuperview()
-            $0.width.height.equalTo(50)
-        }
-        
-        pauseImageView.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.centerY.equalToSuperview()
-            $0.width.height.equalTo(50)
         }
     }
 }

@@ -31,6 +31,7 @@ final class ReelsViewModel: ViewModel {
     
     struct Output {
         let reelsList: Driver<[Reels]>
+        let shouldPlay: Driver<Bool>
     }
     
     var disposeBag = DisposeBag()
@@ -38,13 +39,15 @@ final class ReelsViewModel: ViewModel {
     let navigation = PublishSubject<ReelsNavigation>()
     let videoController = VideoPlayerController.sharedVideoPlayer
     let reelsList = BehaviorSubject<[Reels]>(value: [])
+    let shouldPlay = BehaviorSubject<Bool>(value: false)
     private var currentIndexPath: IndexPath?
     static let reload = PublishSubject<Void>()
     
     func transform(input: Input) -> Output {
         bind(input: input)
         return Output(
-            reelsList: reelsList.asDriver(onErrorJustReturn: [])
+            reelsList: reelsList.asDriver(onErrorJustReturn: []),
+            shouldPlay: shouldPlay.asDriver(onErrorJustReturn: false)
         )
     }
     
@@ -70,6 +73,7 @@ final class ReelsViewModel: ViewModel {
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 videoController.shouldPlay.toggle()
+                shouldPlay.onNext(videoController.shouldPlay)
             })
             .disposed(by: disposeBag)
         
@@ -77,6 +81,7 @@ final class ReelsViewModel: ViewModel {
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 videoController.shouldPlay = false
+                shouldPlay.onNext(videoController.shouldPlay)
             })
             .disposed(by: disposeBag)
         
@@ -84,6 +89,7 @@ final class ReelsViewModel: ViewModel {
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 videoController.shouldPlay = true
+                shouldPlay.onNext(videoController.shouldPlay)
             })
             .disposed(by: disposeBag)
         
@@ -95,4 +101,3 @@ final class ReelsViewModel: ViewModel {
             .disposed(by: self.disposeBag)
         }
 }
-
