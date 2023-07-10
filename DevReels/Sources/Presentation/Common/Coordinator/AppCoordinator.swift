@@ -21,13 +21,13 @@ final class AppCoordinator: BaseCoordinator<Void> {
     private func setup(with window: UIWindow?) {
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
-        window?.backgroundColor = .systemBackground
+        window?.backgroundColor = .devReelsColor.backgroundDefault
     }
     
     override func start() -> Observable<Void> {
         setup(with: window)
-//        showLogin()
-        showTab()
+        showLogin()
+//        showTab()
         return Observable.never()
     }
     

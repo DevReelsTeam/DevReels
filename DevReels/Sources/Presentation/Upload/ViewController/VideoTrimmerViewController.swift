@@ -17,28 +17,30 @@ import PhotosUI
 
 final class VideoTrimmerViewController: ViewController {
 
-    private lazy var playButton = UIButton().then {
-        $0.backgroundColor = .blue
-        $0.setTitle("플레이", for: .normal)
-        $0.addTarget(self, action: #selector(play), for: .touchUpInside)
+    // MARK: - Properties
+    
+    private let muteButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "speaker.wave.2.fill")?.withTintColor(.white, renderingMode: .alwaysOriginal), for: .normal)
+        $0.setImage(UIImage(systemName: "volume.slash")?.withTintColor(.devReelsColor.primary90 ?? UIColor.orange, renderingMode: .alwaysOriginal), for: .selected)
     }
 
-    private var selectVideoButton = UIButton().then {
-        $0.backgroundColor = .red
-        $0.setImage(UIImage(systemName: "square.stack"), for: .normal)
+    private let albumButton = UIButton().then {
+        $0.tintColor = .devReelsColor.neutral1000
+        $0.setImage(UIImage(systemName: "photo.stack"), for: .normal)
+    }
+    
+    private let cancelButton = UIButton().then {
+        $0.setTitleColor(.devReelsColor.neutral100, for: .normal)
+        $0.setTitle("취소", for: .normal)
     }
 
-    private lazy var hStack = UIStackView(arrangedSubviews: [playButton, selectVideoButton]).then {
-        $0.distribution = .fillEqually
-        $0.spacing = 30
-        $0.axis = .horizontal
-    }
-
-    private lazy var nextButton = UIButton().then {
-        $0.backgroundColor = .yellow
+    private let nextButton = UIButton().then {
+        $0.setTitleColor(.devReelsColor.neutral100, for: .disabled)
+        $0.setTitleColor(.devReelsColor.primary80, for: .normal)
         $0.setTitle("다음", for: .normal)
+        $0.isEnabled = false
     }
-
+    
     private let playerView = UIView()
     private let trimmerView = TrimmerView()
 
@@ -65,44 +67,77 @@ final class VideoTrimmerViewController: ViewController {
         fatalError("init(coder:) has not been implemented")
     }
 
+    // MARK: - LifeCycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        trimmerView.handleColor = UIColor.white
-        trimmerView.mainColor = UIColor.darkGray
-        trimmerView.positionBarColor = .orange
+        configurePicker()
+        configureNavigationBar()
+        configureTrimmerView()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        navigationController?.isNavigationBarHidden = true
+        navigationController?.isNavigationBarHidden = false
+        navigationItem.hidesBackButton = true
+        navigationItem.leftBarButtonItem = nil
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        configurePicker()
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.isNavigationBarHidden = true
     }
 
+    // MARK: - binds
+
     override func bind() {
-        selectVideoButton.rx.tap
+        
+        albumButton.rx.tap
             .observe(on: MainScheduler.instance)
             .subscribe(onNext: { [weak self] in
                 self?.presentPicker()
             })
             .disposed(by: disposeBag)
         
+        let muteObservable = muteButton.rx.tap
+            .withUnretained(self)
+            .map {
+                $0.0.muteButton.isSelected.toggle()
+                return $0.0.muteButton.isSelected
+            }
+            .asObservable()
+            
         
         let input = VideoTrimmerViewModel.Input(
+            isMute: muteObservable,
             nextButtonTapped: nextButton.rx.tap.throttle(.seconds(1), scheduler: MainScheduler.instance),
+            cancelButtonTapped: cancelButton.rx.tap.throttle(.seconds(1), scheduler: MainScheduler.instance),
             selectedVideoURL: selectedVideoURLSubject.asObserver(),
             startTime: startTimeSubject.asObserver(),
             endTime: endTimeSubject.asObserver()
         )
         
-        _ = viewModel.transform(input: input)
+        let output = viewModel.transform(input: input)
+                
+        output.nextButtonEnabled
+            .drive(nextButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+    }
+    
+    // MARK: - Methods
+    
+    private func configureNavigationBar() {
+        navigationItem.title = "비디오 수정하기"
+    }
+    
+    private func configureTrimmerView() {
+        trimmerView.handleColor = .white
+        trimmerView.mainColor = .devReelsColor.primary90 ?? .orange
+        trimmerView.positionBarColor = .white
+        trimmerView.maskColor = UIColor(red: 9 / 255, green: 30 / 255, blue: 66 / 255, alpha: 0.6)
     }
 
-
-    @objc func play() {
+    private func play() {
         guard let player = player else { return }
 
         if !player.isPlaying {
@@ -114,7 +149,7 @@ final class VideoTrimmerViewController: ViewController {
         }
     }
 
-    func loadAsset(_ asset: AVAsset) {
+    private func loadAsset(_ asset: AVAsset) {
         trimmerView.asset = asset
         trimmerView.delegate = self
         addVideoPlayer(with: asset, playerView: playerView)
@@ -129,10 +164,11 @@ final class VideoTrimmerViewController: ViewController {
         layer.videoGravity = AVLayerVideoGravity.resizeAspectFill
         playerView.layer.sublayers?.forEach({ $0.removeFromSuperlayer() })
         playerView.layer.addSublayer(layer)
+        updateTime()
     }
 
 
-    func startPlaybackTimeChecker() {
+    private func startPlaybackTimeChecker() {
         stopPlaybackTimeChecker()
         playbackTimeCheckerTimer = Timer.scheduledTimer(timeInterval: 0.1,
                                                         target: self,
@@ -141,7 +177,7 @@ final class VideoTrimmerViewController: ViewController {
                                                         repeats: true)
     }
 
-    func stopPlaybackTimeChecker() {
+    private func stopPlaybackTimeChecker() {
         playbackTimeCheckerTimer?.invalidate()
         playbackTimeCheckerTimer = nil
     }
@@ -160,58 +196,8 @@ final class VideoTrimmerViewController: ViewController {
             trimmerView.seek(to: startTime)
         }
     }
-
-    override func layout() {
-        view.backgroundColor = .white
-
-        playerView.backgroundColor = .gray
-        view.addSubview(playerView)
-        playerView.snp.makeConstraints { make in
-            make.leading.equalToSuperview().offset(20)
-            make.trailing.equalToSuperview().offset(-20)
-            make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
-            make.height.equalToSuperview().multipliedBy(0.65)
-        }
-
-        view.addSubview(trimmerView)
-        trimmerView.snp.makeConstraints { make in
-            make.top.equalTo(playerView.snp.bottom).offset(30)
-            make.width.equalTo(playerView)
-            make.height.equalTo(60)
-            make.centerX.equalToSuperview()
-        }
-
-        hStack.backgroundColor = .gray
-        view.addSubview(hStack)
-        hStack.snp.makeConstraints { make in
-            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(10)
-            make.width.equalToSuperview().offset(0.7)
-            make.height.equalTo(50)
-            make.centerX.equalToSuperview()
-        }
-
-        view.addSubview(nextButton)
-        nextButton.snp.makeConstraints { make in
-            make.height.equalTo(30)
-            make.bottom.equalTo(hStack.snp.top)
-            make.trailing.equalToSuperview()
-        }
-    }
-}
-
-// MARK: Tirmmer Delegate
-
-extension VideoTrimmerViewController: TrimmerViewDelegate {
-    func positionBarStoppedMoving(_ playerTime: CMTime) {
-        player?.seek(to: playerTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
-        player?.play()
-        startPlaybackTimeChecker()
-    }
-
-    func didChangePositionBar(_ playerTime: CMTime) {
-        stopPlaybackTimeChecker()
-        player?.pause()
-        player?.seek(to: playerTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
+    
+    private func updateTime() {
         if let start = trimmerView.startTime,
             let end = trimmerView.endTime {
             let duration = (end - start).seconds
@@ -219,9 +205,68 @@ extension VideoTrimmerViewController: TrimmerViewDelegate {
             endTimeSubject.onNext(end)
         }
     }
+
+    override func layout() {
+
+        view.addSubview(playerView)
+        playerView.snp.makeConstraints { make in
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(20)
+            make.centerX.equalToSuperview()
+            make.height.equalToSuperview().multipliedBy(0.5)
+            make.width.equalToSuperview().multipliedBy(0.5)
+        }
+
+        view.addSubview(trimmerView)
+        trimmerView.snp.makeConstraints { make in
+            make.top.equalTo(playerView.snp.bottom).offset(30)
+            make.leading.trailing.equalToSuperview().inset(24)
+            make.height.equalTo(56)
+        }
+        
+        view.addSubview(muteButton)
+        muteButton.snp.makeConstraints { make in
+            make.top.equalTo(trimmerView.snp.bottom).offset(30)
+            make.leading.equalTo(trimmerView.snp.leading)
+        }
+        
+        view.addSubview(albumButton)
+        albumButton.snp.makeConstraints { make in
+            make.top.equalTo(trimmerView.snp.bottom).offset(30)
+            make.trailing.equalTo(trimmerView.snp.trailing)
+        }
+
+        view.addSubview(cancelButton)
+        cancelButton.snp.makeConstraints { make in
+            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-10)
+            make.leading.equalTo(trimmerView.snp.leading)
+        }
+        
+        view.addSubview(nextButton)
+        nextButton.snp.makeConstraints { make in
+            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(-10)
+            make.trailing.equalTo(trimmerView.snp.trailing)
+        }
+    }
 }
 
-// MARK: Picker
+// MARK: - Tirmmer Delegate
+
+extension VideoTrimmerViewController: TrimmerViewDelegate {
+    func positionBarStoppedMoving(_ playerTime: CMTime) {
+        player?.seek(to: playerTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
+        player?.play()
+        startPlaybackTimeChecker()
+        updateTime()
+    }
+
+    func didChangePositionBar(_ playerTime: CMTime) {
+        stopPlaybackTimeChecker()
+        player?.pause()
+        player?.seek(to: playerTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
+    }
+}
+
+// MARK: - Picker
 
 extension VideoTrimmerViewController: UIImagePickerControllerDelegate & UINavigationControllerDelegate {
     private func configurePicker() {

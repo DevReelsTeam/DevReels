@@ -20,7 +20,7 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
         case reels
         case upload
         case profile
-
+        
         var title: String {
             switch self {
             case .reels: return "릴스"
@@ -28,7 +28,7 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
             case .profile: return "프로필"
             }
         }
-
+        
         var image: String {
             switch self {
             case .reels: return "house.fill"
@@ -38,16 +38,26 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
         }
     }
     
-    private var tabBarController = UITabBarController()
+    private var tabBarController = TabbarController()
     private let finish = PublishSubject<TabCoordinatorResult>()
     
     override func start() -> Observable<TabCoordinatorResult> {
         push(tabBarController, animated: true, isRoot: true)
+        setUploadTapAction()
         setup()
         return finish
     }
     
+    private func setUploadTapAction() {
+        tabBarController.selectedUploadTab
+            .withUnretained(self)
+            .subscribe(onNext: {
+                $0.0.showUploadModal()
+            })
+    }
+    
     private func setup() {
+        
         var rootViewControllers: [UINavigationController] = []
         
         Tab.allCases.forEach {
@@ -56,12 +66,10 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
             
             switch $0 {
             case .reels: showReels(navigationController)
-            case .upload: showUpload(navigationController)
+            case .upload: break
             case .profile: showProfile(navigationController)
-            default: break
             }
         }
-        
         tabBarController.setViewControllers(rootViewControllers, animated: false)
     }
     
@@ -77,15 +85,15 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
         return navigationController
     }
     
-    private func showUpload(_ root: UINavigationController) {
-        let child = UploadCoordinator(root)
+    private func showUpload() {
+        let child = UploadCoordinator(navigationController)
         coordinate(to: child)
             .subscribe(onNext: { [weak self] in
-            switch $0 {
-            case .finish:
-                self?.finish.onNext(.finish)
-            }
-        })
+                switch $0 {
+                case .finish:
+                    self?.navigationController.popToRootViewController(animated: true)
+                }
+            })
             .disposed(by: disposeBag)
     }
     
@@ -111,5 +119,40 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
                 }
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func showUploadModal() {
+        let viewModel = UploadModalViewModel()
+        viewModel.navigation
+            .subscribe(onNext: { [weak self] in
+                switch $0 {
+                case .back:
+                    self?.navigationController.dismiss(animated: true)
+                case .upload:
+                    self?.navigationController.dismiss(animated: true)
+                    self?.showUpload()
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        let viewController = UploadModalViewController(viewModel: viewModel)
+        
+        viewController.modalPresentationStyle = .pageSheet
+        
+        if #available(iOS 15.0, *) {
+            guard let sheet = viewController.sheetPresentationController else { return }
+            if #available(iOS 16.0, *) {
+                sheet.detents = [
+                    .custom(resolver: { _ in
+                        return 180
+                    })
+                ]
+            } else {
+                sheet.detents = [
+                    .medium()
+                ]
+            }
+            navigationController.present(viewController, animated: true)
+        }
     }
 }

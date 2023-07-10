@@ -69,20 +69,22 @@ final class VideoDetailsViewModel: ViewModel {
             .withLatestFrom(reels)
             .withUnretained(self)
             .flatMap { viewModel, reels in
-                viewModel.uploadReelsUsecase?.upload(reels: reels, video: videoData, thumbnailImage: thumbnailData).asResult() ?? .empty()
+                viewModel.uploadReelsUsecase?.upload(reels: reels,
+                                                     video: videoData,
+                                                     thumbnailImage: thumbnailData).asResult() ?? .empty()
             }
             .withUnretained(self)
             .subscribe(onNext: { viewModel, result in
                 switch result {
                 case .success:
-                    viewModel.navigation.onNext(.back)
+                    viewModel.navigation.onNext(.finish)
                 case .failure(let error):
                     print(error)
                 }
             })
         
         let uploadButtonEnabled = Observable.combineLatest(
-            input.title.map{ !$0.isEmpty },
+            input.title.map { !$0.isEmpty },
             input.description.map { !$0.isEmpty },
             input.linkValidation
         ) {

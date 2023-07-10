@@ -49,13 +49,12 @@ final class ReelsViewController: UIViewController {
     }
     
     var commentButtonTapped = PublishSubject<Reels>()
-    
     private let viewModel: ReelsViewModel
-    private var videoController: VideoPlayerController {
-        viewModel.videoController
-    }
-    private let disposeBag = DisposeBag()
-    private var currentReels: Reels?
+       private var videoController: VideoPlayerController {
+           viewModel.videoController
+       }
+       private let disposeBag = DisposeBag()
+       private var currentReels: Reels?
     
     // MARK: - Inits
     init(viewModel: ReelsViewModel) {

@@ -12,6 +12,7 @@ struct User: Codable {
     let identifire: String
     let profileImageURLString: String
     let nickName: String
+    let profileLink: String
     let introduce: String
     let uid: String
 }
@@ -21,6 +22,7 @@ extension User {
         self.uid = uid
         self.identifire = identifire
         self.profileImageURLString = ""
+        self.profileLink = ""
         self.nickName = ""
         self.introduce = ""
     }

@@ -14,6 +14,12 @@ import Then
 import RxKeyboard
 import FirebaseFirestore
 
+struct ActionSheet {
+    let title: String
+    let message: String
+    let actions: [UIAlertAction]
+}
+
 final class CommentViewController: ViewController {
     
     // MARK: - Properties
@@ -54,22 +60,47 @@ final class CommentViewController: ViewController {
         let input = CommentViewModel.Input(
             viewWillAppear: rx.viewWillAppear.map { _ in ()}.asObservable(),
             backButtonTapped: tmpBackButton.rx.tap
+                .throttle(.seconds(1), scheduler: MainScheduler.instance),
+            inputButtonDidTap: commentInputView.inputButton.rx.tap.asObservable()
+                .throttle(.seconds(1), scheduler: MainScheduler.instance),
+            inputViewText: commentInputView.textField.rx.text.orEmpty.asObservable(),
+            selectedComment: tableView.rx.modelSelected(Comment.self)
                 .throttle(.seconds(1), scheduler: MainScheduler.instance)
         )
         
         let output = viewModel.transform(input: input)
-        
         
         commentInputView.inputButton.rx
             .tap
             .subscribe(onNext: {
                 let repository = DIContainer.shared.container.resolve(CommentRepositoryProtocol.self)
                // MARK: - text를 위해 임시로 작성
+                let tkrepository = DIContainer.shared.container.resolve(TokenRepositoryProtocol.self)
+                
+//                tkrepository?.delete()
+//                    .subscribe {
+//                        $0
+//                    }
+//
+//                tkrepository?.load()
+//                    .subscribe(onNext: {
+//                        print( $0)
+//                    }, onError: {
+//                        print($0)
+//                    })
 
             })
             .disposed(by: disposeBag)
         
-        bindInputView()
+        output.presentAlert
+            .emit(to: rx.presentAlert)
+            .disposed(by: disposeBag)
+        
+        output.deleteAlert
+            .emit(to: rx.presentActionSheet)
+            .disposed(by: disposeBag)
+        
+        bindInputView(output: output)
         bindTableView(output: output)
     }
     
@@ -80,19 +111,33 @@ final class CommentViewController: ViewController {
                 cellIdentifier: CommentCell.identifier,
                 cellType: CommentCell.self)) { _, comment, cell in
                     cell.prepareForReuse()
-                    cell.configureCell(data: comment)
+                    cell.configureCell(data: comment, reels: output.reels)
                     cell.selectionStyle = .none
                 }
                 .disposed(by: disposeBag)
     }
     
-    func bindInputView() {
+    func bindInputView(output: CommentViewModel.Output) {
         RxKeyboard.instance.visibleHeight
             .drive(onNext: { [weak self] keyboardHeight in
                 self?.commentInputView.snp.updateConstraints {
                     $0.bottom.equalTo(self?.view ?? UIView()).offset(-keyboardHeight)
                 }
                 self?.view.layoutIfNeeded()
+            })
+            .disposed(by: disposeBag)
+        
+        output.commentUploadCompleted
+            .drive(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                self.commentInputView.textField.text = nil
+            })
+            .disposed(by: disposeBag)
+        
+        output.profileImageURL
+            .subscribe(onNext: { [weak self] urlString in
+                guard let self = self else { return }
+                self.commentInputView.userimageView.imageURL = urlString
             })
             .disposed(by: disposeBag)
     }

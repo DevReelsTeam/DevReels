@@ -32,6 +32,7 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
             .subscribe(onNext: { [weak self] in
                 switch $0 {
                 case .finish:
+                    self?.pop(animated: true)
                     self?.showReels()
                 }
             })

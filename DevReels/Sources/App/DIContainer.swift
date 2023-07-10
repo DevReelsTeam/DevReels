@@ -7,7 +7,6 @@
 //
 
 import Foundation
-
 import Swinject
 
 final class DIContainer {
@@ -62,6 +61,7 @@ final class DIContainer {
         container.register(UserRepositoryProtocol.self) { resolver in
             var repository = UserRepository()
             repository.userDataSource = resolver.resolve(UserDataSourceProtocol.self)
+            repository.keyChainManager = resolver.resolve(KeychainManagerProtocol.self)
             return repository
         }
     }
@@ -89,6 +89,19 @@ final class DIContainer {
         
         container.register(CommentListUseCaseProtocol.self) { resolver in
             var useCase = CommentListUseCase()
+            useCase.commentRepository = resolver.resolve(CommentRepositoryProtocol.self)
+            return useCase
+        }
+        
+        container.register(LoginCheckUseCaseProtocol.self) { resolver in
+            var useCase = LoginCheckUseCase()
+            useCase.tokenRepository = resolver.resolve(TokenRepositoryProtocol.self)
+            useCase.userRepository = resolver.resolve(UserRepositoryProtocol.self)
+            return useCase
+        }
+        
+        container.register(CommentUploadUseCaseProtocol.self) { resolver in
+            var useCase = CommentUploadUseCase()
             useCase.commentRepository = resolver.resolve(CommentRepositoryProtocol.self)
             return useCase
         }

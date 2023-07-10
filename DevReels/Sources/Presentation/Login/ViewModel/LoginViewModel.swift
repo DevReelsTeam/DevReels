@@ -40,7 +40,6 @@ final class LoginViewModel: ViewModel {
             .subscribe { viewModel, result in
                 switch result {
                 case .success:
-                    print(result)
                     viewModel.navigation.onNext(.finish)
                 case .failure:
                     // MARK: - 로그인 실패 알럿 띄워야함.

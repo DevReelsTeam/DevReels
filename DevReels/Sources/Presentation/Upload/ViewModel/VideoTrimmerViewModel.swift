@@ -19,24 +19,26 @@ enum VideoTrimmerNavigation {
 final class VideoTrimmerViewModel: ViewModel {
     
     struct Input {
+        let isMute: Observable<Bool>
         let nextButtonTapped: Observable<Void>
+        let cancelButtonTapped: Observable<Void>
         let selectedVideoURL: Observable<URL>
         let startTime: Observable<CMTime>
         let endTime: Observable<CMTime>
     }
     
     struct Output {
-//        let selectedVideoAsset: Observable<AVAsset>
+        let nextButtonEnabled: Driver<Bool>
     }
     
     var disposeBag = DisposeBag()
     let navigation = PublishSubject<VideoTrimmerNavigation>()
+    let muteSubject = BehaviorSubject<Bool>(value: false)
     
     func transform(input: Input) -> Output {
         
         let trimmingObservable = Observable.combineLatest(input.selectedVideoURL, input.startTime, input.endTime)
-            
-        guard let url = outputURL() else { return Output()}
+        
         input.nextButtonTapped
             .withLatestFrom(trimmingObservable)
             .withUnretained(self)
@@ -46,7 +48,16 @@ final class VideoTrimmerViewModel: ViewModel {
             .bind(to: navigation)
             .disposed(by: disposeBag)
         
-        return Output()
+        input.cancelButtonTapped
+            .map { VideoTrimmerNavigation.finish }
+            .bind(to: navigation)
+            .disposed(by: disposeBag)
+        
+        let nextButtonEnabled = trimmingObservable
+            .map { $0.0.isFileURL && $0.1.isValid && $0.2.isValid }
+            .asDriver(onErrorJustReturn: false)
+            
+        return Output(nextButtonEnabled: nextButtonEnabled)
     }
     
     func videoURLToAsset(sourceURL: URL) -> Observable<AVAsset> {
@@ -60,6 +71,7 @@ final class VideoTrimmerViewModel: ViewModel {
         
         return Observable.create { [weak self] observer in
             let asset = AVAsset(url: sourceURL as URL)
+            
             
             guard let outputURL = self?.outputURL(),
                   let exportSession = AVAssetExportSession(asset: asset, presetName: AVAssetExportPresetHighestQuality)  else {

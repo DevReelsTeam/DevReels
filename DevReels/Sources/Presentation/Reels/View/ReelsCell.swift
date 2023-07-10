@@ -125,6 +125,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         
         contentView.addSubViews([heartNumberLabel, commentImageView, commentNumberLabel, shareImageView])
 
+
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(contentView.snp.bottom).offset(-150)
             $0.leading.equalTo(contentView.snp.leading).offset(20)

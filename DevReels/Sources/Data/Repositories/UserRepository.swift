@@ -10,7 +10,13 @@ import Foundation
 import RxSwift
 
 struct UserRepository: UserRepositoryProtocol {
+    
+    enum UserRepositoryError: Error {
+        case noUserInfo
+    }
+    
     var userDataSource: UserDataSourceProtocol?
+    var keyChainManager: KeychainManagerProtocol?
     
     func create(uid: String, email: String) -> Observable<Void> {
         let request = UserRequestDTO(uid: uid, email: email)
@@ -21,4 +27,14 @@ struct UserRepository: UserRepositoryProtocol {
         return userDataSource?.read(uid: uid)
             .map { $0.toDomain() } ?? .empty()
     }
+    
+    func currentUser() -> Observable<User> {
+        guard let data = keyChainManager?.load(key: .authorization),
+              let authorization = try? JSONDecoder().decode(Authorization.self, from: data) else {
+            return Observable.error(UserRepositoryError.noUserInfo)
+        }
+        
+        return fetch(uid: authorization.localId)
+    }
+    
 }
