@@ -32,6 +32,22 @@ final class ReelsViewController: UIViewController {
         $0.contentMode = .scaleToFill
     }
     
+    private lazy var playImageView = UIImageView().then {
+        $0.adjustsImageSizeForAccessibilityContentSizeCategory = true
+        $0.image = UIImage(systemName: "play.circle.fill")
+        $0.image = $0.image?.withRenderingMode(.alwaysTemplate)
+        $0.tintColor = .systemGray5
+        $0.alpha = 0
+    }
+    
+    private lazy var pauseImageView = UIImageView().then {
+        $0.adjustsImageSizeForAccessibilityContentSizeCategory = true
+        $0.image = UIImage(systemName: "pause.circle.fill")
+        $0.image = $0.image?.withRenderingMode(.alwaysTemplate)
+        $0.tintColor = .systemGray5
+        $0.alpha = 0
+    }
+    
     var commentButtonTapped = PublishSubject<Reels>()
     
     private let viewModel: ReelsViewModel
@@ -100,6 +116,17 @@ final class ReelsViewController: UIViewController {
             }
             .disposed(by: disposeBag)
         
+        output.shouldPlay
+            .drive(onNext: { [weak self] asd in
+                guard let self = self else { return }
+                if asd {
+                    playAnimation()
+                } else {
+                    pauseAnimation()
+                }
+            })
+            .disposed(by: disposeBag)
+        
         tableView.rx.didEndDisplayingCell
             .subscribe(onNext: { [weak self] cell, _ in
                 guard let self = self else { return }
@@ -130,10 +157,29 @@ final class ReelsViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    private func playAnimation() {
+        UIView.animate(withDuration: 0.3, animations: {
+            self.playImageView.alpha = 1
+        }, completion: { _ in
+            UIView.animate(withDuration: 1.0) {
+                self.playImageView.alpha = 0
+            }
+        })
+    }
+    
+    private func pauseAnimation() {
+        UIView.animate(withDuration: 0.3, animations: {
+            self.pauseImageView.alpha = 1
+        }, completion: { _ in
+            UIView.animate(withDuration: 1.0) {
+                self.pauseImageView.alpha = 0
+            }
+        })
+    }
+    
     // MARK: - Layout
     func layout() {
-        view.addSubview(tableView)
-        view.addSubview(topGradientImageView)
+        view.addSubViews([tableView, topGradientImageView, playImageView, pauseImageView])
         
         tableView.snp.makeConstraints {
             $0.edges.equalToSuperview()
@@ -141,6 +187,18 @@ final class ReelsViewController: UIViewController {
         
         topGradientImageView.snp.makeConstraints {
             $0.edges.equalToSuperview()
+        }
+        
+        playImageView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(50)
+        }
+        
+        pauseImageView.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.centerY.equalToSuperview()
+            $0.width.height.equalTo(50)
         }
     }
 }
