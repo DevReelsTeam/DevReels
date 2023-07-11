@@ -29,7 +29,7 @@ final class ReelsViewController: UIViewController {
     }
     
     private lazy var topGradientImageView = UIImageView().then {
-        $0.contentMode = .scaleToFill
+        $0.contentMode = .scaleAspectFit
     }
     
     private lazy var playImageView = UIImageView().then {
