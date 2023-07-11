@@ -17,6 +17,7 @@ struct DevReelsColor {
     let backgroundDefault = UIColor(named: "BackgroundDefault")
     let neutral100 = UIColor(named: "Neutral100")
     let neutral1000 = UIColor(named: "Neutral1000")
+    let neutral10 = UIColor(named: "Neutral10")
     let neutral20 = UIColor(named: "Neutral20")
     let neutral200 = UIColor(named: "Neutral200")
     let neutral30 = UIColor(named: "Neutral30")

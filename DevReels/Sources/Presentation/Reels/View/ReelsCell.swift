@@ -54,12 +54,21 @@ final class ReelsCell: UITableViewCell, Identifiable {
     }
     
     private lazy var thumbnailImageView = UIImageView().then {
-        $0.contentMode = .scaleToFill
+        $0.contentMode = .scaleAspectFit
         $0.backgroundColor = .black
+        $0.layer.cornerRadius = 12
     }
     
     private lazy var bottomGradientImageView = UIImageView().then {
-        $0.contentMode = .scaleToFill
+        $0.contentMode = .scaleAspectFit
+    }
+    
+    private lazy var githubButton = UIButton().then {
+        $0.setTitle(" 지금 영상 속 Github로!", for: .normal)
+        $0.setImage(UIImage(named: "github"), for: .normal)
+        $0.titleLabel?.textAlignment = .center
+        $0.backgroundColor = .devReelsColor.primary90
+        $0.layer.cornerRadius = 24
     }
         
     var reels: Reels?
@@ -73,7 +82,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.selectionStyle = .none
-        
+        self.backgroundColor = .devReelsColor.neutral10
         commentImageView.tapEvent
             .subscribe(onNext: { [weak self] in
                 self?.commentButtonTap
@@ -101,7 +110,9 @@ final class ReelsCell: UITableViewCell, Identifiable {
     override func layoutSubviews() {
         super.layoutSubviews()
         configureGradient()
-        videoLayer.frame = CGRect(x: 0, y: 0, width: self.frame.width, height: self.frame.height)
+        videoLayer.frame = CGRect(x: 0, y: 0, width: self.frame.width - 32, height: thumbnailImageView.frame.height)
+        self.thumbnailImageView.layer.cornerRadius = 12
+        self.videoLayer.cornerRadius = 12
     }
     
     func configureGradient() {
@@ -123,7 +134,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
     private func layout() {
         contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel, heartImageView])
         
-        contentView.addSubViews([heartNumberLabel, commentImageView, commentNumberLabel, shareImageView])
+        contentView.addSubViews([heartNumberLabel, commentImageView, commentNumberLabel, shareImageView, githubButton])
 
 
         titleLabel.snp.makeConstraints {
@@ -139,10 +150,18 @@ final class ReelsCell: UITableViewCell, Identifiable {
         }
 
         thumbnailImageView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.equalTo(safeAreaLayoutGuide.snp.top)
+            $0.leading.trailing.equalToSuperview().inset(16)
+            $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).inset(73)
         }
         
         thumbnailImageView.layer.addSublayer(videoLayer)
+        
+        githubButton.snp.makeConstraints {
+            $0.top.equalTo(thumbnailImageView.snp.bottom).inset(-14)
+            $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).inset(10)
+            $0.leading.trailing.equalToSuperview().inset(16)
+        }
         
         bottomGradientImageView.snp.makeConstraints {
             $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-120)
