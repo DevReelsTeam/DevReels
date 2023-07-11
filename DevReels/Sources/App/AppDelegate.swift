@@ -20,6 +20,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //        DevReelsUI.hello()
 //        self.window?.overrideUserInterfaceStyle = .dark
         appearance()
+        
+        
         return true
     }
     

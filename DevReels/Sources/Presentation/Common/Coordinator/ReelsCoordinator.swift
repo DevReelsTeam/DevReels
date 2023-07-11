@@ -57,14 +57,32 @@ final class ReelsCoordinator: BaseCoordinator<ReelsCoordinatorResult> {
                 case .back:
                     self?.setTabBarHidden(false)
                     self?.setNavigationBarHidden(true, animated: false)
-                    self?.pop(animated: true)
+//                    self?.pop(animated: true)
+                    self?.navigationController.dismiss(animated: true)
                 }
             })
             .disposed(by: disposeBag)
         
         let viewController = CommentViewController(viewModel: viewModel)
-        self.setNavigationBarHidden(false, animated: false)
+        viewController.modalPresentationStyle = .pageSheet
+        
+        if #available(iOS 15.0, *) {
+            guard let sheet = viewController.sheetPresentationController else { return }
+            if #available(iOS 16.0, *) {
+                sheet.detents = [
+                    .custom(resolver: { _ in
+                        return 540
+                    })
+                ]
+            } else {
+                sheet.detents = [
+                    .medium()
+                ]
+            }
+            navigationController.present(viewController, animated: true)
+        }
+        
         self.setTabBarHidden(true)
-        push(viewController, animated: true)
+//        push(viewController, animated: true)
     }
 }

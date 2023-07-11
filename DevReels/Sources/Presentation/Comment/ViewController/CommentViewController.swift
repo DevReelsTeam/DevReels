@@ -28,9 +28,11 @@ final class CommentViewController: ViewController {
         $0.register(CommentCell.self, forCellReuseIdentifier: CommentCell.identifier)
         $0.rowHeight = UITableView.automaticDimension
     }
+    
     private let commentInputView = CommentInputView(frame: .zero)
-    private let tmpBackButton = UIButton(type: .system).then {
-        $0.setTitle("Back", for: .normal)
+    
+    private let rightBarButton = UIButton().then {
+        $0.setTitle("X", for: .normal)
     }
 
     private let viewModel: CommentViewModel
@@ -59,7 +61,7 @@ final class CommentViewController: ViewController {
         
         let input = CommentViewModel.Input(
             viewWillAppear: rx.viewWillAppear.map { _ in ()}.asObservable(),
-            backButtonTapped: tmpBackButton.rx.tap
+            backButtonTapped: rightBarButton.rx.tap
                 .throttle(.seconds(1), scheduler: MainScheduler.instance),
             inputButtonDidTap: commentInputView.inputButton.rx.tap.asObservable()
                 .throttle(.seconds(1), scheduler: MainScheduler.instance),
@@ -69,28 +71,6 @@ final class CommentViewController: ViewController {
         )
         
         let output = viewModel.transform(input: input)
-        
-        commentInputView.inputButton.rx
-            .tap
-            .subscribe(onNext: {
-                let repository = DIContainer.shared.container.resolve(CommentRepositoryProtocol.self)
-               // MARK: - text를 위해 임시로 작성
-                let tkrepository = DIContainer.shared.container.resolve(TokenRepositoryProtocol.self)
-                
-//                tkrepository?.delete()
-//                    .subscribe {
-//                        $0
-//                    }
-//
-//                tkrepository?.load()
-//                    .subscribe(onNext: {
-//                        print( $0)
-//                    }, onError: {
-//                        print($0)
-//                    })
-
-            })
-            .disposed(by: disposeBag)
         
         output.presentAlert
             .emit(to: rx.presentAlert)
@@ -156,25 +136,13 @@ final class CommentViewController: ViewController {
             $0.leading.trailing.bottom.equalToSuperview()
             $0.height.equalTo(80)
         }
-        
-        view.addSubview(tmpBackButton)
-        
-        tmpBackButton.snp.makeConstraints {
-            $0.bottom.equalTo(commentInputView.snp.top)
-            $0.leading.equalToSuperview()
-        }
     }
     
-    // TODO: - navigation Item 표시 안됨
     func attribute() {
-        self.navigationController?.navigationItem.title = "댓글"
-        self.navigationItem.title = "댓글"
-        self.title = "댓글"
-        self.navigationController?.tabBarController?.navigationController?.title = title
-        self.navigationController?.tabBarController?.navigationController?.navigationItem.title = title
-        print("@@@@@@@@@@@@@")
-        print(navigationItem.leftBarButtonItem?.title)
-        print(navigationItem.title)
-        print("@@@@@@@@@@@@@")
+        navigationItem.title = "댓글"
+        navigationController?.isNavigationBarHidden = false
+        navigationItem.hidesBackButton = true
+        navigationItem.leftBarButtonItem = nil
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightBarButton)
     }
 }

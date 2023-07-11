@@ -2,82 +2,78 @@
 //  ReelsCollectionCell.swift
 //  DevReels
 //
-//  Created by Sh Hong on 2023/06/14.
+//  Created by 강현준 2023/06/14.
 //  Copyright © 2023 DevReels. All rights reserved.
 //
 
 import UIKit
 import SnapKit
+import Then
 
-class ReelsCollectionCell: UICollectionViewCell {
+class ReelsCollectionCell: UICollectionViewCell, Identifiable {
     
     // MARK: - Constants
-    private enum Metric {
+    private enum Metrics {
         enum ThumbnailImageView {
             static let height = 245
+            static let cornerRadius: CGFloat = 8
         }
         
         enum Title {
-            static let topMargin = 9
-            static let leftMargin = 14
+            static let leadingMargin = 8
+            static let bottomMargin = 11
         }
         
         enum Like {
-            static let topMargin = 11
-            static let bottomMargin = 14
+            static let topMargin = 6
+            static let imageViewLeadingMargin = 8
+            static let countLabelLeadingMargin = 2
         }
         
         enum Comment {
-            static let leftMargin = 10
+            static let imageViewLeadingMargin = 8
+            static let countLabelLeadingMargin = 2
         }
     }
     
-    private let thumbnailImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.backgroundColor = .yellow
-        return imageView
-    }()
+    private let thumbnailImageView = UIImageView().then {
+        $0.imageURL = "https://firebasestorage.googleapis.com/v0/b/devreels.appspot.com/o/tempUID%2Fimages%2FE6F9553F-19C2-4AB6-ADB2-137F0BB8344C1687708291.981889?alt=media&token=f28888cf-ef46-4591-866c-b2c73fb1ec08"
+        
+        $0.layer.cornerRadius = Metrics.ThumbnailImageView.cornerRadius
+        $0.clipsToBounds = true
+    }
     
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 12)
-        label.textColor = .white
-        label.text = "UI 낙엽 애니메이션 구현하기"
-        return label
-    }()
+    private let titleLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 12, weight: .bold)
+        $0.textColor = .black
+        $0.text = "UI 낙엽 애니메이션 구현하기"
+    }
     
-    private let likeImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        return imageView
-    }()
+    private let likeImageView = UIImageView().then {
+        $0.image = UIImage(systemName: "heart")
+        $0.tintColor = .devReelsColor.neutral60
+    }
     
-    private let likeCount: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 10)
-        label.textColor = .white
-        label.text = "123"
-        return label
-    }()
+    private let likeCountLabel = UILabel().then {
+        $0.font = .systemFont(ofSize: 12)
+        $0.textColor = .white
+        $0.text = "123"
+    }
     
-    private let commentImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-        return imageView
-    }()
+    private let commentImageView = UIImageView().then {
+        $0.image = UIImage(systemName: "bubble.right")
+        $0.tintColor = .devReelsColor.neutral60
+    }
     
-    private let commentCount: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 10)
-        label.textColor = .white
-        label.text = "123"
-        return label
-    }()
+    private let commentCountLabel = UILabel().then {
+         $0.font = .systemFont(ofSize: 12)
+         $0.textColor = .white
+         $0.text = "123"
+     }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.backgroundColor = .init(red: 29, green: 31, blue: 49, alpha: 1)
         layout()
     }
     
@@ -88,34 +84,44 @@ class ReelsCollectionCell: UICollectionViewCell {
     // MARK: - Layout
     private func layout() {
         
-        self.addSubview(thumbnailImageView)
-        thumbnailImageView.snp.makeConstraints { make in
-            make.left.top.right.equalToSuperview()
-            make.height.equalTo(Metric.ThumbnailImageView.height)
+        contentView.addSubview(thumbnailImageView)
+        thumbnailImageView.snp.makeConstraints {
+            $0.leading.top.trailing.equalToSuperview()
+            $0.height.lessThanOrEqualTo(Metrics.ThumbnailImageView.height)
         }
         
-        self.addSubview(titleLabel)
-        titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(thumbnailImageView.snp.bottom).offset(Metric.Title.topMargin)
-            make.left.equalToSuperview().inset(Metric.Title.leftMargin)
+        thumbnailImageView.addSubview(titleLabel)
+        titleLabel.snp.makeConstraints {
+            $0.leading.equalToSuperview().offset(Metrics.Title.leadingMargin)
+            $0.bottom.equalToSuperview().inset(Metrics.Title.bottomMargin)
         }
         
-        self.addSubview(likeImageView)
+        contentView.addSubview(likeImageView)
         
-        
-        self.addSubview(likeCount)
-        likeCount.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(Metric.Like.topMargin)
-            make.left.equalTo(titleLabel)
-            make.bottom.equalToSuperview().inset(Metric.Like.bottomMargin)
+        likeImageView.snp.makeConstraints {
+            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(Metrics.Like.topMargin)
+            $0.leading.equalToSuperview().offset(Metrics.Like.imageViewLeadingMargin)
         }
         
-        self.addSubview(commentImageView)
+        contentView.addSubview(likeCountLabel)
         
-        self.addSubview(commentCount)
-        commentCount.snp.makeConstraints { make in
-            make.centerY.equalTo(likeCount)
-            make.left.equalTo(likeCount.snp.right).offset(Metric.Comment.leftMargin)
+        likeCountLabel.snp.makeConstraints {
+            $0.centerY.equalTo(likeImageView)
+            $0.leading.equalTo(likeImageView.snp.trailing).offset(Metrics.Like.countLabelLeadingMargin)
+        }
+        
+        contentView.addSubview(commentImageView)
+        
+        commentImageView.snp.makeConstraints {
+            $0.centerY.equalTo(likeImageView)
+            $0.leading.equalTo(likeCountLabel.snp.trailing).offset(Metrics.Comment.imageViewLeadingMargin)
+        }
+        
+        contentView.addSubview(commentCountLabel)
+        
+        commentCountLabel.snp.makeConstraints {
+            $0.centerY.equalTo(likeImageView)
+            $0.leading.equalTo(commentImageView.snp.trailing).offset(Metrics.Comment.countLabelLeadingMargin)
         }
     }
 }
