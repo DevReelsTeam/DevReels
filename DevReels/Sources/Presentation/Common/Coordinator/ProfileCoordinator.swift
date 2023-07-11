@@ -11,7 +11,6 @@ import RxSwift
 
 enum ProfileCoordinatorResult {
     case finish
-    case back
 }
 
 final class ProfileCoordinator: BaseCoordinator<ProfileCoordinatorResult> {
@@ -32,21 +31,15 @@ final class ProfileCoordinator: BaseCoordinator<ProfileCoordinatorResult> {
         guard let viewModel = DIContainer.shared.container.resolve(ProfileViewModel.self) else { return }
         
         viewModel.navigation
-            .bind { [weak self] navigation in
-                switch navigation {
-                case .editProfile:
-                    self?.showEditProfile()
-                case .blog, .github: break
-                case .follower, .following: break
-                case .post: break
-                case .finish:
-                    self?.finish.onNext(.back)
+            .subscribe(onNext: { [weak self]  in
+                switch $0 {
+                default:
+                    break
                 }
-            }
+            })
             .disposed(by: disposeBag)
         
         let viewController = ProfileViewController(viewModel: viewModel)
-        
         push(viewController, animated: true)
     }
     

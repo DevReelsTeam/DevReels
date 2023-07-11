@@ -26,5 +26,4 @@ struct AuthRepository: AuthRepositoryProtocol {
         return authService?.login(reqeust)
             .map { $0.toDomain() } ?? .empty()
     }
-
 }

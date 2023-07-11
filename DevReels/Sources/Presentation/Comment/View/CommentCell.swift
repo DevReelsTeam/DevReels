@@ -53,7 +53,7 @@ final class CommentCell: UITableViewCell, Identifiable {
         $0.textContainerInset = .init(top: 0, left: 0, bottom: 45, right: 0)
     }
     
-    private let likenumberLabel = UILabel().then {
+    let likenumberLabel = UILabel().then {
         $0.text = "123"
         $0.font = .systemFont(ofSize: 13)
         $0.textColor = .white

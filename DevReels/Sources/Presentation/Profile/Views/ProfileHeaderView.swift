@@ -85,7 +85,7 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
     private let postLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 12)
         $0.text = "게시물"
-        $0.textColor = .devReelsColor.neutral20
+        $0.textColor = .devReelsColor.neutral400
     }
     
     private let postCountLabel = UILabel().then {
@@ -97,7 +97,7 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
     private let followerLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 12)
         $0.text = "게시물"
-        $0.textColor = .devReelsColor.neutral20
+        $0.textColor = .devReelsColor.neutral400
     }
     
     private let followerCountLabel = UILabel().then {
@@ -109,7 +109,7 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
     private let followingLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 12)
         $0.text = "게시물"
-        $0.textColor = .devReelsColor.neutral20
+        $0.textColor = .devReelsColor.neutral400
     }
     
     private let followingCountLabel = UILabel().then {
@@ -142,8 +142,6 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        backgroundColor = .gray
         
         layout()
         

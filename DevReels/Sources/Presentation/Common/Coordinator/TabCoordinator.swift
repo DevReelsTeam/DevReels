@@ -114,7 +114,7 @@ final class TabCoordinator: BaseCoordinator<TabCoordinatorResult> {
         coordinate(to: child)
             .subscribe(onNext: { [weak self] in
                 switch $0 {
-                case .finish, .back:
+                case .finish:
                     self?.finish.onNext(.finish)
                 }
             })

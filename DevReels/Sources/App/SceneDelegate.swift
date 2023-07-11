@@ -24,8 +24,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     ) {        
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
-//        window?.rootViewController = UINavigationController(rootViewController: CommentViewController(viewModel: CommentViewModel()))
+//        window?.rootViewController = ProfileViewController(viewModel: ProfileViewModel())
 //        window?.makeKeyAndVisible()
+        
         appCoordinator = AppCoordinator(window)
         appCoordinator?.start()
             .subscribe()

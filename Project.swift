@@ -14,12 +14,13 @@ protocol ProjectFactory {
 class BaseProjectFactory: ProjectFactory {
     let projectName: String = "DevReels"
     
-    let deploymentTarget: ProjectDescription.DeploymentTarget = .iOS(targetVersion: "14.0", devices: [.iphone])
+    let deploymentTarget: ProjectDescription.DeploymentTarget = .iOS(targetVersion: "16.0", devices: [.iphone])
     
     let dependencies: [TargetDependency] = [
         .external(name: "RxSwift"),
         .external(name: "RxCocoa"),
         .external(name: "RxKeyboard"),
+        .external(name: "RxDataSources"),
         .external(name: "SnapKit"),
         .external(name: "Then"),
         .external(name: "FirebaseAuth"),

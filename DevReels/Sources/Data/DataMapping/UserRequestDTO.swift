@@ -33,5 +33,4 @@ struct UserRequestDTO: Encodable {
         self.introduce = ""
         self.uid = uid
     }
-
 }

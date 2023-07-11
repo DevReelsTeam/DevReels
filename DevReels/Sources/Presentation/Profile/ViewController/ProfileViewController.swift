@@ -2,27 +2,85 @@
 //  ProfileViewController.swift
 //  DevReels
 //
-//  Created by Sh Hong on 2023/05/14.
+//  Created by 강현준 on 2023/05/14.
 //  Copyright © 2023 DevReels. All rights reserved.
 //
 
 import UIKit
 import RxSwift
 import RxCocoa
+import RxDataSources
 
-class ProfileViewController: UIViewController {
+struct ReelsSection {
+    let header: String
+    var items: [String]
+}
+
+extension ReelsSection: AnimatableSectionModelType {
+    typealias Item = String
     
-    var disposeBag: DisposeBag = .init()
+    var identity: String {
+        return header
+    }
+    
+    init(original: ReelsSection, items: [String]) {
+        self = original
+        self.items = items
+    }
+}
+
+final class ProfileViewController: ViewController {
+    
+    private let dataSource = RxCollectionViewSectionedAnimatedDataSource<ReelsSection>(configureCell: { (datasource, collectionView, indexPath, item) in
+        
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: ReelsCollectionCell.identifier,
+            for: indexPath
+        ) as? ReelsCollectionCell else { return UICollectionViewCell() }
+        
+//        cell.commentCount.text = "\(item)"
+        return cell
+        
+    }, configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
+       
+        guard let header = collectionView.dequeueReusableSupplementaryView(
+            ofKind: UICollectionView.elementKindSectionHeader,
+            withReuseIdentifier: ProfileHeaderView.identifier,
+            for: indexPath
+        ) as? ProfileHeaderView else { return UICollectionReusableView() }
+        
+        return header
+    })
+    
+    private let mockSession = [ReelsSection(header: "첫번째 섹션", items: ["김치", "삼계탕", "불고기","김치", "삼계탕", "불고기","김치", "삼계탕", "불고기"])]
+    
+    // MARK: - Components
+    
+    private let collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = CGFloat(12)
+        layout.minimumInteritemSpacing = CGFloat(12)
+        
+        let collectionView = UICollectionView(
+            frame: .zero,
+            collectionViewLayout: layout
+        )
+
+        collectionView.register(ReelsCollectionCell.self, forCellWithReuseIdentifier: ReelsCollectionCell.identifier)
+        collectionView.register(ProfileHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: ProfileHeaderView.identifier)
+                                
+        collectionView.contentInset = UIEdgeInsets(top: 15, left: 15, bottom: 0, right: 20)
+        return collectionView
+    }()
+    
     var viewModel: ProfileViewModel
     
-    let profileHeader: ProfileHeaderViewController
     
     init(viewModel: ProfileViewModel) {
         self.viewModel = ProfileViewModel()
-        self.profileHeader = ProfileHeaderViewController()
         super.init(nibName: nil, bundle: nil)
-        bindViewModel()
-        self.view.backgroundColor = .white
         layout()
     }
     
@@ -44,41 +102,13 @@ class ProfileViewController: UIViewController {
         static let headerTitle: String = "마이페이지"
     }
     
-    // MARK: - Components
-    
-    private let postCollectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        
-        layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = .zero
-        layout.minimumInteritemSpacing = .zero
-        let itemSize = (UIScreen.main.bounds.width - 34) / 2.0
-        
-        layout.itemSize = CGSize(
-            width: itemSize,
-            height: itemSize
-        )
-        
-        let collectionView = UICollectionView(
-            frame: .zero,
-            collectionViewLayout: layout
-        )
-
-        collectionView.register(ReelsCollectionCell.self)
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.alwaysBounceHorizontal = false
-        collectionView.contentInset = UIEdgeInsets(top: 0, left: 15, bottom: 0, right: 15)
-        
-        return collectionView
-    }()
-    
     // MARK: Bind View Model
-    func bindViewModel() {
-        viewModel.output.posts
-            .drive(postCollectionView.rx.items(cellIdentifier: ReelsCollectionCell.defaultReuseIdentifier, cellType: ReelsCollectionCell.self)) { _, _, cell in
-                cell.layer.cornerRadius = 6
-            }
-            .disposed(by: disposeBag)
+    override func bind() {
+//        viewModel.output.posts
+//            .drive(postCollectionView.rx.items(cellIdentifier: ReelsCollectionCell.defaultReuseIdentifier, cellType: ReelsCollectionCell.self)) { _, _, cell in
+//                cell.layer.cornerRadius = 6
+//            }
+//            .disposed(by: disposeBag)
     }
     
     // MARK: - View Life Cycle
@@ -86,21 +116,48 @@ class ProfileViewController: UIViewController {
         super.viewDidLoad()
         
         layout()
+        
+        Observable.just(mockSession)
+            .bind(to: collectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+        
+        self.collectionView.rx.setDelegate(self).disposed(by: disposeBag)
     }
 
     // MARK: - Layout
-    private func layout() {
-        self.view.addSubview(profileHeader.view)
-        profileHeader.view.snp.makeConstraints { make in
-            make.top.left.right.equalToSuperview()
-        }
+    override func layout() {
         
-        self.view.addSubview(postCollectionView)
-        postCollectionView.snp.makeConstraints { make in
-            postCollectionView.snp.makeConstraints { make in
-                make.top.equalTo(profileHeader.view.snp.bottom)
-                make.left.right.bottom.equalToSuperview()
-            }
+        attribute()
+        
+        view.addSubview(collectionView)
+        collectionView.snp.makeConstraints {
+            $0.top.equalToSuperview()
+            $0.leading.trailing.bottom.equalToSuperview()
         }
+    }
+    
+    func attribute() {
+    }
+}
+
+extension ProfileViewController: UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        let itemWidth = (UIScreen.main.bounds.width - 12 - 40) / 2.0
+        let itemHeight = itemWidth * 1.65
+        
+        print("\n\n\n\n\n\n\n")
+        print(itemWidth, itemHeight)
+        print("\n\n\n\n\n\n\n")
+        return CGSize(width: itemWidth, height: itemHeight)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize {
+        return CGSize(width: view.frame.width, height: 380)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 14, left: 0, bottom: 14, right: 0)
     }
 }
