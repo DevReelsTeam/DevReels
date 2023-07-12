@@ -2,7 +2,7 @@
 //  ProfileViewModel.swift
 //  DevReels
 //
-//  Created by Sh Hong on 2023/05/14.
+//  Created by 현준 on 2023/05/14.
 //  Copyright © 2023 DevReels. All rights reserved.
 //
 
@@ -20,59 +20,140 @@ enum ProfileNavigation {
     case finish
 }
 
-struct Post {
-    typealias Identifier = Int
+enum ProfileType {
+    case current
+    case other(User)
     
-    let id: Int
-    let image: UIImage
-}
-
-struct Count {
-    var count: Int
-    
-    init?(cnt: Int) {
-        guard cnt >= 0 else { return nil }
-        self.count = cnt
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case (.current, .current), (.other, .other):
+            return true
+        default:
+            return false
+        }
     }
 }
 
 final class ProfileViewModel: ViewModel {
     
-    var disposeBag: DisposeBag = .init()
-    
     struct Input {
-        let editButtonTapped = PublishRelay<Void>()
-        let githubButtonTapped = PublishRelay<Void>()
-        let blogButtonTapped = PublishRelay<Void>()
-        let followerButtonTapped = PublishRelay<Void>()
-        let followingButtonTapped = PublishRelay<Void>()
-        let postTapped = PublishRelay<Post.Identifier>()
+        let viewWillAppear: Observable<Void>
     }
     
+    let type = BehaviorSubject<ProfileType>(value: .current)
+    private let currentUser = BehaviorSubject<User?>(value: nil)
+    private let collectionViewDataSource = BehaviorSubject<[SectionOfReelsPost]>(value:[])
+    
+    private let userUseCase = UserUseCase()
+    var disposeBag = DisposeBag()
+    
     struct Output {
-        //        let userImage: Driver<UIImage>
-        //        let userName: Driver<String>
-        //        let userIntroduction: Driver<String>
-        //        let userGithubURL: Driver<URL>
-        //        let userBlogURL: Driver<URL>
-        //        let postCount: Driver<Count>
-        //        let followerCount: Driver<Count>
-        //        let followingCount: Driver<Count>
-        let posts: Driver<[String]>
+        let collectionViewDataSource: Driver<[SectionOfReelsPost]>
+        let currentUserName: Driver<String>
+        let currentUserIntroduce: Driver<String>
+        let currentUserProfileImageURLString: Observable<String>
+        let currentUserGithubURL: Driver<String>
+        let currentUserBlogURL: Driver<String>
     }
     
     let navigation = PublishSubject<ProfileNavigation>()
     
     func transform(input: Input) -> Output {
+       
+        Observable.merge(
+            Observable.just(()),
+            input.viewWillAppear.skip(1)
+        )
+        .withLatestFrom(type)
+        .filter { $0 == ProfileType.current }
+        .withUnretained(self)
+        .flatMap {
+            $0.0.userUseCase.currentUser().asResult()
+        }
+        .withUnretained(self)
+        .subscribe(onNext: { viewModel, result in
+            switch result {
+            case .success(let user):
+                viewModel.currentUser.onNext(user)
+            case .failure:
+                let failureUser = User(
+                    identifier: "",
+                    profileImageURLString: "",
+                    nickName: "홍길동",
+                    githubURL: "https://github.com/",
+                    blogURL: "www.naver.com",
+                    introduce: "비 로그인 상태입니다.",
+                    uid: "")
+                viewModel.currentUser.onNext(failureUser)
+            }
+        })
+        .disposed(by: disposeBag)
         
-        let posts = Observable.of(["1", "2", "3", "4", "5", "6", "7"])
+        
+        input.viewWillAppear
+            .withLatestFrom(type)
+            .compactMap { type in
+                switch type {
+                case .current:
+                    return nil
+                case let .other(user):
+                    return user
+                }
+            }
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, user in
+                viewModel.currentUser.onNext(user)
+            })
+            .disposed(by: disposeBag)
+        
+        Observable.combineLatest(
+            currentUser.compactMap { $0 },
+            Observable.just(())
+        )
+        .map { user, _  -> [SectionOfReelsPost] in
+            let header = Header(
+                profileImageURLString: user.profileImageURLString,
+                userName: user.nickName,
+                introduce: user.introduce,
+                githubURL: user.githubURL,
+                blogURL: user.blogURL,
+                postCount: "0",
+                followerCount: "0",
+                followingCount: "0")
+            
+            return [
+                SectionOfReelsPost(
+                    header: header,
+                    items: [
+                        Reels(id: "", title: "", videoDescription: ""),
+                        Reels(id: "", title: "", videoDescription: "")
+                    ]
+                )
+            ]
+        }
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, result in
+                viewModel.collectionViewDataSource.onNext(result)
+            })
+            .disposed(by: disposeBag)
+        
+//        let aa = UserDataSource()
         
         
+//        aa.fetchFollowing(uid: "QoTCI64dz7bTOv6dfVaXCCssRrp2")
+//            .subscribe(onNext: {
+//                print("\n\n\n\n\n")
+//                print($0)
+//                print("\n\n\n\n\n")
+//            })
+
         return Output(
-            posts: posts.asDriver(onErrorJustReturn: [])
+            collectionViewDataSource: collectionViewDataSource.asDriver(onErrorJustReturn: []),
+            currentUserName: currentUser.compactMap { $0?.nickName }.asDriver(onErrorJustReturn: "홍길동"),
+            currentUserIntroduce: currentUser.compactMap { $0?.introduce }.asDriver(onErrorJustReturn: "비 로그인 상태입니다."),
+            currentUserProfileImageURLString: currentUser.compactMap { $0?.profileImageURLString }.asObservable(),
+            currentUserGithubURL: currentUser.compactMap { $0?.githubURL }.asDriver(onErrorJustReturn: "https://github.com/"),
+            currentUserBlogURL: currentUser.compactMap { $0?.githubURL }.asDriver(onErrorJustReturn: "www.naver.com")
         )
     }
-    
-    let input = Input()
-    lazy var output = transform(input: input)
 }

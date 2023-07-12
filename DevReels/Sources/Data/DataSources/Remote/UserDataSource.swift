@@ -45,4 +45,42 @@ struct UserDataSource: UserDataSourceProtocol {
             return Disposables.create()
         }
     }
+    
+    func fetchFollower(uid: String) -> Observable<[UserResponseDTO]> {
+        return Observable.create { emitter in
+            fireStore.document(uid)
+                .collection("follower")
+                .getDocuments { snapshot, _ in
+                if let documents = snapshot?.documents {
+                    let followers = documents
+                        .map { $0.data() }
+                        .compactMap { try? JSONSerialization.data(withJSONObject: $0) }
+                        .compactMap { try? JSONDecoder().decode(User.self, from: $0) }
+                        .map { UserResponseDTO(user: $0) }
+                    
+                    emitter.onNext(followers)
+                }
+            }
+            return Disposables.create()
+        }
+    }
+    
+    func fetchFollowing(uid: String) -> Observable<[UserResponseDTO]> {
+        return Observable.create { emitter in
+            fireStore.document(uid)
+                .collection("following")
+                .getDocuments { snapshot, _ in
+                    if let documents = snapshot?.documents {
+                        let following = documents
+                            .map { $0.data() }
+                            .compactMap { try? JSONSerialization.data(withJSONObject: $0) }
+                            .compactMap { try? JSONDecoder().decode(User.self, from: $0) }
+                            .map { UserResponseDTO(user: $0) }
+                        
+                        emitter.onNext(following)
+                    }
+                }
+            return Disposables.create()
+        }
+    }
 }

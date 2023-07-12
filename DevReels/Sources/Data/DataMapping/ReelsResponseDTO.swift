@@ -35,6 +35,15 @@ struct ReelsResponseDTO: Codable {
         self.videoDescription = try fieldContainer.decode(StringValue.self, forKey: .videoDescription)
     }
     
+    init(reels: Reels) {
+        self.id = StringValue(value: reels.id)
+        self.uid = StringValue(value: reels.uid ?? "")
+        self.videoURL = StringValue(value: reels.videoURL ?? "")
+        self.thumbnailURL = StringValue(value: reels.videoDescription)
+        self.title = StringValue(value: reels.title)
+        self.videoDescription = StringValue(value: reels.videoDescription)
+    }
+    
     func toDomain() -> Reels {
         return Reels(
             id: id.value,

@@ -11,19 +11,26 @@ import RxSwift
 import RxCocoa
 import RxDataSources
 
-struct ReelsSection {
-    let header: String
-    var items: [String]
+struct Header {
+    var profileImageURLString: String
+    var userName: String
+    var introduce: String
+    var githubURL: String
+    var blogURL: String
+    var postCount: String
+    var followerCount: String
+    var followingCount: String
 }
 
-extension ReelsSection: AnimatableSectionModelType {
-    typealias Item = String
+struct SectionOfReelsPost {
+    var header: Header
+    var items: [Item]
+}
+
+extension SectionOfReelsPost: SectionModelType {
+    typealias Item = Reels
     
-    var identity: String {
-        return header
-    }
-    
-    init(original: ReelsSection, items: [String]) {
+    init(original: SectionOfReelsPost, items: [Reels]) {
         self = original
         self.items = items
     }
@@ -31,14 +38,14 @@ extension ReelsSection: AnimatableSectionModelType {
 
 final class ProfileViewController: ViewController {
     
-    private let dataSource = RxCollectionViewSectionedAnimatedDataSource<ReelsSection>(configureCell: { (datasource, collectionView, indexPath, item) in
+    private let dataSource = RxCollectionViewSectionedReloadDataSource<SectionOfReelsPost>(configureCell: { (datasource, collectionView, indexPath, item) in
         
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: ReelsCollectionCell.identifier,
             for: indexPath
         ) as? ReelsCollectionCell else { return UICollectionViewCell() }
         
-//        cell.commentCount.text = "\(item)"
+
         return cell
         
     }, configureSupplementaryView: { dataSource, collectionView, kind, indexPath in
@@ -49,10 +56,11 @@ final class ProfileViewController: ViewController {
             for: indexPath
         ) as? ProfileHeaderView else { return UICollectionReusableView() }
         
+        header.configure(header: dataSource.sectionModels[indexPath.section].header)
         return header
     })
     
-    private let mockSession = [ReelsSection(header: "첫번째 섹션", items: ["김치", "삼계탕", "불고기","김치", "삼계탕", "불고기","김치", "삼계탕", "불고기"])]
+
     
     // MARK: - Components
     
@@ -102,26 +110,27 @@ final class ProfileViewController: ViewController {
         static let headerTitle: String = "마이페이지"
     }
     
-    // MARK: Bind View Model
-    override func bind() {
-//        viewModel.output.posts
-//            .drive(postCollectionView.rx.items(cellIdentifier: ReelsCollectionCell.defaultReuseIdentifier, cellType: ReelsCollectionCell.self)) { _, _, cell in
-//                cell.layer.cornerRadius = 6
-//            }
-//            .disposed(by: disposeBag)
-    }
-    
     // MARK: - View Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
         layout()
-        
-        Observable.just(mockSession)
-            .bind(to: collectionView.rx.items(dataSource: dataSource))
-            .disposed(by: disposeBag)
-        
         self.collectionView.rx.setDelegate(self).disposed(by: disposeBag)
+    }
+    
+    // MARK: Bind View Model
+    override func bind() {
+        
+        let input = ProfileViewModel.Input(
+            viewWillAppear: rx.viewWillAppear.map { _ in () }.asObservable()
+            )
+        
+        let output = viewModel.transform(input: input)
+        
+        // bindCollectionView
+        output.collectionViewDataSource
+            .drive(collectionView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
     }
 
     // MARK: - Layout
@@ -143,13 +152,8 @@ final class ProfileViewController: ViewController {
 extension ProfileViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
         let itemWidth = (UIScreen.main.bounds.width - 12 - 40) / 2.0
         let itemHeight = itemWidth * 1.65
-        
-        print("\n\n\n\n\n\n\n")
-        print(itemWidth, itemHeight)
-        print("\n\n\n\n\n\n\n")
         return CGSize(width: itemWidth, height: itemHeight)
     }
     

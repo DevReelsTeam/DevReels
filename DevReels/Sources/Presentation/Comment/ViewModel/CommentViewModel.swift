@@ -161,6 +161,7 @@ final class CommentViewModel: ViewModel {
                     break
                 }
             })
+            .disposed(by: disposeBag)
       
         return Output(
             commentList: commentList.asDriver(onErrorJustReturn: []),

@@ -96,7 +96,7 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
     
     private let followerLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 12)
-        $0.text = "게시물"
+        $0.text = "팔로워"
         $0.textColor = .devReelsColor.neutral400
     }
     
@@ -108,7 +108,7 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
     
     private let followingLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 12)
-        $0.text = "게시물"
+        $0.text = "팔로잉"
         $0.textColor = .devReelsColor.neutral400
     }
     
@@ -156,6 +156,15 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func configure(header: Header) {
+        self.userImageView.imageURL = header.profileImageURLString
+        self.userNameLabel.text = header.userName
+        self.introduceLabel.text = header.introduce
+        self.postCountLabel.text = header.postCount
+        self.followerCountLabel.text = header.followerCount
+        self.followingCountLabel.text = header.followingCount
     }
     
     func layout() {

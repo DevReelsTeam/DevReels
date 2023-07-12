@@ -11,11 +11,10 @@ import RxSwift
 
 struct UserUseCase {
     
-    var userRepository: UserRepositoryProtocol?
+    var userRepository = DIContainer.shared.container.resolve(UserRepositoryProtocol.self)
     private let disposeBag = DisposeBag()
     
-//    func myProfileImage() -> Observable<UIImage> {
-//        userRepository?.currentUser()
-//            .flatMap { }
-//    }
+    func currentUser() -> Observable<User> {
+        return userRepository?.currentUser() ?? .empty()
+    }
 }

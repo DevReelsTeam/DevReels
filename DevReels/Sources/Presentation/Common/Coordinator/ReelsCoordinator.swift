@@ -56,8 +56,8 @@ final class ReelsCoordinator: BaseCoordinator<ReelsCoordinatorResult> {
                 switch $0 {
                 case .back:
                     self?.setTabBarHidden(false)
+                    
                     self?.setNavigationBarHidden(true, animated: false)
-//                    self?.pop(animated: true)
                     self?.navigationController.dismiss(animated: true)
                 }
             })
@@ -81,8 +81,5 @@ final class ReelsCoordinator: BaseCoordinator<ReelsCoordinatorResult> {
             }
             navigationController.present(viewController, animated: true)
         }
-        
-        self.setTabBarHidden(true)
-//        push(viewController, animated: true)
     }
 }
