@@ -9,20 +9,22 @@
 import Foundation
 
 struct User: Codable {
-    let identifire: String
+    let identifier: String
     let profileImageURLString: String
     let nickName: String
-    let profileLink: String
+    let githubURL: String
+    let blogURL: String
     let introduce: String
     let uid: String
 }
 
 extension User {
-    init(uid: String, identifire: String) {
+    init(uid: String, identifier: String) {
         self.uid = uid
-        self.identifire = identifire
+        self.identifier = identifier
         self.profileImageURLString = ""
-        self.profileLink = ""
+        self.githubURL = ""
+        self.blogURL = ""
         self.nickName = ""
         self.introduce = ""
     }

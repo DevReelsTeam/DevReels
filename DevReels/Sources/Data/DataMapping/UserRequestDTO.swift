@@ -9,27 +9,31 @@
 import Foundation
 
 struct UserRequestDTO: Encodable {
-    let identifire: String
+    let identifier: String
     let profileImageURLString: String
     let nickName: String
-    let profileLink: String
+    let githubURL: String
+    let blogURL: String
     let introduce: String
     let uid: String
     
     init(user: User) {
-        self.identifire = user.identifire
+        self.identifier = user.identifier
         self.profileImageURLString = user.profileImageURLString
         self.nickName = user.nickName
-        self.profileLink = user.profileLink
+        self.githubURL = user.githubURL
+        self.blogURL = user.blogURL
         self.introduce = user.introduce
         self.uid = user.uid
     }
     
+    // 회원가입시
     init(uid: String, email: String) {
-        self.identifire = email
+        self.identifier = email
         self.profileImageURLString = ""
         self.nickName = ""
-        self.profileLink = ""
+        self.githubURL = ""
+        self.blogURL = ""
         self.introduce = ""
         self.uid = uid
     }
