@@ -10,27 +10,33 @@ import Foundation
 
 struct Reels {
     let id: String
+    let title: String
+    let videoDescription: String
+    let githubUrlString: String
+    let blogUrlString: String
     let uid: String?
     let videoURL: String?
     let thumbnailURL: String?
-    let title: String
-    let videoDescription: String
     
-    init(id: String, uid: String?, videoURL: String?, thumbnailURL: String?, title: String, videoDescription: String) {
+    init(id: String, title: String,videoDescription: String, githubUrlString: String, blogUrlString: String, uid: String?, videoURL: String?, thumbnailURL: String?) {
         self.id = id
+        self.title = title
+        self.videoDescription = videoDescription
+        self.githubUrlString = githubUrlString
+        self.blogUrlString = blogUrlString
         self.uid = uid
         self.videoURL = videoURL
         self.thumbnailURL = thumbnailURL
-        self.title = title
-        self.videoDescription = videoDescription
     }
         
-    init(id: String, title: String, videoDescription: String) {
+    init(id: String, title: String, videoDescription: String, githubUrlString: String, blogUrlString: String) {
         self.id = id
+        self.title = title
+        self.videoDescription = videoDescription
+        self.githubUrlString = githubUrlString
+        self.blogUrlString = blogUrlString
         self.uid = nil
         self.videoURL = nil
         self.thumbnailURL = nil
-        self.title = title
-        self.videoDescription = videoDescription
     }
 }

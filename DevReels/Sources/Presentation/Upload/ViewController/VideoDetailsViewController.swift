@@ -40,9 +40,20 @@ final class VideoDetailsViewController: ViewController {
         $0.maxCount = 100
     }
     
-    private let linkTextField = TextField(inputType: .url).then {
-        $0.placeholder = "영상 관련 링크를 입력해주세요"
-        $0.title = "링크"
+    private lazy var githubToggleTextField = ToggleUrlTextfield().then {
+        $0.toggleBarImage = UIImage(systemName: "square.and.arrow.up")
+        $0.toggleBarTitle = "Github 링크 추가하기"
+        $0.textFieldTitle = "링크"
+        $0.placeholder = "Github 링크를 입력해주세요"
+        $0.scrollview = self.scrollView
+    }
+    
+    private lazy var blogToggleTextField = ToggleUrlTextfield().then {
+        $0.toggleBarImage = UIImage(systemName: "square.and.arrow.up")
+        $0.toggleBarTitle = "블로그 링크 추가하기"
+        $0.textFieldTitle = "링크"
+        $0.placeholder = "블로그 링크를 입력해주세요"
+        $0.scrollview = self.scrollView
     }
     
     private let uploadButton = ValidationButton().then {
@@ -80,43 +91,6 @@ final class VideoDetailsViewController: ViewController {
         navigationController?.isNavigationBarHidden = true
     }
     
-    private let githubToggleBar = ToggleBar().then {
-        $0.image = UIImage(systemName: "square.and.arrow.up")
-        $0.title = "Github 링크 추가하기"
-    }
-    
-    private lazy var stackView = UIStackView().then {
-        $0.addArrangedSubview(githubToggleBar)
-        $0.axis = .vertical
-        $0.spacing = 4
-    }
-    
-    private func addTextField() {
-        guard let toggleBar = stackView.arrangedSubviews.last else { return }
-        let nextEntryIndex = stackView.arrangedSubviews.count
-                
-        let offset = CGPoint(x: scrollView.contentOffset.x, y: scrollView.contentOffset.y + toggleBar.bounds.size.height)
-        
-        let newEntryView = linkTextField
-        newEntryView.isHidden = true
-        
-        stackView.insertArrangedSubview(newEntryView, at: nextEntryIndex)
-        
-        UIView.animate(withDuration: 0.25) {
-            newEntryView.isHidden = false
-            self.scrollView.contentOffset = offset
-        }
-    }
-    
-    private func removeTextField() {
-        
-        UIView.animate(withDuration: 0.25, animations: {
-            self.linkTextField.isHidden = true
-        }, completion: { _ in
-            self.linkTextField.removeFromSuperview()
-        })
-    }
-    
     // MARK: - binds
     
     override func bind() {
@@ -126,18 +100,29 @@ final class VideoDetailsViewController: ViewController {
             })
             .disposed(by: disposeBag)
         
-        githubToggleBar.rx.isOn
-            .subscribe(onNext: { [weak self] in
-                $0 ? self?.addTextField() : self?.removeTextField()
-            })
-            .disposed(by: disposeBag)
+        let urlValidation = Observable.combineLatest(githubToggleTextField.rx.validSubmit,
+                                        blogToggleTextField.rx.validSubmit)
+            .map { $0 && $1 }
         
+        let githubUrlString = githubToggleTextField.rx.validSubmit
+            .flatMap { isValid in
+                isValid ? self.githubToggleTextField.rx.urlString.orEmpty.asObservable() : Observable.just("")
+            }
+        
+        let blogUrlString = blogToggleTextField.rx.validSubmit
+            .flatMap { isValid in
+                isValid ? self.blogToggleTextField.rx.urlString.orEmpty.asObservable() : Observable.just("")
+            }
+        
+        
+    
         let input = VideoDetailsViewModel.Input(
             backButtonTapped: backButton.rx.tap.throttle(.seconds(1), scheduler: MainScheduler.instance),
             title: titleTextField.rx.text.orEmpty.asObservable(),
             description: descriptionTextView.rx.text.orEmpty.asObservable(),
-            linkString: linkTextField.rx.text.orEmpty.asObservable(),
-            linkValidation: linkTextField.rx.isValidURL.asObservable(),
+            urlValidation: urlValidation,
+            githubUrlString: githubUrlString,
+            blogUrlString: blogUrlString,
             uploadButtonTapped: uploadButton.rx.tap.asObservable()
             )
             
@@ -198,17 +183,24 @@ final class VideoDetailsViewController: ViewController {
             $0.height.equalTo(150)
         }
         
-        contentView.addSubview(stackView)
-        stackView.snp.makeConstraints { make in
+        contentView.addSubview(githubToggleTextField)
+        githubToggleTextField.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview().inset(16.0)
             make.top.equalTo(descriptionTextView.snp.bottom).offset(18)
+        }
+        
+        contentView.addSubview(blogToggleTextField)
+        blogToggleTextField.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview().inset(16.0)
+            make.top.equalTo(githubToggleTextField.snp.bottom).offset(18)
         }
     
         let marginView = UIView()
         contentView.addSubview(marginView)
         marginView.snp.makeConstraints {
-            $0.leading.trailing.bottom.equalToSuperview()
-            $0.top.equalTo(stackView.snp.bottom)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(30)
+            $0.top.equalTo(blogToggleTextField.snp.bottom)
         }
     }
 }

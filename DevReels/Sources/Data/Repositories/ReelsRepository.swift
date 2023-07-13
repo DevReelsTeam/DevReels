@@ -30,12 +30,16 @@ struct ReelsRepository: ReelsRepositoryProtocol {
         let reelsRequest = Observable.zip(videoURLObservable, thumbnailURLObservable)
             .map { return ($0.0.absoluteString, $0.1.absoluteString) }
             .map {
+                
                 let reels = Reels(id: reels.id,
+                                  title: reels.title,
+                                  videoDescription: reels.videoDescription,
+                                  githubUrlString: reels.githubUrlString,
+                                  blogUrlString: reels.blogUrlString,
                                   uid: uid,
                                   videoURL: $0.0,
-                                  thumbnailURL: $0.1,
-                                  title: reels.title,
-                                  videoDescription: reels.videoDescription)
+                                  thumbnailURL: $0.1)
+
                 return ReelsRequestDTO(reels: reels)
             }
         
