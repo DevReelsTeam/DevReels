@@ -19,48 +19,95 @@ final class ReelsCell: UITableViewCell, Identifiable {
     private lazy var titleLabel = UILabel().then {
         $0.text = "릴스 제목"
         $0.textColor = .white
+        $0.layer.shadowColor = UIColor.black.cgColor
+        $0.layer.shadowOffset = CGSize(width: 2, height: 2)
+        $0.layer.shadowOpacity = 0.5
+        $0.layer.shadowRadius = 4
+        $0.layer.masksToBounds = false
     }
     
     private lazy var descriptionLabel = UILabel().then {
         $0.text = "설명"
         $0.textColor = .white
+        $0.layer.shadowColor = UIColor.black.cgColor
+        $0.layer.shadowOffset = CGSize(width: 2, height: 2)
+        $0.layer.shadowOpacity = 0.5
+        $0.layer.shadowRadius = 4
+        $0.layer.masksToBounds = false
+    }
+    
+    private lazy var profileImageView = UIImageView().then {
+        $0.image = UIImage(named: "profile")
+        $0.layer.shadowColor = UIColor.black.cgColor
+        $0.layer.shadowOffset = CGSize(width: 2, height: 2)
+        $0.layer.shadowOpacity = 0.5
+        $0.layer.shadowRadius = 4
+        $0.layer.masksToBounds = false
     }
     
     private lazy var heartImageView = UIImageView().then {
-        $0.image = UIImage(systemName: "heart")
+        $0.image = UIImage(named: "heart")
         $0.tintColor = .white
+        $0.layer.shadowColor = UIColor.black.cgColor
+        $0.layer.shadowOffset = CGSize(width: 2, height: 2)
+        $0.layer.shadowOpacity = 0.5
+        $0.layer.shadowRadius = 4
+        $0.layer.masksToBounds = false
     }
     
     private lazy var heartNumberLabel = UILabel().then {
         $0.text = "5.0k"
+        $0.font = UIFont.systemFont(ofSize: 12)
         $0.textAlignment = .center
         $0.textColor = .white
+        $0.layer.shadowColor = UIColor.black.cgColor
+        $0.layer.shadowOffset = CGSize(width: 2, height: 2)
+        $0.layer.shadowOpacity = 0.5
+        $0.layer.shadowRadius = 4
+        $0.layer.masksToBounds = false
     }
     
     private lazy var commentImageView = RxUIImageView(frame: .zero).then {
-        $0.image = UIImage(systemName: "bubble.left")
+        $0.image = UIImage(named: "comment")
         $0.tintColor = .white
+        $0.layer.shadowColor = UIColor.black.cgColor
+        $0.layer.shadowOffset = CGSize(width: 2, height: 2)
+        $0.layer.shadowOpacity = 0.5
+        $0.layer.shadowRadius = 4
+        $0.layer.masksToBounds = false
     }
     
     private lazy var commentNumberLabel = UILabel().then {
         $0.text = "25"
+        $0.font = UIFont.systemFont(ofSize: 12)
         $0.textAlignment = .center
         $0.textColor = .white
+        $0.layer.shadowColor = UIColor.black.cgColor
+        $0.layer.shadowOffset = CGSize(width: 2, height: 2)
+        $0.layer.shadowOpacity = 0.5
+        $0.layer.shadowRadius = 4
+        $0.layer.masksToBounds = false
     }
     
     private lazy var shareImageView = UIImageView().then {
-        $0.image = UIImage(systemName: "arrow.turn.up.right")
+        $0.image = UIImage(named: "share")
         $0.tintColor = .white
+        $0.layer.shadowColor = UIColor.black.cgColor
+        $0.layer.shadowOffset = CGSize(width: 2, height: 2)
+        $0.layer.shadowOpacity = 0.5
+        $0.layer.shadowRadius = 4
+        $0.layer.masksToBounds = false
     }
     
     private lazy var thumbnailImageView = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
+        $0.contentMode = .scaleToFill
         $0.backgroundColor = .black
         $0.layer.cornerRadius = 12
+        $0.clipsToBounds = true
     }
     
     private lazy var bottomGradientImageView = UIImageView().then {
-        $0.contentMode = .scaleAspectFit
+        $0.contentMode = .scaleToFill
     }
     
     private lazy var githubButton = UIButton().then {
@@ -134,20 +181,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
     private func layout() {
         contentView.addSubViews([thumbnailImageView, bottomGradientImageView, titleLabel, descriptionLabel, heartImageView])
         
-        contentView.addSubViews([heartNumberLabel, commentImageView, commentNumberLabel, shareImageView, githubButton])
-
-
-        titleLabel.snp.makeConstraints {
-            $0.top.equalTo(contentView.snp.bottom).offset(-150)
-            $0.leading.equalTo(contentView.snp.leading).offset(20)
-            $0.trailing.equalTo(contentView.snp.trailing).offset(-20)
-        }
-
-        descriptionLabel.snp.makeConstraints {
-            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-120)
-            $0.leading.equalTo(thumbnailImageView.snp.leading).offset(20)
-            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-20)
-        }
+        contentView.addSubViews([heartNumberLabel, commentImageView, commentNumberLabel, shareImageView, profileImageView, githubButton])
 
         thumbnailImageView.snp.makeConstraints {
             $0.top.equalTo(safeAreaLayoutGuide.snp.top)
@@ -155,7 +189,59 @@ final class ReelsCell: UITableViewCell, Identifiable {
             $0.bottom.equalTo(safeAreaLayoutGuide.snp.bottom).inset(73)
         }
         
-        thumbnailImageView.layer.addSublayer(videoLayer)
+        thumbnailImageView.layer.insertSublayer(videoLayer, at: 0)
+        videoLayer.frame = thumbnailImageView.bounds
+        videoLayer.videoGravity = .resizeAspectFill
+        videoLayer.masksToBounds = true
+        
+        titleLabel.snp.makeConstraints {
+            $0.top.equalTo(thumbnailImageView.snp.top).offset(23)
+            $0.leading.equalTo(thumbnailImageView.snp.leading).offset(20)
+        }
+        
+        descriptionLabel.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.bottom).offset(2)
+            $0.leading.equalTo(titleLabel.snp.leading)
+        }
+        
+        shareImageView.snp.makeConstraints {
+            $0.bottom.equalTo(thumbnailImageView.snp.bottom).offset(-17.5)
+            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-12)
+            $0.width.height.equalTo(40)
+        }
+        
+        commentNumberLabel.snp.makeConstraints {
+            $0.bottom.equalTo(shareImageView.snp.top).offset(-20)
+            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-12)
+            $0.width.equalTo(40)
+            $0.height.equalTo(12)
+        }
+        
+        commentImageView.snp.makeConstraints {
+            $0.bottom.equalTo(commentNumberLabel.snp.top)
+            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-12)
+            $0.width.height.equalTo(40)
+        }
+        
+        heartNumberLabel.snp.makeConstraints {
+            $0.bottom.equalTo(commentImageView.snp.top).offset(-20)
+            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-12)
+            $0.width.equalTo(40)
+            $0.height.equalTo(12)
+        }
+        
+        heartImageView.snp.makeConstraints {
+            $0.bottom.equalTo(heartNumberLabel.snp.top)
+            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-12)
+            $0.width.height.equalTo(40)
+        }
+        
+        profileImageView.snp.makeConstraints {
+            $0.bottom.equalTo(heartImageView.snp.top).offset(-20)
+            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-12)
+            $0.width.equalTo(47)
+            $0.height.equalTo(60)
+        }
         
         githubButton.snp.makeConstraints {
             $0.top.equalTo(thumbnailImageView.snp.bottom).inset(-14)
@@ -168,34 +254,6 @@ final class ReelsCell: UITableViewCell, Identifiable {
             $0.leading.equalTo(thumbnailImageView.snp.leading)
             $0.trailing.equalTo(thumbnailImageView.snp.trailing)
             $0.bottom.equalTo(thumbnailImageView.snp.bottom)
-        }
-                
-        heartImageView.snp.makeConstraints {
-            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(-400)
-            $0.leading.equalTo(thumbnailImageView.snp.trailing).offset(-60)
-            $0.trailing.equalTo(thumbnailImageView.snp.trailing).offset(-20)
-            $0.bottom.equalTo(thumbnailImageView.snp.bottom).offset(-360)
-        }
-        
-        heartNumberLabel.snp.makeConstraints {
-            $0.top.equalTo(heartImageView.snp.bottom).offset(0)
-            $0.leading.equalTo(heartImageView.snp.leading)
-            $0.trailing.equalTo(heartImageView.snp.trailing)
-            $0.bottom.equalTo(heartImageView.snp.bottom).offset(40)
-        }
-        
-        commentImageView.snp.makeConstraints {
-            $0.top.equalTo(heartNumberLabel.snp.bottom).offset(40)
-            $0.leading.equalTo(heartImageView.snp.leading)
-            $0.trailing.equalTo(heartImageView.snp.trailing)
-            $0.bottom.equalTo(heartNumberLabel.snp.bottom).offset(80)
-        }
-        
-        commentNumberLabel.snp.makeConstraints {
-            $0.top.equalTo(commentImageView.snp.bottom).offset(0)
-            $0.leading.equalTo(heartImageView.snp.leading)
-            $0.trailing.equalTo(heartImageView.snp.trailing)
-            $0.bottom.equalTo(commentImageView.snp.bottom).offset(40)
         }
     }
 }
