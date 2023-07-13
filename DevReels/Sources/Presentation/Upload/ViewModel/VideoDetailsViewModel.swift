@@ -22,8 +22,9 @@ final class VideoDetailsViewModel: ViewModel {
         let backButtonTapped: Observable<Void>
         let title: Observable<String>
         let description: Observable<String>
-        let linkString: Observable<String>
-        let linkValidation: Observable<Bool>
+        let urlValidation: Observable<Bool>
+        let githubUrlString: Observable<String>
+        let blogUrlString: Observable<String>
         let uploadButtonTapped: Observable<Void>
     }
     
@@ -51,12 +52,16 @@ final class VideoDetailsViewModel: ViewModel {
         let reels = Observable
             .combineLatest(input.title,
                            input.description,
-                           input.linkString)
+                           input.githubUrlString,
+                           input.blogUrlString)
+            
             .map {
                 let id = UUID().uuidString
                 return Reels(id: id,
                              title: $0.0,
-                             videoDescription: $0.1)
+                             videoDescription: $0.1,
+                             githubUrlString: $0.2,
+                             blogUrlString: $0.3)
             }
         
         input.backButtonTapped
@@ -86,7 +91,7 @@ final class VideoDetailsViewModel: ViewModel {
         let uploadButtonEnabled = Observable.combineLatest(
             input.title.map { !$0.isEmpty },
             input.description.map { !$0.isEmpty },
-            input.linkValidation
+            input.urlValidation
         ) {
             $0 && $1 && $2
         }
