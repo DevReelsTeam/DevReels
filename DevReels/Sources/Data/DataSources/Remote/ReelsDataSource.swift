@@ -34,11 +34,14 @@ struct ReelsDataSource: ReelsDataSourceProtocol {
     }
     
     func list() -> Observable<Documents<[ReelsResponseDTO]>> {
-        return provider.request(ReelsTarget.list)
+        return provider.request(ReelsTarget.list).debug()
     }
     
     func upload(request: ReelsRequestDTO) -> Observable<Void> {
-        return provider.request(ReelsTarget.upload(request))
+        let request = Observable.zip(provider.request(ReelsTarget.uploadToReels(request)),
+                       provider.request(ReelsTarget.uploadToUserReels(request)))
+            .map { _, _ in }
+        return request
     }
         
     func uploadFile(type: FileType, uid: String, file: Data) -> Observable<URL> {
@@ -72,19 +75,20 @@ struct ReelsDataSource: ReelsDataSourceProtocol {
 
 enum ReelsTarget {
     case list
-    case upload(ReelsRequestDTO)
+    case uploadToReels(ReelsRequestDTO)
+    case uploadToUserReels(ReelsRequestDTO)
 }
 
 extension ReelsTarget: TargetType {
     var baseURL: String {
-        return Network.baseURLString + "/documents/reels"
+        return Network.baseURLString + "/documents"
     }
     
     var method: HTTPMethod {
         switch self {
         case .list:
             return .get
-        case .upload:
+        case .uploadToReels, .uploadToUserReels:
             return .post
         }
     }
@@ -95,10 +99,12 @@ extension ReelsTarget: TargetType {
     
     var path: String {
         switch self {
-        case .upload(let reels):
-            return "/?documentId=\(reels.id.value)"
+        case .uploadToReels(let reels):
+            return "/reels/?documentId=\(reels.id.value)"
+        case .uploadToUserReels(let reels):
+            return "/users/\(reels.uid.value)/reels/?documentId=\(reels.id.value)"
         default:
-            return ""
+            return "/reels"
         }
     }
     
@@ -106,7 +112,7 @@ extension ReelsTarget: TargetType {
         switch self {
         case .list:
             return nil
-        case .upload(let reels):
+        case .uploadToReels(let reels), .uploadToUserReels(let reels):
             return .body(reels)
         }
     }

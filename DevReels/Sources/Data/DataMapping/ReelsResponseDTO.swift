@@ -15,13 +15,15 @@ struct ReelsResponseDTO: Codable {
     private let thumbnailURL: StringValue
     private let title: StringValue
     private let videoDescription: StringValue
+    private let githubUrl: StringValue
+    private let blogUrl: StringValue
     
     private enum RootKey: String, CodingKey {
         case fields
     }
     
     private enum FieldKeys: String, CodingKey {
-        case id, uid, videoURL, thumbnailURL, title, videoDescription
+        case id, uid, videoURL, thumbnailURL, title, videoDescription, githubUrl, blogUrl
     }
     
     init(from decoder: Decoder) throws {
@@ -33,16 +35,18 @@ struct ReelsResponseDTO: Codable {
         self.thumbnailURL = try fieldContainer.decode(StringValue.self, forKey: .thumbnailURL)
         self.title = try fieldContainer.decode(StringValue.self, forKey: .title)
         self.videoDescription = try fieldContainer.decode(StringValue.self, forKey: .videoDescription)
+        self.githubUrl = try fieldContainer.decode(StringValue.self, forKey: .githubUrl)
+        self.blogUrl = try fieldContainer.decode(StringValue.self, forKey: .blogUrl)
     }
     
     func toDomain() -> Reels {
-        return Reels(
-            id: id.value,
-            uid: uid.value,
-            videoURL: videoURL.value,
-            thumbnailURL: thumbnailURL.value,
-            title: title.value,
-            videoDescription: videoDescription.value
-        )
+        return Reels(id: id.value,
+                     title: title.value,
+                     videoDescription: videoDescription.value,
+                     githubUrlString: githubUrl.value,
+                     blogUrlString: blogUrl.value,
+                     uid: uid.value,
+                     videoURL: videoURL.value,
+                     thumbnailURL: thumbnailURL.value)
     }
 }

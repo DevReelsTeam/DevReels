@@ -15,13 +15,16 @@ struct ReelsRequestDTO: Codable {
     private let thumbnailURL: StringValue
     private let title: StringValue
     private let videoDescription: StringValue
+    private let githubUrl: StringValue
+    private let blogUrl: StringValue
+    
     
     private enum RootKey: String, CodingKey {
         case fields
     }
     
     private enum FieldKeys: String, CodingKey {
-        case id, uid, videoURL, thumbnailURL, title, videoDescription
+        case id, uid, videoURL, thumbnailURL, title, videoDescription, githubUrl, blogUrl
     }
     
     func encode(to encoder: Encoder) throws {
@@ -33,6 +36,8 @@ struct ReelsRequestDTO: Codable {
         try fieldContainer.encode(self.thumbnailURL, forKey: .thumbnailURL)
         try fieldContainer.encode(self.title, forKey: .title)
         try fieldContainer.encode(self.videoDescription, forKey: .videoDescription)
+        try fieldContainer.encode(self.githubUrl, forKey: .githubUrl)
+        try fieldContainer.encode(self.blogUrl, forKey: .blogUrl)
     }
     
     init(reels: Reels) {
@@ -42,5 +47,7 @@ struct ReelsRequestDTO: Codable {
         self.thumbnailURL = StringValue(value: reels.thumbnailURL ?? "")
         self.title = StringValue(value: reels.title)
         self.videoDescription = StringValue(value: reels.videoDescription)
+        self.githubUrl = StringValue(value: reels.githubUrlString)
+        self.blogUrl = StringValue(value: reels.blogUrlString)
     }
 }
