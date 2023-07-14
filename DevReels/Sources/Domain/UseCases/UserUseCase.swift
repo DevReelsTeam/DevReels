@@ -9,13 +9,12 @@
 import Foundation
 import RxSwift
 
-struct UserUseCase {
+struct UserUseCase: UserUseCaseProtocol {
     
     var userRepository: UserRepositoryProtocol?
     private let disposeBag = DisposeBag()
     
-//    func myProfileImage() -> Observable<UIImage> {
-//        userRepository?.currentUser()
-//            .flatMap { }
-//    }
+    func currentUser() -> Observable<User> {
+        return userRepository?.currentUser() ?? .empty()
+    }
 }

@@ -11,7 +11,7 @@ import Firebase
 
 struct CommentDataSource: CommentDataSourceProtocol {
     
-    let fireStore = Firestore.firestore().collection("reels")
+    let fireStore = Firestore.firestore().collection("reelsList")
     
     func upload(request: CommentRequestDTO) -> Observable<Void> {
         

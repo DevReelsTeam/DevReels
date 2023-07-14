@@ -9,27 +9,30 @@
 import Foundation
 
 struct UserResponseDTO: Decodable {
-    let identifire: String
+    let identifier: String
     let profileImageURLString: String
     let nickName: String
-    let profileLink: String
+    let githubURL: String
+    let blogURL: String
     let introduce: String
     let uid: String
     
     init(user: User) {
-        self.identifire = user.identifire
+        self.identifier = user.identifier
         self.profileImageURLString = user.profileImageURLString
         self.nickName = user.nickName
-        self.profileLink = user.profileLink
+        self.githubURL = user.githubURL
+        self.blogURL = user.blogURL
         self.introduce = user.introduce
         self.uid = user.uid
     }
     
     func toDomain() -> User {
-        return User(identifire: identifire,
+        return User(identifier: identifier,
                     profileImageURLString: profileImageURLString,
                     nickName: nickName,
-                    profileLink: profileLink,
+                    githubURL: githubURL,
+                    blogURL: blogURL,
                     introduce: introduce,
                     uid: uid)
     }

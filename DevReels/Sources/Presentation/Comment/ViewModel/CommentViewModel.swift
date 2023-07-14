@@ -33,9 +33,10 @@ final class CommentViewModel: ViewModel {
         let deleteAlert: Signal<Alert>
     }
     
-    var commentListUseCase = DIContainer.shared.container.resolve(CommentListUseCaseProtocol.self)
-    var commentUploadUseCase = DIContainer.shared.container.resolve(CommentUploadUseCaseProtocol.self)
-    var loginCheckUseCase = DIContainer.shared.container.resolve(LoginCheckUseCaseProtocol.self)
+    var commentListUseCase: CommentListUseCaseProtocol?
+    var commentUploadUseCase: CommentUploadUseCaseProtocol?
+    var loginCheckUseCase: LoginCheckUseCaseProtocol?
+    
     let navigation = PublishSubject<CommentNavigation>()
     private let commentList = PublishSubject<[Comment]>()
     private let currentUser = BehaviorSubject<User?>(value: nil)
@@ -161,6 +162,7 @@ final class CommentViewModel: ViewModel {
                     break
                 }
             })
+            .disposed(by: disposeBag)
       
         return Output(
             commentList: commentList.asDriver(onErrorJustReturn: []),

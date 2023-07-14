@@ -12,4 +12,6 @@ import RxSwift
 protocol UserDataSourceProtocol {
     func create(request: UserRequestDTO) -> Observable<Void>
     func read(uid: String) -> Observable<UserResponseDTO>
+    func fetchFollower(uid: String) -> Observable<[UserResponseDTO]>
+    func fetchFollowing(uid: String) -> Observable<[UserResponseDTO]>
 }

@@ -36,4 +36,16 @@ struct UserRepository: UserRepositoryProtocol {
         
         return fetch(uid: authorization.localId)
     }
+    
+    func fetchFollower(uid: String) -> Observable<[User]> {
+        return userDataSource?.fetchFollower(uid: uid)
+            .map { $0.map { $0.toDomain() } } ?? .empty()
+    }
+    
+    func fetchFollowing(uid: String) -> Observable<[User]> {
+        return userDataSource?.fetchFollowing(uid: uid)
+            .map { $0.map { $0.toDomain() } } ?? .empty()
+    }
+    
+    
 }

@@ -105,6 +105,18 @@ final class DIContainer {
             useCase.commentRepository = resolver.resolve(CommentRepositoryProtocol.self)
             return useCase
         }
+        
+        container.register(UserUseCaseProtocol.self) { resolver in
+            var useCase = UserUseCase()
+            useCase.userRepository = resolver.resolve(UserRepositoryProtocol.self)
+            return useCase
+        }
+        
+        container.register(ProfileUseCaseProtocol.self) { resolver in
+            var useCase = ProfileUseCase()
+            useCase.userRepository = resolver.resolve(UserRepositoryProtocol.self)
+            return useCase
+        }
     }
     
     private func registerViewModels() {
@@ -113,19 +125,30 @@ final class DIContainer {
             viewModel.loginUseCase = resolver.resolve(LoginUseCaseProtocol.self)
             return viewModel
         }
+        
         container.register(ReelsViewModel.self) { resolver in
             let viewModel = ReelsViewModel()
             viewModel.reelsUseCase = resolver.resolve(ReelsUseCaseProtocol.self)
             return viewModel
         }
+        
         container.register(VideoTrimmerViewModel.self) { _ in VideoTrimmerViewModel() }
+        
         container.register(VideoDetailsViewModel.self) { resolver in
             let viewModel = VideoDetailsViewModel()
             viewModel.uploadReelsUsecase = resolver.resolve(UploadReelsUsecaseProtocol.self)
             return viewModel
         }
+        
         container.register(ProfileViewModel.self) { _ in ProfileViewModel() }
         
-        // TODO: - CommentViewModel 추가
+        container.register(CommentViewModel.self) { resolver in
+            let viewModel = CommentViewModel()
+            viewModel.commentListUseCase = resolver.resolve(CommentListUseCaseProtocol.self)
+            viewModel.commentUploadUseCase = resolver.resolve(CommentUploadUseCaseProtocol.self)
+            viewModel.loginCheckUseCase = resolver.resolve(LoginCheckUseCaseProtocol.self)
+            
+            return viewModel
+        }
     }
 }
