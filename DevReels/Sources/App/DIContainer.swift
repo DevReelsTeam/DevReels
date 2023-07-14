@@ -117,18 +117,22 @@ final class DIContainer {
             useCase.userRepository = resolver.resolve(UserRepositoryProtocol.self)
             return useCase
         }
+        
+        container.register(HyperLinkUseCaseProtocol.self) { _ in HyperLinkUseCase() }
     }
     
     private func registerViewModels() {
         container.register(LoginViewModel.self) { resolver in
             let viewModel = LoginViewModel()
             viewModel.loginUseCase = resolver.resolve(LoginUseCaseProtocol.self)
+            
             return viewModel
         }
         
         container.register(ReelsViewModel.self) { resolver in
             let viewModel = ReelsViewModel()
             viewModel.reelsUseCase = resolver.resolve(ReelsUseCaseProtocol.self)
+            
             return viewModel
         }
         
@@ -137,10 +141,19 @@ final class DIContainer {
         container.register(VideoDetailsViewModel.self) { resolver in
             let viewModel = VideoDetailsViewModel()
             viewModel.uploadReelsUsecase = resolver.resolve(UploadReelsUsecaseProtocol.self)
+           
             return viewModel
         }
         
-        container.register(ProfileViewModel.self) { _ in ProfileViewModel() }
+        container.register(ProfileViewModel.self) { resolver in
+            let viewModel = ProfileViewModel()
+            viewModel.userUseCase = DIContainer.shared.container.resolve(UserUseCaseProtocol.self)
+            viewModel.profileUseCase = DIContainer.shared.container.resolve(ProfileUseCaseProtocol.self)
+            viewModel.reelsUseCase = DIContainer.shared.container.resolve(ReelsUseCaseProtocol.self)
+            viewModel.hyperlinkUseCase = DIContainer.shared.container.resolve(HyperLinkUseCaseProtocol.self)
+            
+            return viewModel
+        }
         
         container.register(CommentViewModel.self) { resolver in
             let viewModel = CommentViewModel()

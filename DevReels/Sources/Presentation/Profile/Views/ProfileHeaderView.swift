@@ -9,6 +9,8 @@
 import UIKit
 import SnapKit
 import Then
+import RxSwift
+import RxCocoa
 
 final class ProfileHeaderView: UICollectionReusableView, Identifiable {
     
@@ -47,13 +49,14 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
         }
     }
     
+    // MARK: - Properties
+    
     private let blogImageView = UIImageView().then {
-        $0.image = UIImage(systemName: "mic")
-        $0.backgroundColor = .gray
+        $0.image = UIImage(named: "profileBlog")
     }
     
     private let githubImageView = UIImageView().then {
-        $0.image = UIImage(systemName: "mic.fill")
+        $0.image = UIImage(named: "profileGithub")
         $0.backgroundColor = .gray
     }
     
@@ -70,7 +73,6 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
             ofSize: 20,
             weight: .bold
         )
-        $0.text = "김코드"
     }
     
     private let introduceLabel = UILabel().then {
@@ -79,7 +81,6 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
             ofSize: 14,
             weight: .semibold
         )
-        $0.text = "< 안녕하세요🔥 성장하는 개발자입니다👩‍💻 />"
     }
     
     private let postLabel = UILabel().then {
@@ -140,31 +141,89 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
         $0.setTitle("< Follow >", for: .normal)
     }
     
+    private let editButton = UIButton().then {
+        $0.layer.cornerRadius = Metrics.FollowingButton.corneradius
+        $0.clipsToBounds = true
+        $0.titleLabel?.font = .systemFont(ofSize: 16)
+        $0.setTitle("< Edit >", for: .normal)
+        $0.setBackgroundColor(UIColor.devReelsColor.neutral40 ?? UIColor.darkGray, for: .normal)
+        $0.setTitleColor(.white, for: .normal)
+    }
+    
+    private let settingButton = UIButton().then {
+        $0.layer.cornerRadius = Metrics.FollowingButton.corneradius
+        $0.clipsToBounds = true
+        $0.titleLabel?.font = .systemFont(ofSize: 16)
+        $0.setTitle("< Setting >", for: .normal)
+        $0.setBackgroundColor(UIColor.devReelsColor.neutral40 ?? UIColor.darkGray, for: .normal)
+        $0.setTitleColor(.white, for: .normal)
+    }
+    
+    private lazy var editAndSettingButtonStackView = UIStackView(arrangedSubviews: [editButton, settingButton]).then {
+        $0.axis = .horizontal
+        $0.spacing = 12
+        $0.distribution = .fillEqually
+    }
+    
+    private var blogImageViewTapSubject = PublishSubject<Void>()
+    private var githubImageViewTapSubject = PublishSubject<Void>()
+    
+    var blogImageViewTap: Observable<Void> {
+        return blogImageViewTapSubject.asObservable()
+    }
+    
+    var githubImageViewTap: Observable<Void> {
+        return githubImageViewTapSubject.asObservable()
+    }
+    
+    var editButtonTap: Observable<Void> {
+        return editButton.rx.tap.asObservable()
+    }
+    
+    var settingButtonTap: Observable<Void> {
+        return settingButton.rx.tap.asObservable()
+    }
+    
+    var followButtonTap: Observable<Void> {
+        return followButton.rx.tap.asObservable()
+    }
+    
+    // MARK: - Inits
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         layout()
         
-        [blogImageView, githubImageView].forEach {
-            $0.layer.cornerRadius = Metrics.BlogGithubStackView.blogGithubImageViewWidHeight / 2
-            $0.clipsToBounds = true
-        }
+        let blogTapGesture = UITapGestureRecognizer(target: self, action: #selector(blogImageViewTapped))
+        blogImageView.addGestureRecognizer(blogTapGesture)
+        blogImageView.isUserInteractionEnabled = true
         
-        userImageView.layer.cornerRadius = Metrics.UserImage.widthHeight / 2
-        userImageView.clipsToBounds = true
+        let githubTapGesture = UITapGestureRecognizer(target: self, action: #selector(githubImageViewTapped))
+        githubImageView.addGestureRecognizer(githubTapGesture)
+        githubImageView.isUserInteractionEnabled = true
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Methods
+    
     func configure(header: Header) {
         self.userImageView.imageURL = header.profileImageURLString
         self.userNameLabel.text = header.userName
-        self.introduceLabel.text = header.introduce
+        
+        let text = NSMutableAttributedString(string: header.introduce)
+        text.addAttribute(.foregroundColor, value: UIColor.devReelsColor.primary90, range: NSRange(location: 0, length: 1))
+        text.addAttribute(.foregroundColor, value: UIColor.devReelsColor.primary90, range: NSRange(location: header.introduce.count - 2, length: 2))
+        
+        self.introduceLabel.attributedText = text
         self.postCountLabel.text = header.postCount
         self.followerCountLabel.text = header.followerCount
         self.followingCountLabel.text = header.followingCount
+        self.followButton.isHidden = header.isMyProfile
+        self.followButton.isUserInteractionEnabled = !header.isMyProfile
     }
     
     func layout() {
@@ -225,6 +284,14 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
             $0.centerX.equalToSuperview()
         }
         
+        addSubview(editAndSettingButtonStackView)
+        
+        editAndSettingButtonStackView.snp.makeConstraints {
+            $0.top.equalTo(countStackView.snp.bottom).offset(Metrics.FollowingButton.topMargin)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview()
+        }
+        
         addSubview(followButton)
         
         followButton.snp.makeConstraints {
@@ -232,5 +299,21 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
         }
+        
+        [blogImageView, githubImageView].forEach {
+            $0.layer.cornerRadius = Metrics.BlogGithubStackView.blogGithubImageViewWidHeight / 2
+            $0.clipsToBounds = true
+        }
+        
+        userImageView.layer.cornerRadius = Metrics.UserImage.widthHeight / 2
+        userImageView.clipsToBounds = true
+    }
+    
+    @objc private func blogImageViewTapped() {
+        blogImageViewTapSubject.onNext(())
+    }
+    
+    @objc private func githubImageViewTapped() {
+        githubImageViewTapSubject.onNext(())
     }
 }

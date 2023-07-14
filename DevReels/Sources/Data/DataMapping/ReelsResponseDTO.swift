@@ -46,14 +46,16 @@ struct ReelsResponseDTO: Codable {
         self.thumbnailURL = StringValue(value: reels.videoDescription)
         self.title = StringValue(value: reels.title)
         self.videoDescription = StringValue(value: reels.videoDescription)
+        self.githubUrl = StringValue(value: reels.githubUrl)
+        self.blogUrl = StringValue(value: reels.blogUrl)
     }
     
     func toDomain() -> Reels {
         return Reels(id: id.value,
                      title: title.value,
                      videoDescription: videoDescription.value,
-                     githubUrlString: githubUrl.value,
-                     blogUrlString: blogUrl.value,
+                     githubUrl: githubUrl.value,
+                     blogUrl: blogUrl.value,
                      uid: uid.value,
                      videoURL: videoURL.value,
                      thumbnailURL: thumbnailURL.value)

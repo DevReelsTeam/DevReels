@@ -47,7 +47,7 @@ struct ReelsRequestDTO: Codable {
         self.thumbnailURL = StringValue(value: reels.thumbnailURL ?? "")
         self.title = StringValue(value: reels.title)
         self.videoDescription = StringValue(value: reels.videoDescription)
-        self.githubUrl = StringValue(value: reels.githubUrlString)
-        self.blogUrl = StringValue(value: reels.blogUrlString)
+        self.githubUrl = StringValue(value: reels.githubUrl)
+        self.blogUrl = StringValue(value: reels.blogUrl)
     }
 }

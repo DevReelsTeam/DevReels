@@ -72,7 +72,7 @@ struct ReelsDataSource: ReelsDataSourceProtocol {
         }
     }
   
-    func fetch(uid: String) -> Observable<[Reels]> {
+    func fetch(uid: String) -> Observable<[ReelsResponseDTO]> {
         return Observable.create { emitter in
             Firestore.firestore()
                 .collection("users")
@@ -84,8 +84,10 @@ struct ReelsDataSource: ReelsDataSourceProtocol {
                             .map { $0.data() }
                             .compactMap { try? JSONSerialization.data(withJSONObject: $0) }
                             .compactMap { try? JSONDecoder().decode(Reels.self, from: $0) }
-
+                            .map { ReelsResponseDTO(reels: $0)}
+                        
                         emitter.onNext(reels)
+                        emitter.onCompleted()
                     }
                 })
             return Disposables.create()
