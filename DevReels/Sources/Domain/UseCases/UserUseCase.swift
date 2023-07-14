@@ -9,9 +9,9 @@
 import Foundation
 import RxSwift
 
-struct UserUseCase {
+struct UserUseCase: UserUseCaseProtocol {
     
-    var userRepository = DIContainer.shared.container.resolve(UserRepositoryProtocol.self)
+    var userRepository: UserRepositoryProtocol?
     private let disposeBag = DisposeBag()
     
     func currentUser() -> Observable<User> {

@@ -42,9 +42,12 @@ final class ProfileViewModel: ViewModel {
     
     let type = BehaviorSubject<ProfileType>(value: .current)
     private let currentUser = BehaviorSubject<User?>(value: nil)
+    private let follower = BehaviorSubject<[User]>(value: [])
+    private let following = BehaviorSubject<[User]>(value: [])
     private let collectionViewDataSource = BehaviorSubject<[SectionOfReelsPost]>(value:[])
     
-    private let userUseCase = UserUseCase()
+    let userUseCase = DIContainer.shared.container.resolve(UserUseCaseProtocol.self)
+    let profileUseCase = DIContainer.shared.container.resolve(ProfileUseCaseProtocol.self)
     var disposeBag = DisposeBag()
     
     struct Output {
@@ -68,7 +71,7 @@ final class ProfileViewModel: ViewModel {
         .filter { $0 == ProfileType.current }
         .withUnretained(self)
         .flatMap {
-            $0.0.userUseCase.currentUser().asResult()
+            $0.0.userUseCase?.currentUser().asResult() ?? .empty()
         }
         .withUnretained(self)
         .subscribe(onNext: { viewModel, result in
@@ -106,11 +109,44 @@ final class ProfileViewModel: ViewModel {
             })
             .disposed(by: disposeBag)
         
+        
+        
+        currentUser
+            .withUnretained(self)
+            .flatMap { $0.0.profileUseCase?.follower(uid: $0.1?.uid ?? " ").asResult() ?? .empty() }
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, result in
+                switch result {
+                case .success(let users):
+                    viewModel.follower.onNext(users)
+                default:
+                    viewModel.follower.onNext([])
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        currentUser
+            .withUnretained(self)
+            .flatMap { $0.0.profileUseCase?.following(uid: $0.1?.uid ?? " ").asResult() ?? .empty() }
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, result in
+                switch result {
+                case .success(let users):
+                    viewModel.following.onNext(users)
+                default:
+                    viewModel.following.onNext([])
+                }
+            })
+            .disposed(by: disposeBag)
+
+        
+        
         Observable.combineLatest(
             currentUser.compactMap { $0 },
-            Observable.just(())
+            follower,
+            following
         )
-        .map { user, _  -> [SectionOfReelsPost] in
+        .map { user, follower, following  -> [SectionOfReelsPost] in
             let header = Header(
                 profileImageURLString: user.profileImageURLString,
                 userName: user.nickName,
@@ -118,9 +154,8 @@ final class ProfileViewModel: ViewModel {
                 githubURL: user.githubURL,
                 blogURL: user.blogURL,
                 postCount: "0",
-                followerCount: "0",
-                followingCount: "0")
-            
+                followerCount: "\(follower.count)",
+                followingCount: "\(following.count)")
             return [
                 SectionOfReelsPost(
                     header: header,
@@ -137,10 +172,10 @@ final class ProfileViewModel: ViewModel {
             })
             .disposed(by: disposeBag)
         
-//        let aa = UserDataSource()
+        let aa = ProfileUseCase()
         
         
-//        aa.fetchFollowing(uid: "QoTCI64dz7bTOv6dfVaXCCssRrp2")
+//        aa.follower(uid: "asdf")
 //            .subscribe(onNext: {
 //                print("\n\n\n\n\n")
 //                print($0)

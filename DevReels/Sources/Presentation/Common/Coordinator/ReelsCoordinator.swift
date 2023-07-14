@@ -48,7 +48,7 @@ final class ReelsCoordinator: BaseCoordinator<ReelsCoordinatorResult> {
     }
     
     func showComment(_ reels: Reels) {
-        let viewModel = CommentViewModel()
+        guard let viewModel = DIContainer.shared.container.resolve(CommentViewModel.self) else { return }
         viewModel.reels = reels
         
         viewModel.navigation

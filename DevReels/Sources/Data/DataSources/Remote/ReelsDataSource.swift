@@ -69,25 +69,26 @@ struct ReelsDataSource: ReelsDataSourceProtocol {
         }
     }
   
-    // 사용자 릴스 가져오기 
-//    func fetch(uid: String) -> Observable<[Reels]> {
-//        return Observable.create { emitter in
-//            Firestore.firestore()
-//                .collection("reels")
-//                .getDocuments(completion: { snapshot, _ in
-//                    if let snapshot = snapshot?.documents {
-//                        let reels = snapshot
-//                            .map { $0.data() }
-//                            .compactMap { try? JSONSerialization.data(withJSONObject: $0) }
-//                            .compactMap { try? JSONDecoder().decode(Reels.self, from: $0) }
-//
-//                        emitter.onNext(reels)
-//                    }
-//                })
-//            return Disposables.create()
-//        }
-//    }
-//
+    func fetch(uid: String) -> Observable<[Reels]> {
+        return Observable.create { emitter in
+            Firestore.firestore()
+                .collection("users")
+                .document(uid)
+                .collection("reels")
+                .getDocuments(completion: { snapshot, _ in
+                    if let snapshot = snapshot?.documents {
+                        let reels = snapshot
+                            .map { $0.data() }
+                            .compactMap { try? JSONSerialization.data(withJSONObject: $0) }
+                            .compactMap { try? JSONDecoder().decode(Reels.self, from: $0) }
+
+                        emitter.onNext(reels)
+                    }
+                })
+            return Disposables.create()
+        }
+    }
+
     
 }
 
