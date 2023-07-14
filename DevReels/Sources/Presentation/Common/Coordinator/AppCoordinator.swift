@@ -26,8 +26,8 @@ final class AppCoordinator: BaseCoordinator<Void> {
     
     override func start() -> Observable<Void> {
         setup(with: window)
-//        showLogin()
-        showTab()
+        showLogin()
+//        showTab()
         return Observable.never()
     }
     
