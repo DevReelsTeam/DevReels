@@ -40,6 +40,7 @@ struct CommentDataSource: CommentDataSourceProtocol {
                             .map { CommentResponseDTO(comment: $0) }
                         
                         emitter.onNext(comments)
+                        emitter.onCompleted()
                     }
                 })
             return Disposables.create()

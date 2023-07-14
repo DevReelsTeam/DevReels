@@ -10,4 +10,5 @@ import RxSwift
 
 protocol ReelsUseCaseProtocol {
     func list() -> Observable<[Reels]>
+    func fetch(uid: String) -> Observable<[Reels]>
 }

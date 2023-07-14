@@ -133,7 +133,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         commentImageView.tapEvent
             .subscribe(onNext: { [weak self] in
                 self?.commentButtonTap
-                    .onNext(self?.reels ?? Reels(id: "", title: "", videoDescription: "", githubUrlString: "", blogUrlString: ""))
+                    .onNext(self?.reels ?? Reels(id: "", title: "", videoDescription: "", githubUrl: "", blogUrl: ""))
             })
             .disposed(by: disposeBag)
         

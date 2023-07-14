@@ -60,8 +60,8 @@ final class VideoDetailsViewModel: ViewModel {
                 return Reels(id: id,
                              title: $0.0,
                              videoDescription: $0.1,
-                             githubUrlString: $0.2,
-                             blogUrlString: $0.3)
+                             githubUrl: $0.2,
+                             blogUrl: $0.3)
             }
         
         input.backButtonTapped

@@ -16,4 +16,8 @@ struct ReelsUseCase: ReelsUseCaseProtocol {
     func list() -> Observable<[Reels]> {
         return reelsRepository?.list() ?? .empty()
     }
+    
+    func fetch(uid: String) -> Observable<[Reels]> {
+        return reelsRepository?.fetch(uid: uid) ?? .empty()
+    }
 }

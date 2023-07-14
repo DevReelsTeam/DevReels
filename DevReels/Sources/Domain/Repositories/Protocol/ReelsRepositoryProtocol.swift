@@ -12,4 +12,5 @@ import Foundation
 protocol ReelsRepositoryProtocol {
     func list() -> Observable<[Reels]>
     func upload(reels: Reels, video: Data, thumbnailImage: Data) -> Observable<Void>
+    func fetch(uid: String) -> Observable<[Reels]>
 }

@@ -32,33 +32,45 @@ enum ProfileType {
             return false
         }
     }
+    
+    static func != (lhs: Self, rhs: Self) -> Bool {
+        switch (lhs, rhs) {
+        case (.other, .current), (.current, .other):
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 final class ProfileViewModel: ViewModel {
     
     struct Input {
         let viewWillAppear: Observable<Void>
+        let blogImageViewTap: Observable<Void>
+        let githubImageViewTap: Observable<Void>
+        let followButtonTap: Observable<Void>
+        let editButtonTap: Observable<Void>
+        let settingButtonTap: Observable<Void>
+    }
+    
+    struct Output {
+        let collectionViewDataSource: Driver<[SectionOfReelsPost]>
     }
     
     let type = BehaviorSubject<ProfileType>(value: .current)
     private let currentUser = BehaviorSubject<User?>(value: nil)
     private let follower = BehaviorSubject<[User]>(value: [])
     private let following = BehaviorSubject<[User]>(value: [])
-    private let collectionViewDataSource = BehaviorSubject<[SectionOfReelsPost]>(value:[])
+    private let reels = BehaviorSubject<[Reels]>(value: [])
+    private let collectionViewDataSource = BehaviorSubject<[SectionOfReelsPost]>(value: [])
     
-    let userUseCase = DIContainer.shared.container.resolve(UserUseCaseProtocol.self)
-    let profileUseCase = DIContainer.shared.container.resolve(ProfileUseCaseProtocol.self)
-    var disposeBag = DisposeBag()
-    
-    struct Output {
-        let collectionViewDataSource: Driver<[SectionOfReelsPost]>
-        let currentUserName: Driver<String>
-        let currentUserIntroduce: Driver<String>
-        let currentUserProfileImageURLString: Observable<String>
-        let currentUserGithubURL: Driver<String>
-        let currentUserBlogURL: Driver<String>
-    }
-    
+    var userUseCase: UserUseCaseProtocol?
+    var profileUseCase: ProfileUseCaseProtocol?
+    var reelsUseCase: ReelsUseCaseProtocol?
+    var hyperlinkUseCase: HyperLinkUseCaseProtocol?
+    let disposeBag = DisposeBag()
+
     let navigation = PublishSubject<ProfileNavigation>()
     
     func transform(input: Input) -> Output {
@@ -78,13 +90,14 @@ final class ProfileViewModel: ViewModel {
             switch result {
             case .success(let user):
                 viewModel.currentUser.onNext(user)
+                
             case .failure:
                 let failureUser = User(
                     identifier: "",
                     profileImageURLString: "",
                     nickName: "홍길동",
                     githubURL: "https://github.com/",
-                    blogURL: "www.naver.com",
+                    blogURL: "https://www.naver.com/",
                     introduce: "비 로그인 상태입니다.",
                     uid: "")
                 viewModel.currentUser.onNext(failureUser)
@@ -109,6 +122,13 @@ final class ProfileViewModel: ViewModel {
             })
             .disposed(by: disposeBag)
         
+        type
+            .filter { $0 != .current }
+            .subscribe(onNext: { _ in
+                print("\n\n\n\n\n")
+                print("aaaa")
+                print("\n\n\n\n\n")
+            })
         
         
         currentUser
@@ -138,31 +158,65 @@ final class ProfileViewModel: ViewModel {
                 }
             })
             .disposed(by: disposeBag)
-
         
+        currentUser
+            .withUnretained(self)
+            .flatMap { $0.0.reelsUseCase?.fetch(uid: $0.1?.uid ?? " ").asResult() ?? .empty() }
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, result in
+                switch result {
+                case .success(let reels):
+                    viewModel.reels.onNext(reels)
+                default:
+                    viewModel.reels.onNext([])
+                }
+            })
+            .disposed(by: disposeBag)
         
-        Observable.combineLatest(
-            currentUser.compactMap { $0 },
-            follower,
-            following
+//        let aa = reelsUseCase
+//
+//
+//        aa?.fetch(uid: "tempUID")
+//            .subscribe(onNext: {
+//                print("\n\n\n\n\n")
+//                print($0)
+//                print("\n\n\n\n\n")
+//            })
+        
+        transformCollectionViewDataSource(input: input)
+        transformTapEvent(input: input)
+    
+        return Output(
+            collectionViewDataSource: collectionViewDataSource.asDriver(onErrorJustReturn: [])
         )
-        .map { user, follower, following  -> [SectionOfReelsPost] in
+    }
+    
+    private func transformCollectionViewDataSource(input: ProfileViewModel.Input) {
+        Observable.combineLatest(
+            currentUser.compactMap { $0 }.asObservable(),
+            follower,
+            following,
+            reels,
+            type
+        )
+        .map { user, follower, following, reels, type -> [SectionOfReelsPost] in
+            
             let header = Header(
                 profileImageURLString: user.profileImageURLString,
                 userName: user.nickName,
-                introduce: user.introduce,
+                introduce:  "<" + " \(user.introduce) " + "/>",
                 githubURL: user.githubURL,
                 blogURL: user.blogURL,
-                postCount: "0",
+                postCount: "\(reels.count)",
                 followerCount: "\(follower.count)",
-                followingCount: "\(following.count)")
+                followingCount: "\(following.count)",
+                isMyProfile: type == .current ? true : false
+            )
+            
             return [
                 SectionOfReelsPost(
                     header: header,
-                    items: [
-                        Reels(id: "", title: "", videoDescription: ""),
-                        Reels(id: "", title: "", videoDescription: "")
-                    ]
+                    items: reels
                 )
             ]
         }
@@ -171,24 +225,47 @@ final class ProfileViewModel: ViewModel {
                 viewModel.collectionViewDataSource.onNext(result)
             })
             .disposed(by: disposeBag)
+    }
+    
+    private func transformTapEvent(input: ProfileViewModel.Input) {
+        input.blogImageViewTap
+            .withLatestFrom(currentUser.compactMap { $0 })
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, user in
+                viewModel.hyperlinkUseCase?.openSafari(urlString: user.blogURL)
+            })
+            .disposed(by: disposeBag)
         
-        let aa = ProfileUseCase()
+        input.githubImageViewTap
+            .withLatestFrom(currentUser.compactMap { $0 })
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, user in
+                viewModel.hyperlinkUseCase?.openSafari(urlString: user.githubURL)
+            })
+            .disposed(by: disposeBag)
         
+        input.followButtonTap
+            .subscribe(onNext: { _ in
+                print("\n\n\n")
+                print("follow")
+                print("\n\n\n")
+            })
+            .disposed(by: disposeBag)
         
-//        aa.follower(uid: "asdf")
-//            .subscribe(onNext: {
-//                print("\n\n\n\n\n")
-//                print($0)
-//                print("\n\n\n\n\n")
-//            })
-
-        return Output(
-            collectionViewDataSource: collectionViewDataSource.asDriver(onErrorJustReturn: []),
-            currentUserName: currentUser.compactMap { $0?.nickName }.asDriver(onErrorJustReturn: "홍길동"),
-            currentUserIntroduce: currentUser.compactMap { $0?.introduce }.asDriver(onErrorJustReturn: "비 로그인 상태입니다."),
-            currentUserProfileImageURLString: currentUser.compactMap { $0?.profileImageURLString }.asObservable(),
-            currentUserGithubURL: currentUser.compactMap { $0?.githubURL }.asDriver(onErrorJustReturn: "https://github.com/"),
-            currentUserBlogURL: currentUser.compactMap { $0?.githubURL }.asDriver(onErrorJustReturn: "www.naver.com")
-        )
+        input.editButtonTap
+            .subscribe(onNext: { _ in
+                print("\n\n\n")
+                print("edit")
+                print("\n\n\n")
+            })
+            .disposed(by: disposeBag)
+        
+        input.settingButtonTap
+            .subscribe(onNext: { _ in
+            print("\n\n\n")
+            print("setting")
+            print("\n\n\n")
+        })
+        .disposed(by: disposeBag)
     }
 }

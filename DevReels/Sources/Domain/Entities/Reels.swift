@@ -12,29 +12,29 @@ struct Reels: Codable {
     let id: String
     let title: String
     let videoDescription: String
-    let githubUrlString: String
-    let blogUrlString: String
+    let githubUrl: String
+    let blogUrl: String
     let uid: String?
     let videoURL: String?
     let thumbnailURL: String?
     
-    init(id: String, title: String,videoDescription: String, githubUrlString: String, blogUrlString: String, uid: String?, videoURL: String?, thumbnailURL: String?) {
+    init(id: String, title: String,videoDescription: String, githubUrl: String, blogUrl: String, uid: String?, videoURL: String?, thumbnailURL: String?) {
         self.id = id
         self.title = title
         self.videoDescription = videoDescription
-        self.githubUrlString = githubUrlString
-        self.blogUrlString = blogUrlString
+        self.githubUrl = githubUrl
+        self.blogUrl = blogUrl
         self.uid = uid
         self.videoURL = videoURL
         self.thumbnailURL = thumbnailURL
     }
         
-    init(id: String, title: String, videoDescription: String, githubUrlString: String, blogUrlString: String) {
+    init(id: String, title: String, videoDescription: String, githubUrl: String, blogUrl: String) {
         self.id = id
         self.title = title
         self.videoDescription = videoDescription
-        self.githubUrlString = githubUrlString
-        self.blogUrlString = blogUrlString
+        self.githubUrl = githubUrl
+        self.blogUrl = blogUrl
         self.uid = nil
         self.videoURL = nil
         self.thumbnailURL = nil

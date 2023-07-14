@@ -34,8 +34,8 @@ struct ReelsRepository: ReelsRepositoryProtocol {
                 let reels = Reels(id: reels.id,
                                   title: reels.title,
                                   videoDescription: reels.videoDescription,
-                                  githubUrlString: reels.githubUrlString,
-                                  blogUrlString: reels.blogUrlString,
+                                  githubUrl: reels.githubUrl,
+                                  blogUrl: reels.blogUrl,
                                   uid: uid,
                                   videoURL: $0.0,
                                   thumbnailURL: $0.1)
@@ -45,5 +45,10 @@ struct ReelsRepository: ReelsRepositoryProtocol {
         
         return reelsRequest
             .flatMap { reelsDataSource?.upload(request: $0) ?? .empty() }
+    }
+    
+    func fetch(uid: String) -> Observable<[Reels]> {
+        return reelsDataSource?.fetch(uid: uid)
+            .map { $0.map { $0.toDomain() } } ?? .empty()
     }
 }
