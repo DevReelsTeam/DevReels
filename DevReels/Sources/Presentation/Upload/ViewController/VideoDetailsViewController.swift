@@ -114,7 +114,7 @@ final class VideoDetailsViewController: ViewController {
                 isValid ? self.blogToggleTextField.rx.urlString.orEmpty.asObservable() : Observable.just("")
             }
         
-        
+        let hearts = Observable.just(0)    // 업로드할 하트 개수
     
         let input = VideoDetailsViewModel.Input(
             backButtonTapped: backButton.rx.tap.throttle(.seconds(1), scheduler: MainScheduler.instance),
@@ -123,6 +123,7 @@ final class VideoDetailsViewController: ViewController {
             urlValidation: urlValidation,
             githubUrlString: githubUrlString,
             blogUrlString: blogUrlString,
+            hearts: hearts,
             uploadButtonTapped: uploadButton.rx.tap.asObservable()
             )
             
