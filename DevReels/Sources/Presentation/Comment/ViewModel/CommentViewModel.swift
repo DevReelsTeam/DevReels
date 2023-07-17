@@ -12,6 +12,7 @@ import RxCocoa
 
 enum CommentNavigation {
     case back
+    case profile(User)
 }
 
 final class CommentViewModel: ViewModel {
@@ -21,7 +22,8 @@ final class CommentViewModel: ViewModel {
         let backButtonTapped: Observable<Void>
         let inputButtonDidTap: Observable<Void>
         let inputViewText: Observable<String>
-        let selectedComment: Observable<Comment>
+        let selectedDotDotDot: Observable<Comment>
+        let selectedUserProfile: Observable<Comment>
     }
     
     struct Output {
@@ -36,18 +38,18 @@ final class CommentViewModel: ViewModel {
     var commentListUseCase: CommentListUseCaseProtocol?
     var commentUploadUseCase: CommentUploadUseCaseProtocol?
     var loginCheckUseCase: LoginCheckUseCaseProtocol?
+    var userUseCase: UserUseCaseProtocol?
     
     let navigation = PublishSubject<CommentNavigation>()
     private let commentList = PublishSubject<[Comment]>()
     private let currentUser = BehaviorSubject<User?>(value: nil)
     private let refresh = PublishSubject<Void>()
     private let alert = PublishSubject<Alert>()
+    private let presentAlert = PublishSubject<Alert>()
     var reels: Reels?
     var disposeBag = DisposeBag()
     
     func transform(input: Input) -> Output {
-        // 알럿
-        let presentAlert = PublishSubject<Alert>()
         
         Observable.merge(refresh, input.viewWillAppear)
             .withUnretained(self)
@@ -87,19 +89,52 @@ final class CommentViewModel: ViewModel {
             .bind(to: navigation)
             .disposed(by: disposeBag)
         
+        Observable.combineLatest(input.selectedUserProfile, currentUser)
+            .filter{ comment, user in
+                comment.writerUID != user?.uid
+            }
+            .withUnretained(self)
+            .flatMap { $0.0.userUseCase?.fetchUser(uid: $0.1.0.writerUID).asResult() ?? .empty() }
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, result in
+                switch result {
+                case .success(let user):
+                    viewModel.navigation.onNext(.profile(user))
+                default:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        
+        transformInput(input: input)
+        transformAlert(input: input)
+        
+        return Output(
+            commentList: commentList.asDriver(onErrorJustReturn: []),
+            presentAlert: presentAlert.asSignal(onErrorSignalWith: .empty()),
+            commentUploadCompleted: refresh.asDriver(onErrorJustReturn: ()),
+            profileImageURL: currentUser
+                .compactMap { $0?.profileImageURLString },
+            reels: reels,
+            deleteAlert: alert.asSignal(onErrorSignalWith: .empty())
+        )
+    }
+    
+    func transformInput(input: Input) {
         input.inputButtonDidTap
             .withUnretained(self)
             .flatMap { viewModel, _ in
                 viewModel.loginCheckUseCase?.loginCheck().asResult() ?? .empty()
             }
             .withUnretained(self)
-            .subscribe(onNext: { _, result in
+            .subscribe(onNext: { viewModel, result in
                 switch result {
                 case .success:
                    break
                 case .failure:
                     let alert = Alert(title: "로그인이 필요합니다.", message: "댓글을 남기시려면 로그인을 하셔야 합니다. 로그인을 해주세요", observer: nil)
-                    presentAlert.onNext(alert)
+                    viewModel.presentAlert.onNext(alert)
                 }
             })
             .disposed(by: disposeBag)
@@ -131,10 +166,12 @@ final class CommentViewModel: ViewModel {
                 }
             })
             .disposed(by: disposeBag)
-        
+    }
+    
+    func transformAlert(input: Input) {
         let removeCommentAlertObserver = PublishSubject<Bool>()
         
-        Observable.combineLatest(input.selectedComment, currentUser)
+        Observable.combineLatest(input.selectedDotDotDot, currentUser)
             .compactMap { $0 }
             .map { comment, user -> Alert? in
                 if comment.writerUID == user?.uid {
@@ -150,7 +187,7 @@ final class CommentViewModel: ViewModel {
             .disposed(by: disposeBag)
         
         removeCommentAlertObserver
-            .withLatestFrom(input.selectedComment)
+            .withLatestFrom(input.selectedDotDotDot)
             .withUnretained(self)
             .flatMap { $0.commentUploadUseCase?.delete(comment: $1).asResult() ?? .empty() }
             .withUnretained(self)
@@ -163,15 +200,5 @@ final class CommentViewModel: ViewModel {
                 }
             })
             .disposed(by: disposeBag)
-      
-        return Output(
-            commentList: commentList.asDriver(onErrorJustReturn: []),
-            presentAlert: presentAlert.asSignal(onErrorSignalWith: .empty()),
-            commentUploadCompleted: refresh.asDriver(onErrorJustReturn: ()),
-            profileImageURL: currentUser
-                .compactMap { $0?.profileImageURLString },
-            reels: reels,
-            deleteAlert: alert.asSignal(onErrorSignalWith: .empty())
-        )
     }
 }

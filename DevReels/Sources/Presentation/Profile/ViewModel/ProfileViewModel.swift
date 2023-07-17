@@ -52,13 +52,16 @@ final class ProfileViewModel: ViewModel {
         let followButtonTap: Observable<Void>
         let editButtonTap: Observable<Void>
         let settingButtonTap: Observable<Void>
+        let backButtonTap: Observable<Void>
     }
     
     struct Output {
         let collectionViewDataSource: Driver<[SectionOfReelsPost]>
+        let isMyprofile: Observable<Bool>
     }
     
     let type = BehaviorSubject<ProfileType>(value: .current)
+    private let isMyprofile = BehaviorSubject<Bool>(value: true)
     private let currentUser = BehaviorSubject<User?>(value: nil)
     private let follower = BehaviorSubject<[User]>(value: [])
     private let following = BehaviorSubject<[User]>(value: [])
@@ -69,8 +72,7 @@ final class ProfileViewModel: ViewModel {
     var profileUseCase: ProfileUseCaseProtocol?
     var reelsUseCase: ReelsUseCaseProtocol?
     var hyperlinkUseCase: HyperLinkUseCaseProtocol?
-    let disposeBag = DisposeBag()
-
+    var disposeBag = DisposeBag()
     let navigation = PublishSubject<ProfileNavigation>()
     
     func transform(input: Input) -> Output {
@@ -124,11 +126,11 @@ final class ProfileViewModel: ViewModel {
         
         type
             .filter { $0 != .current }
-            .subscribe(onNext: { _ in
-                print("\n\n\n\n\n")
-                print("aaaa")
-                print("\n\n\n\n\n")
+            .withUnretained(self)
+            .subscribe(onNext:  { viewModel, _ in
+                viewModel.isMyprofile.onNext(false)
             })
+            .disposed(by: disposeBag)
         
         
         currentUser
@@ -173,21 +175,19 @@ final class ProfileViewModel: ViewModel {
             })
             .disposed(by: disposeBag)
         
-//        let aa = reelsUseCase
-//
-//
-//        aa?.fetch(uid: "tempUID")
-//            .subscribe(onNext: {
-//                print("\n\n\n\n\n")
-//                print($0)
-//                print("\n\n\n\n\n")
-//            })
+        input.backButtonTap
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, _ in
+                viewModel.navigation.onNext(.finish)
+            })
+            .disposed(by: disposeBag)
         
         transformCollectionViewDataSource(input: input)
         transformTapEvent(input: input)
     
         return Output(
-            collectionViewDataSource: collectionViewDataSource.asDriver(onErrorJustReturn: [])
+            collectionViewDataSource: collectionViewDataSource.asDriver(onErrorJustReturn: []),
+            isMyprofile: isMyprofile.asObserver()
         )
     }
     
@@ -212,7 +212,7 @@ final class ProfileViewModel: ViewModel {
                 followingCount: "\(following.count)",
                 isMyProfile: type == .current ? true : false
             )
-            
+                        
             return [
                 SectionOfReelsPost(
                     header: header,

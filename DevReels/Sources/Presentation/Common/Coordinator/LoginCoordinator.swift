@@ -34,6 +34,7 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
                 case .finish:
                     self?.pop(animated: true)
                     self?.showReels()
+                    //self?.finish.onNext(.finish)
                 }
             })
         let viewController = LoginViewController(viewModel: viewModel)

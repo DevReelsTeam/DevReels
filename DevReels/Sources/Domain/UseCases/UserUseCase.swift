@@ -17,4 +17,8 @@ struct UserUseCase: UserUseCaseProtocol {
     func currentUser() -> Observable<User> {
         return userRepository?.currentUser() ?? .empty()
     }
+    
+    func fetchUser(uid: String) -> Observable<User> {
+        return userRepository?.fetch(uid: uid) ?? .empty()
+    }
 }

@@ -22,7 +22,7 @@ struct ActionSheet {
 
 final class CommentViewController: ViewController {
     
-    // MARK: - Properties
+    // MARK: - Components
     
     private lazy var tableView = UITableView().then {
         $0.register(CommentCell.self, forCellReuseIdentifier: CommentCell.identifier)
@@ -34,8 +34,12 @@ final class CommentViewController: ViewController {
     private let rightBarButton = UIButton().then {
         $0.setTitle("X", for: .normal)
     }
+    
+    // MARK: - Properties
 
     private let viewModel: CommentViewModel
+    private let dotdotdotButtonTapped = PublishSubject<Comment>()
+    private let profileImageViewTapped = PublishSubject<Comment>()
     
     // MARK: - Inits
     
@@ -66,8 +70,10 @@ final class CommentViewController: ViewController {
             inputButtonDidTap: commentInputView.inputButton.rx.tap.asObservable()
                 .throttle(.seconds(1), scheduler: MainScheduler.instance),
             inputViewText: commentInputView.textField.rx.text.orEmpty.asObservable(),
-            selectedComment: tableView.rx.modelSelected(Comment.self)
-                .throttle(.seconds(1), scheduler: MainScheduler.instance)
+            selectedDotDotDot: dotdotdotButtonTapped
+                .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
+            selectedUserProfile: profileImageViewTapped
+                .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance)
         )
         
         let output = viewModel.transform(input: input)
@@ -89,10 +95,19 @@ final class CommentViewController: ViewController {
         output.commentList
             .drive(tableView.rx.items(
                 cellIdentifier: CommentCell.identifier,
-                cellType: CommentCell.self)) { _, comment, cell in
+                cellType: CommentCell.self)) { [weak self] _, comment, cell in
+                    guard let self = self else { return }
                     cell.prepareForReuse()
                     cell.configureCell(data: comment, reels: output.reels)
                     cell.selectionStyle = .none
+                    
+                    cell.dotdotdotButtonTap
+                        .bind(to: self.dotdotdotButtonTapped)
+                        .disposed(by: self.disposeBag)
+                    
+                    cell.profileImageViewTap
+                        .bind(to: self.profileImageViewTapped)
+                        .disposed(by: self.disposeBag)
                 }
                 .disposed(by: disposeBag)
     }
