@@ -133,7 +133,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         commentImageView.tapEvent
             .subscribe(onNext: { [weak self] in
                 self?.commentButtonTap
-                    .onNext(self?.reels ?? Reels(id: "", title: "", videoDescription: "", githubUrl: "", blogUrl: ""))
+                    .onNext(self?.reels ?? Reels.Constants.mockReels)
             })
             .disposed(by: disposeBag)
         
@@ -174,6 +174,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         self.videoURL = data.videoURL
         self.titleLabel.text = data.title
         self.descriptionLabel.text = data.videoDescription
+        self.heartNumberLabel.text = "\(data.hearts)"
         self.reels = data
     }
     

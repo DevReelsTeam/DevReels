@@ -25,6 +25,7 @@ final class VideoDetailsViewModel: ViewModel {
         let urlValidation: Observable<Bool>
         let githubUrlString: Observable<String>
         let blogUrlString: Observable<String>
+        let hearts: Observable<Int>
         let uploadButtonTapped: Observable<Void>
     }
     
@@ -53,15 +54,17 @@ final class VideoDetailsViewModel: ViewModel {
             .combineLatest(input.title,
                            input.description,
                            input.githubUrlString,
-                           input.blogUrlString)
-            
+                           input.blogUrlString,
+                           input.hearts
+            )
             .map {
                 let id = UUID().uuidString
                 return Reels(id: id,
                              title: $0.0,
                              videoDescription: $0.1,
                              githubUrl: $0.2,
-                             blogUrl: $0.3)
+                             blogUrl: $0.3,
+                             hearts: $0.4)
             }
         
         input.backButtonTapped

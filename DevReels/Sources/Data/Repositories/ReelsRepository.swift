@@ -33,6 +33,7 @@ struct ReelsRepository: ReelsRepositoryProtocol {
                                   videoDescription: reels.videoDescription,
                                   githubUrl: reels.githubUrl,
                                   blogUrl: reels.blogUrl,
+                                  hearts: 0,
                                   uid: uid,
                                   videoURL: $0.0,
                                   thumbnailURL: $0.1)
