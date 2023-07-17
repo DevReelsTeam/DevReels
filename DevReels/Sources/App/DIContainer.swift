@@ -84,6 +84,7 @@ final class DIContainer {
         container.register(UploadReelsUsecaseProtocol.self) { resolver in
             var useCase = UploadReelsUseCase()
             useCase.reelsRepository = resolver.resolve(ReelsRepositoryProtocol.self)
+            useCase.tokenRepository = resolver.resolve(TokenRepositoryProtocol.self)
             return useCase
         }
         

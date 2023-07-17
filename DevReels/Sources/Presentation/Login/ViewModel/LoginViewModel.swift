@@ -12,6 +12,7 @@ import RxCocoa
 import FirebaseAuth
 
 enum LoginNavigation{
+    case createUser
     case finish
 }
 
