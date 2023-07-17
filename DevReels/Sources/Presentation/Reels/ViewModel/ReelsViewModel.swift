@@ -27,6 +27,7 @@ final class ReelsViewModel: ViewModel {
         let reelsWillBeginDragging: Observable<Void>
         let reelsDidEndDragging: Observable<Void>
         let commentButtonTap: PublishSubject<Reels>
+        let heartButtonTap: PublishSubject<Int>
     }
     
     struct Output {
@@ -97,6 +98,13 @@ final class ReelsViewModel: ViewModel {
             .withUnretained(self)
             .subscribe(onNext: { viewModel, reels in
                 viewModel.navigation.onNext(.comments(reels))
+            })
+            .disposed(by: self.disposeBag)
+        
+        input.heartButtonTap
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, hearts in
+                print("heart 버튼이 눌렸습니다.")
             })
             .disposed(by: self.disposeBag)
         }

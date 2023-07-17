@@ -49,6 +49,7 @@ final class ReelsViewController: UIViewController {
     }
     
     var commentButtonTapped = PublishSubject<Reels>()
+    var heartButtonTapped = PublishSubject<Int>()
     private let viewModel: ReelsViewModel
        private var videoController: VideoPlayerController {
            viewModel.videoController
@@ -86,7 +87,8 @@ final class ReelsViewController: UIViewController {
             reelsChanged: tableView.rx.didEndDisplayingCell.map { $0.indexPath },
             reelsWillBeginDragging: tableView.rx.willBeginDragging.map { _ in },
             reelsDidEndDragging: tableView.rx.didEndDragging.map { _ in },
-            commentButtonTap: commentButtonTapped
+            commentButtonTap: commentButtonTapped,
+            heartButtonTap: heartButtonTapped
         )
         let output = viewModel.transform(input: input)
         
@@ -100,6 +102,12 @@ final class ReelsViewController: UIViewController {
                 cell.commentButtonTap
                     .subscribe(onNext: {
                         self.commentButtonTapped.onNext($0)
+                    })
+                    .disposed(by: cell.disposeBag)
+                
+                cell.heartButtonTap
+                    .subscribe(onNext: {
+                        self.heartButtonTapped.onNext($0)
                     })
                     .disposed(by: cell.disposeBag)
                 
