@@ -74,6 +74,11 @@ final class ProfileViewController: ViewController {
         return collectionView
     }()
     
+    private let doneButton = UIButton().then {
+        $0.setImage(UIImage(systemName: "arrow.left"), for: .normal)
+        $0.tintColor = .white
+    }
+    
     // MARK: - Propertie
     
     var viewModel: ProfileViewModel
@@ -156,7 +161,9 @@ final class ProfileViewController: ViewController {
             githubImageViewTap: githubImageViewTapSubject,
             followButtonTap: followButtonTapSubject,
             editButtonTap: editButtonTapSubject,
-            settingButtonTap: settingButtonTapSubject
+            settingButtonTap: settingButtonTapSubject,
+            backButtonTap: doneButton.rx.tap
+                .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance)
             )
         
         let output = viewModel.transform(input: input)
@@ -166,6 +173,19 @@ final class ProfileViewController: ViewController {
             .drive(collectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
+        output.isMyprofile
+            .subscribe(onNext: { [weak self] bool in
+                print(bool)
+                if bool {
+                    self?.navigationController?.isNavigationBarHidden = true
+                    self?.navigationItem.leftBarButtonItem = nil
+                } else {
+                    self?.navigationController?.isNavigationBarHidden = false
+                    self?.navigationItem.hidesBackButton = true
+                    self?.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: self?.doneButton ?? UIView())
+                }
+            })
+            .disposed(by: disposeBag)
     }
 
     // MARK: - Layout
@@ -181,6 +201,9 @@ final class ProfileViewController: ViewController {
     }
     
     func attribute() {
+//        navigationController?.isNavigationBarHidden = false
+//        navigationItem.hidesBackButton = true
+//        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: doneButton)
     }
 }
 

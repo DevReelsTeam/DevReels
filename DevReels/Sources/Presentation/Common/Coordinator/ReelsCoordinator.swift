@@ -59,6 +59,9 @@ final class ReelsCoordinator: BaseCoordinator<ReelsCoordinatorResult> {
                     
                     self?.setNavigationBarHidden(true, animated: false)
                     self?.navigationController.dismiss(animated: true)
+                case let .profile(user):
+                    self?.showProfile(user: user)
+                    self?.navigationController.dismiss(animated: true)
                 }
             })
             .disposed(by: disposeBag)
@@ -81,5 +84,24 @@ final class ReelsCoordinator: BaseCoordinator<ReelsCoordinatorResult> {
             }
             navigationController.present(viewController, animated: true)
         }
+    }
+    
+    func showProfile(user: User) {
+        guard let viewModel = DIContainer.shared.container.resolve(ProfileViewModel.self) else { return }
+        viewModel.type.onNext(.other(user))
+        
+        viewModel.navigation
+            .subscribe(onNext: { [weak self] in
+                switch $0 {
+                case .finish:
+                    self?.pop(animated: true)
+                default:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        let profile = ProfileViewController(viewModel: viewModel)
+        push(profile, animated: true)
     }
 }

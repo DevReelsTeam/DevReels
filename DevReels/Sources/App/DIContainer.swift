@@ -160,7 +160,7 @@ final class DIContainer {
             viewModel.commentListUseCase = resolver.resolve(CommentListUseCaseProtocol.self)
             viewModel.commentUploadUseCase = resolver.resolve(CommentUploadUseCaseProtocol.self)
             viewModel.loginCheckUseCase = resolver.resolve(LoginCheckUseCaseProtocol.self)
-            
+            viewModel.userUseCase = resolver.resolve(UserUseCaseProtocol.self)
             return viewModel
         }
     }
