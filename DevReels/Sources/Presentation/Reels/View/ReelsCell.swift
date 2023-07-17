@@ -45,7 +45,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         $0.layer.masksToBounds = false
     }
     
-    private lazy var heartImageView = UIImageView().then {
+    private lazy var heartImageView = RxUIImageView(frame: .zero).then {
         $0.image = UIImage(named: "heart")
         $0.tintColor = .white
         $0.layer.shadowColor = UIColor.black.cgColor
@@ -120,6 +120,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         
     var reels: Reels?
     var commentButtonTap = PublishSubject<Reels>()
+    var heartButtonTap = PublishSubject<Int>()
     var disposeBag = DisposeBag()
     var videoLayer = AVPlayerLayer()
     var videoURL: String?
@@ -136,6 +137,12 @@ final class ReelsCell: UITableViewCell, Identifiable {
                     .onNext(self?.reels ?? Reels.Constants.mockReels)
             })
             .disposed(by: disposeBag)
+        
+        heartImageView.tapEvent
+            .subscribe(onNext: { [weak self] in
+                self?.heartButtonTap
+                    .onNext(Int(self?.heartNumberLabel.text ?? "") ?? 0)
+            })
         
         layout()
         self.layoutIfNeeded()
