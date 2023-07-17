@@ -10,6 +10,7 @@ import Foundation
 import RxSwift
 
 struct ProfileUseCase: ProfileUseCaseProtocol {
+    
     var userRepository = DIContainer.shared.container.resolve(UserRepositoryProtocol.self)
     
     func follower(uid: String) -> Observable<[User]> {
@@ -18,5 +19,15 @@ struct ProfileUseCase: ProfileUseCaseProtocol {
     
     func following(uid: String) -> Observable<[User]> {
         return userRepository?.fetchFollowing(uid: uid) ?? .empty()
+    }
+    
+    func follow(target: User) -> Observable<Void> {
+        return (userRepository?.currentUser() ?? .empty() )
+            .flatMap { userRepository?.follow(targetUser: target, currentUser: $0) ?? .empty() }
+    }
+    
+    func unfollow(target: User) -> Observable<Void> {
+        return (userRepository?.currentUser() ?? .empty())
+            .flatMap { userRepository?.unfollow(targetUser: target, currentUser: $0) ?? .empty() }
     }
 }

@@ -141,6 +141,13 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
         $0.setTitle("< Follow >", for: .normal)
     }
     
+    private let unfollowButton = UIButton().then {
+        $0.layer.cornerRadius = Metrics.FollowingButton.corneradius
+        $0.titleLabel?.font = .systemFont(ofSize: 16)
+        $0.backgroundColor = .devReelsColor.neutral40
+        $0.setTitle("< UnFollow >", for: .normal)
+    }
+    
     private let editButton = UIButton().then {
         $0.layer.cornerRadius = Metrics.FollowingButton.corneradius
         $0.clipsToBounds = true
@@ -188,6 +195,10 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
         return followButton.rx.tap.asObservable()
     }
     
+    var unfollowButtonTap: Observable<Void> {
+        return unfollowButton.rx.tap.asObservable()
+    }
+    
     // MARK: - Inits
     
     override init(frame: CGRect) {
@@ -219,11 +230,24 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
         text.addAttribute(.foregroundColor, value: UIColor.devReelsColor.primary90, range: NSRange(location: header.introduce.count - 2, length: 2))
         
         self.introduceLabel.attributedText = text
+        
         self.postCountLabel.text = header.postCount
+        
         self.followerCountLabel.text = header.followerCount
         self.followingCountLabel.text = header.followingCount
+        
         self.followButton.isHidden = header.isMyProfile
         self.followButton.isUserInteractionEnabled = !header.isMyProfile
+        
+        self.unfollowButton.isHidden = header.isMyProfile
+        self.unfollowButton.isUserInteractionEnabled = !header.isMyProfile
+        
+        switch header.buttonType {
+        case .following:
+            followButton.isHidden = true
+        default:
+            break
+        }
     }
     
     func layout() {
@@ -287,6 +311,14 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
         addSubview(editAndSettingButtonStackView)
         
         editAndSettingButtonStackView.snp.makeConstraints {
+            $0.top.equalTo(countStackView.snp.bottom).offset(Metrics.FollowingButton.topMargin)
+            $0.leading.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview()
+        }
+        
+        addSubview(unfollowButton)
+        
+        unfollowButton.snp.makeConstraints {
             $0.top.equalTo(countStackView.snp.bottom).offset(Metrics.FollowingButton.topMargin)
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()

@@ -14,4 +14,6 @@ protocol UserDataSourceProtocol {
     func read(uid: String) -> Observable<UserResponseDTO>
     func fetchFollower(uid: String) -> Observable<[UserResponseDTO]>
     func fetchFollowing(uid: String) -> Observable<[UserResponseDTO]>
+    func follow(targetUserData: User, myUserData: User) -> Observable<Void>
+    func unfollow(targetUserData: User, myUserData: User) -> Observable<Void>
 }
