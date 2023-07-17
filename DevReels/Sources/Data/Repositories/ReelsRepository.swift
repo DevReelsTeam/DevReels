@@ -20,10 +20,7 @@ struct ReelsRepository: ReelsRepositoryProtocol {
         return reels ?? .empty()
     }
     
-    func upload(reels: Reels, video: Data, thumbnailImage: Data) -> Observable<Void> {
-        
-        let uid = "tempUID"
-        
+    func upload(reels: Reels, uid: String, video: Data, thumbnailImage: Data) -> Observable<Void> {
         let videoURLObservable = reelsDataSource?.uploadFile(type: .video, uid: uid, file: video) ?? .empty()
         let thumbnailURLObservable = reelsDataSource?.uploadFile(type: .image, uid: uid, file: thumbnailImage) ?? .empty()
         

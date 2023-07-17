@@ -12,8 +12,15 @@ import RxSwift
 struct UploadReelsUseCase: UploadReelsUsecaseProtocol {
     
     var reelsRepository: ReelsRepositoryProtocol?
+    var tokenRepository: TokenRepositoryProtocol?
     
     func upload(reels: Reels, video: Data, thumbnailImage: Data) -> Observable<Void> {
-        return reelsRepository?.upload(reels: reels, video: video, thumbnailImage: thumbnailImage) ?? .empty()
+        tokenRepository?.load()
+            .compactMap { $0.localId }
+            .flatMap { reelsRepository?.upload(reels: reels,
+                                               uid: $0,
+                                               video: video,
+                                               thumbnailImage: thumbnailImage) ?? .empty() } ?? .empty()
+            
     }
 }

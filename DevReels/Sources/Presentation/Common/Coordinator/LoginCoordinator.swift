@@ -32,9 +32,10 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
             .subscribe(onNext: { [weak self] in
                 switch $0 {
                 case .finish:
-                    self?.pop(animated: true)
-                    self?.showReels()
-                    //self?.finish.onNext(.finish)
+                    self?.finish.onNext(.finish)
+                case .createUser:
+                    // 회원가입 온보딩
+                    break
                 }
             })
         let viewController = LoginViewController(viewModel: viewModel)
