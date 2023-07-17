@@ -12,4 +12,6 @@ import RxSwift
 protocol ProfileUseCaseProtocol {
     func follower(uid: String) -> Observable<[User]>
     func following(uid: String) -> Observable<[User]>
+    func follow(target: User) -> Observable<Void>
+    func unfollow(target: User) -> Observable<Void>
 }

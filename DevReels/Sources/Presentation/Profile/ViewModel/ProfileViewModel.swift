@@ -43,13 +43,21 @@ enum ProfileType {
     }
 }
 
+enum ButtonEnableType {
+    case following
+    case unfollowing
+    case myprofile
+}
+
 final class ProfileViewModel: ViewModel {
     
     struct Input {
         let viewWillAppear: Observable<Void>
+        let viewDidLoad: Observable<Void>
         let blogImageViewTap: Observable<Void>
         let githubImageViewTap: Observable<Void>
         let followButtonTap: Observable<Void>
+        let unfollowBUttonTap: Observable<Void>
         let editButtonTap: Observable<Void>
         let settingButtonTap: Observable<Void>
         let backButtonTap: Observable<Void>
@@ -61,8 +69,11 @@ final class ProfileViewModel: ViewModel {
     }
     
     let type = BehaviorSubject<ProfileType>(value: .current)
+    let buttonType = BehaviorSubject<ButtonEnableType>(value: .myprofile)
+    private let refresh = PublishSubject<Void>()
     private let isMyprofile = BehaviorSubject<Bool>(value: true)
     private let currentUser = BehaviorSubject<User?>(value: nil)
+    private let loggedinUser = BehaviorSubject<User?>(value: nil)
     private let follower = BehaviorSubject<[User]>(value: [])
     private let following = BehaviorSubject<[User]>(value: [])
     private let reels = BehaviorSubject<[Reels]>(value: [])
@@ -76,6 +87,20 @@ final class ProfileViewModel: ViewModel {
     let navigation = PublishSubject<ProfileNavigation>()
     
     func transform(input: Input) -> Output {
+        
+        input.viewWillAppear
+            .withUnretained(self)
+            .flatMap{ $0.0.userUseCase?.currentUser().asResult() ?? .empty() }
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, result in
+                switch result {
+                case .success(let user):
+                    viewModel.loggedinUser.onNext(user)
+                case .failure:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
        
         Observable.merge(
             Observable.just(()),
@@ -92,6 +117,7 @@ final class ProfileViewModel: ViewModel {
             switch result {
             case .success(let user):
                 viewModel.currentUser.onNext(user)
+                viewModel.buttonType.onNext(.myprofile)
                 
             case .failure:
                 let failureUser = User(
@@ -127,11 +153,31 @@ final class ProfileViewModel: ViewModel {
         type
             .filter { $0 != .current }
             .withUnretained(self)
-            .subscribe(onNext:  { viewModel, _ in
+            .subscribe(onNext:  { viewModel, data in
                 viewModel.isMyprofile.onNext(false)
+                switch data {
+                case .other(let user):
+                    viewModel.currentUser.onNext(user)
+                default:
+                    break
+                }
             })
             .disposed(by: disposeBag)
         
+        refresh
+            .withLatestFrom(currentUser)
+            .withUnretained(self)
+            .flatMap { $0.0.profileUseCase?.follower(uid: $0.1?.uid ?? " ").asResult() ?? .empty() }
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, result in
+                switch result {
+                case .success(let users):
+                    viewModel.follower.onNext(users)
+                default:
+                    viewModel.follower.onNext([])
+                }
+            })
+            .disposed(by: disposeBag)
         
         currentUser
             .withUnretained(self)
@@ -185,6 +231,7 @@ final class ProfileViewModel: ViewModel {
         transformCollectionViewDataSource(input: input)
         transformTapEvent(input: input)
     
+        // MARK: - Output
         return Output(
             collectionViewDataSource: collectionViewDataSource.asDriver(onErrorJustReturn: []),
             isMyprofile: isMyprofile.asObserver()
@@ -197,9 +244,10 @@ final class ProfileViewModel: ViewModel {
             follower,
             following,
             reels,
-            type
+            type,
+            buttonType
         )
-        .map { user, follower, following, reels, type -> [SectionOfReelsPost] in
+        .map { user, follower, following, reels, type, buttonType -> [SectionOfReelsPost] in
             
             let header = Header(
                 profileImageURLString: user.profileImageURLString,
@@ -210,7 +258,8 @@ final class ProfileViewModel: ViewModel {
                 postCount: "\(reels.count)",
                 followerCount: "\(follower.count)",
                 followingCount: "\(following.count)",
-                isMyProfile: type == .current ? true : false
+                isMyProfile: type == .current ? true : false,
+                buttonType: buttonType
             )
                         
             return [
@@ -244,11 +293,36 @@ final class ProfileViewModel: ViewModel {
             })
             .disposed(by: disposeBag)
         
+        follower
+            .withLatestFrom(Observable.combineLatest(follower.asObservable(), loggedinUser.compactMap { $0 }))
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, data in
+                if data.0.contains(where: { $0.uid == data.1.uid }) {
+                    viewModel.buttonType.onNext(.following)
+                } else {
+                    viewModel.buttonType.onNext(.unfollowing)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        
         input.followButtonTap
-            .subscribe(onNext: { _ in
-                print("\n\n\n")
-                print("follow")
-                print("\n\n\n")
+            .withLatestFrom(currentUser.compactMap { $0 })
+            .withUnretained(self)
+            .flatMap { $0.0.profileUseCase?.follow(target: $0.1) ?? .empty() }
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, _ in
+                viewModel.refresh.onNext(())
+            })
+            .disposed(by: disposeBag)
+        
+        input.unfollowBUttonTap
+            .withLatestFrom(currentUser.compactMap { $0 })
+            .withUnretained(self)
+            .flatMap { $0.0.profileUseCase?.unfollow(target: $0.1) ?? .empty() }
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, _ in
+                viewModel.refresh.onNext(())
             })
             .disposed(by: disposeBag)
         

@@ -21,6 +21,7 @@ struct Header {
     var followerCount: String
     var followingCount: String
     var isMyProfile: Bool
+    var buttonType: ButtonEnableType
 }
 
 struct SectionOfReelsPost {
@@ -85,13 +86,14 @@ final class ProfileViewController: ViewController {
     private let blogImageViewTapSubject = PublishSubject<Void>()
     private let githubImageViewTapSubject = PublishSubject<Void>()
     private let followButtonTapSubject = PublishSubject<Void>()
+    private let unfollowButtonTapSubject = PublishSubject<Void>()
     private let editButtonTapSubject = PublishSubject<Void>()
     private let settingButtonTapSubject = PublishSubject<Void>()
     
     // MARK: - DataSource
     
-    private lazy var  dataSource = RxCollectionViewSectionedReloadDataSource<SectionOfReelsPost>(configureCell: {
-        (datasource, collectionView, indexPath, item) in
+    private lazy var  dataSource = RxCollectionViewSectionedReloadDataSource<SectionOfReelsPost>(
+        configureCell: { (datasource, collectionView, indexPath, item) in
         
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: ReelsCollectionCell.identifier,
@@ -129,6 +131,9 @@ final class ProfileViewController: ViewController {
         header.settingButtonTap
             .bind(to: self.settingButtonTapSubject)
             .disposed(by: disposeBag)
+        header.unfollowButtonTap
+            .bind(to: self.unfollowButtonTapSubject)
+            .disposed(by: disposeBag)
         
         return header
     })
@@ -157,9 +162,11 @@ final class ProfileViewController: ViewController {
         
         let input = ProfileViewModel.Input(
             viewWillAppear: rx.viewWillAppear.map { _ in () }.asObservable(),
+            viewDidLoad: rx.viewDidLoad.map { _ in () }.asObservable(),
             blogImageViewTap: blogImageViewTapSubject,
             githubImageViewTap: githubImageViewTapSubject,
             followButtonTap: followButtonTapSubject,
+            unfollowBUttonTap: unfollowButtonTapSubject,
             editButtonTap: editButtonTapSubject,
             settingButtonTap: settingButtonTapSubject,
             backButtonTap: doneButton.rx.tap
@@ -175,7 +182,6 @@ final class ProfileViewController: ViewController {
         
         output.isMyprofile
             .subscribe(onNext: { [weak self] bool in
-                print(bool)
                 if bool {
                     self?.navigationController?.isNavigationBarHidden = true
                     self?.navigationItem.leftBarButtonItem = nil

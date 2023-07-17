@@ -47,5 +47,11 @@ struct UserRepository: UserRepositoryProtocol {
             .map { $0.map { $0.toDomain() } } ?? .empty()
     }
     
+    func follow(targetUser: User, currentUser: User) -> Observable<Void> {
+        return userDataSource?.follow(targetUserData: targetUser, myUserData: currentUser) ?? .empty()
+    }
     
+    func unfollow(targetUser: User, currentUser: User) -> Observable<Void> {
+        return userDataSource?.unfollow(targetUserData: targetUser, myUserData: currentUser) ?? .empty()
+    }
 }

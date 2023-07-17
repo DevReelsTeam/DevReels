@@ -83,4 +83,43 @@ struct UserDataSource: UserDataSourceProtocol {
             return Disposables.create()
         }
     }
+    
+    func follow(targetUserData: User, myUserData: User) -> Observable<Void> {
+        return Observable.create { emitter in
+            
+            fireStore.document(targetUserData.uid)
+                .collection("follower")
+                .document(myUserData.uid)
+                .setData(myUserData.toDictionary()) { _ in
+                    fireStore.document(myUserData.uid)
+                        .collection("following")
+                        .document(targetUserData.uid)
+                        .setData(targetUserData.toDictionary()) { _ in
+                            emitter.onNext(())
+                            emitter.onCompleted()
+                        }
+                }
+            
+            return Disposables.create()
+        }
+    }
+    
+    func unfollow(targetUserData: User, myUserData: User) -> Observable<Void> {
+        return Observable.create { emitter in
+            fireStore.document(targetUserData.uid)
+                .collection("follower")
+                .document(myUserData.uid)
+                .delete(completion: { _ in
+                    fireStore.document(myUserData.uid)
+                        .collection("following")
+                        .document(targetUserData.uid)
+                        .delete(completion: { _ in
+                            emitter.onNext(())
+                            emitter.onCompleted()
+                        })
+                })
+            
+            return Disposables.create()
+        }
+    }
 }
