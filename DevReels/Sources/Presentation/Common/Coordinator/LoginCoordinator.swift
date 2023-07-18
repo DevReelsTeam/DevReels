@@ -21,7 +21,8 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
     let finish = PublishSubject<LoginCoordinatorResult>()
     
     override func start() -> Observable<LoginCoordinatorResult> {
-        showLogin()
+//        showLogin()
+        showEditProfile()
         return finish
     }
     
@@ -34,17 +35,18 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
                 case .finish:
                     self?.finish.onNext(.finish)
                 case .createUser:
-                    // 회원가입 온보딩
-                    break
+                    self?.showEditProfile()
                 }
             })
         let viewController = LoginViewController(viewModel: viewModel)
         push(viewController, animated: true, isRoot: true)
     }
     
-    func showReels() {
-        let profile = ProfileCoordinator(navigationController)
+    
+    func showEditProfile() {
+        let viewModel = EditProfileViewModel()
         
-        push(ProfileViewController(viewModel: ProfileViewModel()), animated: true)
+        let viewController = EditProfileViewController(viewModel: viewModel)
+        push(viewController, animated: true)
     }
 }

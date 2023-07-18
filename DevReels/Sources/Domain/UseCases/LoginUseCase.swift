@@ -19,8 +19,10 @@ struct LoginUseCase: LoginUseCaseProtocol {
     func singIn(with credential: OAuthCredential) -> Observable<Void> {
         return (authRepository?.signIn(with: credential) ?? .empty())
             .flatMap { tokenRepository?.save($0) ?? .empty() }
-            .map { ($0.localId, $0.email) }
-            .flatMap { userRepository?.create(uid: $0.0, email: $0.1) ?? .empty() }
-            .map { _ in () }
+            .map { _ in }
+    }
+    
+    func exist() -> Observable<Bool> {
+        return userRepository?.exist() ?? .empty()
     }
 }

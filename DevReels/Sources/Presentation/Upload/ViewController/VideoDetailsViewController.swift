@@ -94,6 +94,7 @@ final class VideoDetailsViewController: ViewController {
     // MARK: - binds
     
     override func bind() {
+        
         RxKeyboard.instance.visibleHeight
             .drive(onNext: { [weak self] keyboardVisibleHeight in
                 self?.scrollView.contentInset.bottom = keyboardVisibleHeight
@@ -114,8 +115,6 @@ final class VideoDetailsViewController: ViewController {
                 isValid ? self.blogToggleTextField.rx.urlString.orEmpty.asObservable() : Observable.just("")
             }
         
-        
-    
         let input = VideoDetailsViewModel.Input(
             backButtonTapped: backButton.rx.tap.throttle(.seconds(1), scheduler: MainScheduler.instance),
             title: titleTextField.rx.text.orEmpty.asObservable(),
@@ -145,42 +144,42 @@ final class VideoDetailsViewController: ViewController {
     override func layout() {
         
         view.addSubview(uploadButton)
-        uploadButton.snp.makeConstraints {
-            $0.bottom.equalTo(view.safeAreaLayoutGuide)
-            $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(49)
+        uploadButton.snp.makeConstraints { make in
+            make.bottom.equalTo(view.safeAreaLayoutGuide)
+            make.leading.trailing.equalToSuperview().inset(16)
+            make.height.equalTo(49)
         }
         
         view.addSubview(scrollView)
-        scrollView.snp.makeConstraints {
-            $0.leading.trailing.top.equalTo(view.safeAreaLayoutGuide)
-            $0.bottom.equalTo(uploadButton.snp.top)
+        scrollView.snp.makeConstraints { make in
+            make.leading.trailing.top.equalTo(view.safeAreaLayoutGuide)
+            make.bottom.equalTo(uploadButton.snp.top)
         }
         
         scrollView.addSubview(contentView)
-        contentView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-            $0.width.equalToSuperview()
+        contentView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+            make.width.equalToSuperview()
         }
         
         contentView.addSubview(thumbnailImageView)
-        thumbnailImageView.snp.makeConstraints {
-            $0.size.equalTo(200)
-            $0.centerX.equalToSuperview()
-            $0.top.equalToSuperview().inset(20)
+        thumbnailImageView.snp.makeConstraints { make in
+            make.size.equalTo(200)
+            make.centerX.equalToSuperview()
+            make.top.equalToSuperview().inset(20)
         }
         
         contentView.addSubview(titleTextField)
-        titleTextField.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(16.0)
-            $0.top.equalTo(thumbnailImageView.snp.bottom).offset(18)
+        titleTextField.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview().inset(16.0)
+            make.top.equalTo(thumbnailImageView.snp.bottom).offset(18)
         }
         
         contentView.addSubview(descriptionTextView)
-        descriptionTextView.snp.makeConstraints {
-            $0.leading.trailing.equalToSuperview().inset(16.0)
-            $0.top.equalTo(titleTextField.snp.bottom).offset(18)
-            $0.height.equalTo(150)
+        descriptionTextView.snp.makeConstraints { make in
+            make.leading.trailing.equalToSuperview().inset(16.0)
+            make.top.equalTo(titleTextField.snp.bottom).offset(18)
+            make.height.equalTo(150)
         }
         
         contentView.addSubview(githubToggleTextField)

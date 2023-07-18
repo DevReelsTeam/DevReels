@@ -30,6 +30,20 @@ struct UserDataSource: UserDataSourceProtocol {
         }
     }
     
+    // 유저 정보 확인
+    func exist(uid: String) -> Observable<Bool> {
+        return Observable.create { emitter in
+            fireStore.document(uid).getDocument { snapshot, error in
+                if let snapshot {
+                    emitter.onNext(snapshot.exists)
+                } else {
+                    emitter.onNext(false)
+                }
+            }
+            return Disposables.create()
+        }
+    }
+    
     // 유저 읽어오기 - 작동 확인
     func read(uid: String) -> Observable<UserResponseDTO> {
         return Observable.create { emitter in

@@ -12,7 +12,7 @@ import RxSwift
 struct UserRepository: UserRepositoryProtocol {
     
     enum UserRepositoryError: Error {
-        case noUserInfo
+        case userNotFound
     }
     
     var userDataSource: UserDataSourceProtocol?
@@ -23,6 +23,15 @@ struct UserRepository: UserRepositoryProtocol {
         return userDataSource?.create(request: request) ?? .empty()
     }
     
+    func exist() -> Observable<Bool> {
+        guard let data = keyChainManager?.load(key: .authorization),
+              let authorization = try? JSONDecoder().decode(Authorization.self, from: data) else {
+            return Observable.error(UserRepositoryError.userNotFound)
+        }
+        
+        return userDataSource?.exist(uid: authorization.localId) ?? .empty()
+    }
+    
     func fetch(uid: String) -> Observable<User> {
         return userDataSource?.read(uid: uid)
             .map { $0.toDomain() } ?? .empty()
@@ -31,7 +40,7 @@ struct UserRepository: UserRepositoryProtocol {
     func currentUser() -> Observable<User> {
         guard let data = keyChainManager?.load(key: .authorization),
               let authorization = try? JSONDecoder().decode(Authorization.self, from: data) else {
-            return Observable.error(UserRepositoryError.noUserInfo)
+            return Observable.error(UserRepositoryError.userNotFound)
         }
         
         return fetch(uid: authorization.localId)
@@ -46,6 +55,4 @@ struct UserRepository: UserRepositoryProtocol {
         return userDataSource?.fetchFollowing(uid: uid)
             .map { $0.map { $0.toDomain() } } ?? .empty()
     }
-    
-    
 }

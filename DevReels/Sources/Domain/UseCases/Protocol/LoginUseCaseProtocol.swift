@@ -10,4 +10,5 @@ import FirebaseAuth
 
 protocol LoginUseCaseProtocol {
     func singIn(with credential: OAuthCredential) -> Observable<Void>
+    func exist() -> Observable<Bool>
 }

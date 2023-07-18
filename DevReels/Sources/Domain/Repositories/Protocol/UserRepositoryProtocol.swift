@@ -11,6 +11,7 @@ import RxSwift
 
 protocol UserRepositoryProtocol {
     func create(uid: String, email: String) -> Observable<Void>
+    func exist() -> Observable<Bool>
     func fetch(uid: String) -> Observable<User>
     func currentUser() -> Observable<User>
     func fetchFollower(uid: String) -> Observable<[User]>

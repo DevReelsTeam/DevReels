@@ -36,12 +36,20 @@ final class LoginViewModel: ViewModel {
         input.appleCredential
             .withUnretained(self)
             .flatMap { viewModel, credential in
-                viewModel.loginUseCase?.singIn(with: credential).asResult() ?? .empty() }
+                viewModel.loginUseCase?.singIn(with: credential).asResult() ?? .empty()
+            }
             .withUnretained(self)
             .subscribe { viewModel, result in
                 switch result {
                 case .success:
-                    viewModel.navigation.onNext(.finish)
+                    viewModel.loginUseCase?.exist()
+                        .subscribe(onNext: { found in
+                            if found {
+                                viewModel.navigation.onNext(.finish)
+                            } else {
+                                viewModel.navigation.onNext(.createUser)
+                            }
+                        })
                 case .failure:
                     // MARK: - 로그인 실패 알럿 띄워야함.
                     break
