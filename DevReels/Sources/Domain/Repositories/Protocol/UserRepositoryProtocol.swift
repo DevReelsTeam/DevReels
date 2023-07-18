@@ -17,4 +17,5 @@ protocol UserRepositoryProtocol {
     func fetchFollowing(uid: String) -> Observable<[User]>
     func follow(targetUser: User, currentUser: User) -> Observable<Void>
     func unfollow(targetUser: User, currentUser: User) -> Observable<Void>
+    func update(user: User)
 }

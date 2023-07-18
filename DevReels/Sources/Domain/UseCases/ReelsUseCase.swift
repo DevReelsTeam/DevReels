@@ -12,6 +12,7 @@ import RxSwift
 struct ReelsUseCase: ReelsUseCaseProtocol {
     
     var reelsRepository: ReelsRepositoryProtocol?
+    var userRepository: UserRepositoryProtocol?
     
     func list() -> Observable<[Reels]> {
         return reelsRepository?.list() ?? .empty()

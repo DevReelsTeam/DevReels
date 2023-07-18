@@ -121,6 +121,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
     var reels: Reels?
     var commentButtonTap = PublishSubject<Reels>()
     var heartButtonTap = PublishSubject<Int>()
+    let isHeartFilled = BehaviorSubject<Bool>(value: false)
     var disposeBag = DisposeBag()
     var videoLayer = AVPlayerLayer()
     var videoURL: String?
@@ -143,6 +144,20 @@ final class ReelsCell: UITableViewCell, Identifiable {
                 self?.heartButtonTap
                     .onNext(Int(self?.heartNumberLabel.text ?? "") ?? 0)
             })
+            .disposed(by: disposeBag)
+        
+        isHeartFilled
+            .asDriver(onErrorJustReturn: false)
+            .drive(onNext: { [weak self] isFilled in
+                guard let self = self else { return }
+                
+                if isFilled {
+                    heartImageView.image = UIImage(systemName: "heart.fill")
+                } else {
+                    heartImageView.image = UIImage(systemName: "heart")
+                }
+            })
+            .disposed(by: disposeBag)
         
         layout()
         self.layoutIfNeeded()

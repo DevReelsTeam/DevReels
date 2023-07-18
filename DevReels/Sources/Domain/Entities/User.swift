@@ -15,6 +15,7 @@ struct User: Codable {
     let githubURL: String
     let blogURL: String
     let introduce: String
+    var likedList: [String]
     let uid: String
 }
 
@@ -27,5 +28,6 @@ extension User {
         self.blogURL = ""
         self.nickName = ""
         self.introduce = ""
+        self.likedList = []
     }
 }

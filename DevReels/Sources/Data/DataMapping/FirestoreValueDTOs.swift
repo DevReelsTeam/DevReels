@@ -69,7 +69,7 @@ struct ArrayValue<T: Codable>: Codable {
     }
 }
 
-struct FieldValue: Codable {
+struct FieldsValue: Codable {
     var fields: [String: StringValue]
     
     private enum CodingKeys: String, CodingKey {
@@ -87,7 +87,7 @@ struct FieldValue: Codable {
 }
 
 struct DocumentsValue: Codable {
-    var value: [FieldValue]
+    var value: [FieldsValue]
     
     private enum CodingKeys: String, CodingKey {
         case value = "documents"
@@ -95,7 +95,7 @@ struct DocumentsValue: Codable {
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.value = try container.decode([FieldValue].self, forKey: .value)
+        self.value = try container.decode([FieldsValue].self, forKey: .value)
     }
 }
 

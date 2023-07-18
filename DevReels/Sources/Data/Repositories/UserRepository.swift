@@ -54,4 +54,8 @@ struct UserRepository: UserRepositoryProtocol {
     func unfollow(targetUser: User, currentUser: User) -> Observable<Void> {
         return userDataSource?.unfollow(targetUserData: targetUser, myUserData: currentUser) ?? .empty()
     }
+    
+    func update(user: User) {
+        userDataSource?.update(user: user)
+    }
 }
