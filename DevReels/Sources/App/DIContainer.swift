@@ -132,6 +132,7 @@ final class DIContainer {
         
         container.register(ReelsViewModel.self) { resolver in
             let viewModel = ReelsViewModel()
+            viewModel.userUseCase = resolver.resolve(UserUseCaseProtocol.self)
             viewModel.reelsUseCase = resolver.resolve(ReelsUseCaseProtocol.self)
             
             return viewModel

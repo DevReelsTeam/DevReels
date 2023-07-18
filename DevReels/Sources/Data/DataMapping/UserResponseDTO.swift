@@ -15,6 +15,7 @@ struct UserResponseDTO: Decodable {
     let githubURL: String
     let blogURL: String
     let introduce: String
+    let likedList: [String]
     let uid: String
     
     init(user: User) {
@@ -24,6 +25,7 @@ struct UserResponseDTO: Decodable {
         self.githubURL = user.githubURL
         self.blogURL = user.blogURL
         self.introduce = user.introduce
+        self.likedList = user.likedList
         self.uid = user.uid
     }
     
@@ -34,6 +36,7 @@ struct UserResponseDTO: Decodable {
                     githubURL: githubURL,
                     blogURL: blogURL,
                     introduce: introduce,
+                    likedList: likedList,
                     uid: uid)
     }
 }

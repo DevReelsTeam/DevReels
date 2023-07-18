@@ -14,4 +14,5 @@ protocol ReelsDataSourceProtocol {
     func upload(request: ReelsRequestDTO) -> Observable<Void>
     func uploadFile(type: ReelsDataSource.FileType, uid: String, file: Data) -> Observable<URL>
     func fetch(uid: String) -> Observable<[ReelsResponseDTO]>
+    func update(reels: Reels) -> Observable<Void>
 }

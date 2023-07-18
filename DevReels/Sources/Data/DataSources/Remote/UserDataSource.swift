@@ -7,6 +7,7 @@
 //
 
 import Firebase
+import FirebaseFirestore
 import RxSwift
 
 struct UserDataSource: UserDataSourceProtocol {
@@ -121,5 +122,10 @@ struct UserDataSource: UserDataSourceProtocol {
             
             return Disposables.create()
         }
+    }
+    
+    func update(user: User) {
+        fireStore.document(user.uid)
+            .updateData(user.toDictionary())
     }
 }
