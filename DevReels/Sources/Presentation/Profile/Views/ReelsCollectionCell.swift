@@ -9,6 +9,8 @@
 import UIKit
 import SnapKit
 import Then
+import RxSwift
+import RxCocoa
 
 class ReelsCollectionCell: UICollectionViewCell, Identifiable {
     
@@ -36,9 +38,9 @@ class ReelsCollectionCell: UICollectionViewCell, Identifiable {
         }
     }
     
+    // MARK: - Components
+    
     private let thumbnailImageView = UIImageView().then {
-        $0.imageURL = "https://firebasestorage.googleapis.com/v0/b/devreels.appspot.com/o/tempUID%2Fimages%2FE6F9553F-19C2-4AB6-ADB2-137F0BB8344C1687708291.981889?alt=media&token=f28888cf-ef46-4591-866c-b2c73fb1ec08"
-        
         $0.layer.cornerRadius = Metrics.ThumbnailImageView.cornerRadius
         $0.clipsToBounds = true
     }
@@ -71,6 +73,13 @@ class ReelsCollectionCell: UICollectionViewCell, Identifiable {
          $0.text = "123"
      }
     
+    // MARK: - Properties
+    
+    var viewModel = ProfileCellViewModel()
+    var disposeBag = DisposeBag()
+    
+    // MARK: - Inits
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -81,13 +90,27 @@ class ReelsCollectionCell: UICollectionViewCell, Identifiable {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - Methods
+    
+    func configure(reels: Reels) {
+        self.thumbnailImageView.imageURL = reels.thumbnailURL
+        self.likeCountLabel.text = "\(reels.hearts)"
+        self.titleLabel.text = "\(reels.title)"
+        
+        let output = viewModel.transform(input: ProfileCellViewModel.Input(reels: Observable.just(reels)))
+        
+        output.commentCount
+            .drive(commentCountLabel.rx.text)
+            .disposed(by: disposeBag)
+    }
+    
     // MARK: - Layout
     private func layout() {
         
         contentView.addSubview(thumbnailImageView)
         thumbnailImageView.snp.makeConstraints {
             $0.leading.top.trailing.equalToSuperview()
-            $0.height.lessThanOrEqualTo(Metrics.ThumbnailImageView.height)
+            $0.height.equalTo(Metrics.ThumbnailImageView.height)
         }
         
         thumbnailImageView.addSubview(titleLabel)

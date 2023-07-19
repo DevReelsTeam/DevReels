@@ -25,20 +25,21 @@ struct ReelsRequestDTO: Codable {
     }
     
     private enum FieldKeys: String, CodingKey {
-        case id, uid, videoURL, thumbnailURL, title, videoDescription, githubUrl, blogUrl
+        case id, uid, videoURL, thumbnailURL, title, videoDescription, githubUrl, blogUrl, hearts
     }
     
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: RootKey.self)
-        var fieldContainer = container.nestedContainer(keyedBy: FieldKeys.self, forKey: .fields)
-        try fieldContainer.encode(self.id, forKey: .id)
-        try fieldContainer.encode(self.uid, forKey: .uid)
-        try fieldContainer.encode(self.videoURL, forKey: .videoURL)
-        try fieldContainer.encode(self.thumbnailURL, forKey: .thumbnailURL)
-        try fieldContainer.encode(self.title, forKey: .title)
-        try fieldContainer.encode(self.videoDescription, forKey: .videoDescription)
-        try fieldContainer.encode(self.githubUrl, forKey: .githubUrl)
-        try fieldContainer.encode(self.blogUrl, forKey: .blogUrl)
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: RootKey.self)
+        let fieldContainer = try container.nestedContainer(keyedBy: FieldKeys.self, forKey: .fields)
+        self.id = try fieldContainer.decode(StringValue.self, forKey: .id)
+        self.uid = try fieldContainer.decode(StringValue.self, forKey: .uid)
+        self.videoURL = try fieldContainer.decode(StringValue.self, forKey: .videoURL)
+        self.thumbnailURL = try fieldContainer.decode(StringValue.self, forKey: .thumbnailURL)
+        self.title = try fieldContainer.decode(StringValue.self, forKey: .title)
+        self.videoDescription = try fieldContainer.decode(StringValue.self, forKey: .videoDescription)
+        self.githubUrl = try fieldContainer.decode(StringValue.self, forKey: .githubUrl)
+        self.blogUrl = try fieldContainer.decode(StringValue.self, forKey: .blogUrl)
+        self.hearts = try fieldContainer.decode(IntegerValue.self, forKey: .hearts)
     }
     
     init(reels: Reels) {

@@ -38,8 +38,10 @@ struct ReelsDataSource: ReelsDataSourceProtocol {
     }
     
     func upload(request: ReelsRequestDTO) -> Observable<Void> {
-        let request = Observable.zip(provider.request(ReelsTarget.uploadToReels(request)),
-                       provider.request(ReelsTarget.uploadToUserReels(request)))
+        let request = Observable.zip(
+            provider.request(ReelsTarget.uploadToReels(request)),
+            provider.request(ReelsTarget.uploadToUserReels(request))
+        )
             .map { _, _ in }
         return request
     }
@@ -85,7 +87,6 @@ struct ReelsDataSource: ReelsDataSourceProtocol {
                             .compactMap { try? JSONSerialization.data(withJSONObject: $0) }
                             .compactMap { try? JSONDecoder().decode(Reels.self, from: $0) }
                             .map { ReelsResponseDTO(reels: $0)}
-                        
                         emitter.onNext(reels)
                         emitter.onCompleted()
                     }

@@ -11,7 +11,7 @@ import Firebase
 
 struct CommentDataSource: CommentDataSourceProtocol {
     
-    let fireStore = Firestore.firestore().collection("reelsList")
+    let fireStore = Firestore.firestore().collection("reels")
     
     func upload(request: CommentRequestDTO) -> Observable<Void> {
         
@@ -20,7 +20,16 @@ struct CommentDataSource: CommentDataSourceProtocol {
                 .collection("comments")
                 .document(request.commentID)
                 .setData(request.toDictionary()) { _ in
-                    emitter.onNext(())
+                    Firestore.firestore()
+                        .collection("users")
+                        .document(request.writerUID)
+                        .collection("reels")
+                        .document(request.reelsID)
+                        .collection("comments")
+                        .document(request.commentID)
+                        .setData(request.toDictionary()) { _ in
+                            emitter.onNext(())
+                        }
                 }
             return Disposables.create()
         }
