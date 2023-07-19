@@ -54,8 +54,7 @@ final class VideoDetailsViewModel: ViewModel {
             .combineLatest(input.title,
                            input.description,
                            input.githubUrlString,
-                           input.blogUrlString,
-                           input.hearts
+                           input.blogUrlString
             )
             .map {
                 let id = UUID().uuidString
@@ -63,8 +62,8 @@ final class VideoDetailsViewModel: ViewModel {
                              title: $0.0,
                              videoDescription: $0.1,
                              githubUrl: $0.2,
-                             blogUrl: $0.3,
-                             hearts: $0.4)
+                             blogUrl: $0.3
+                )
             }
         
         input.backButtonTapped
