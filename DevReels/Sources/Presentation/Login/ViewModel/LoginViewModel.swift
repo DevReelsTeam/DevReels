@@ -24,6 +24,7 @@ final class LoginViewModel: ViewModel {
     }
     
     struct Output {
+        
     }
     
     let navigation = PublishSubject<LoginNavigation>()

@@ -85,8 +85,13 @@ final class ToggleUrlTextfield: UIView {
     
     private func bind() {
         toggleBar.rx.isOn
-            .subscribe { [weak self] in
-                $0 ? self?.addTextField() : self?.removeTextField()
+            .subscribe { [weak self] isOn in
+                if isOn {
+                    self?.addTextField()
+                } else {
+                    self?.removeTextField()
+                    self?.urlTextField.removeText()
+                }
             }
             .disposed(by: disposeBag)
     }
@@ -114,7 +119,6 @@ final class ToggleUrlTextfield: UIView {
     }
     
     private func removeTextField() {
-        
         UIView.animate(withDuration: 0.25, animations: {
             self.urlTextField.isHidden = true
         }, completion: { _ in

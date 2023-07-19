@@ -107,22 +107,26 @@ final class EditProfileViewController: ViewController {
     
     override func bind() {
         
-        RxKeyboard.instance.visibleHeight
-            .drive(onNext: { [weak self] keyboardVisibleHeight in
-                self?.scrollView.contentInset.bottom = keyboardVisibleHeight
-            })
-            .disposed(by: disposeBag)
-        
         let input = EditProfileViewModel.Input(
             name: nameTextfield.rx.text.orEmpty.asObservable(),
             introduce: introduceCountTextView.rx.text.orEmpty.asObservable(),
             profileImage: selectedProfileImage.asObservable(),
+            urlValidation: Observable.combineLatest(githubToggleTextField.rx.validSubmit,
+                                                    blogToggleTextField.rx.validSubmit).map { $0 && $1 },
+            githubUrlString: githubToggleTextField.rx.urlString.orEmpty.asObservable(),
+            blogUrlString: blogToggleTextField.rx.urlString.orEmpty.asObservable(),
             completeButtonTapped: completeButton.rx.tap
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
             backButtonTapped: backButton.rx.tap
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance)
         )
         
+        RxKeyboard.instance.visibleHeight
+            .drive(onNext: { [weak self] keyboardVisibleHeight in
+                self?.scrollView.contentInset.bottom = keyboardVisibleHeight
+            })
+            .disposed(by: disposeBag)
+
         let output = viewModel.transform(input: input)
         
         addImageButton.rx.tap

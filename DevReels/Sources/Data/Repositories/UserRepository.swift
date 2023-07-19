@@ -18,20 +18,6 @@ struct UserRepository: UserRepositoryProtocol {
     var userDataSource: UserDataSourceProtocol?
     var keyChainManager: KeychainManagerProtocol?
     
-    func create(uid: String, email: String) -> Observable<Void> {
-        let request = UserRequestDTO(uid: uid, email: email)
-        return userDataSource?.create(request: request) ?? .empty()
-    }
-    
-    func exist() -> Observable<Bool> {
-        guard let data = keyChainManager?.load(key: .authorization),
-              let authorization = try? JSONDecoder().decode(Authorization.self, from: data) else {
-            return Observable.error(UserRepositoryError.userNotFound)
-        }
-        
-        return userDataSource?.exist(uid: authorization.localId) ?? .empty()
-    }
-    
     func fetch(uid: String) -> Observable<User> {
         return userDataSource?.read(uid: uid)
             .map { $0.toDomain() } ?? .empty()
@@ -44,6 +30,25 @@ struct UserRepository: UserRepositoryProtocol {
         }
         
         return fetch(uid: authorization.localId)
+    }
+    
+    func exist() -> Observable<Bool> {
+        guard let data = keyChainManager?.load(key: .authorization),
+              let authorization = try? JSONDecoder().decode(Authorization.self, from: data) else {
+            return Observable.error(UserRepositoryError.userNotFound)
+        }
+        
+        return userDataSource?.exist(uid: authorization.localId) ?? .empty()
+    }
+    
+    func create(user: User) -> Observable<Void> {
+        let request = UserRequestDTO(user: user)
+        return userDataSource?.create(request: request) ?? .empty()
+    }
+    
+    func update(user: User) -> Observable<Void> {
+        let request = UserRequestDTO(user: user)
+        return userDataSource?.update(request: request) ?? .empty()
     }
     
     func fetchFollower(uid: String) -> Observable<[User]> {

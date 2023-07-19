@@ -1,5 +1,5 @@
 //
-//  EditProfileUseCase.swift
+//  EditProfileUseCaseProtocol.swift
 //  DevReels
 //
 //  Created by HoJun on 2023/07/18.
@@ -7,3 +7,10 @@
 //
 
 import Foundation
+import RxSwift
+
+protocol EditProfileUseCaseProtocol {
+    func loadProfile() -> Observable<User>
+    func createProfile(user: User) -> Observable<Void> 
+    func editProfile(user: User) -> Observable<Void>
+}

@@ -94,36 +94,23 @@ final class VideoDetailsViewController: ViewController {
     // MARK: - binds
     
     override func bind() {
+    
+        let input = VideoDetailsViewModel.Input(
+            backButtonTapped: backButton.rx.tap.throttle(.seconds(1), scheduler: MainScheduler.instance),
+            title: titleTextField.rx.text.orEmpty.asObservable(),
+            description: descriptionTextView.rx.text.orEmpty.asObservable(),
+            urlValidation: Observable.combineLatest(githubToggleTextField.rx.validSubmit,
+                                                    blogToggleTextField.rx.validSubmit).map { $0 && $1 },
+            githubUrlString: githubToggleTextField.rx.urlString.orEmpty.asObservable(),
+            blogUrlString: blogToggleTextField.rx.urlString.orEmpty.asObservable(),
+            uploadButtonTapped: uploadButton.rx.tap.asObservable()
+            )
         
         RxKeyboard.instance.visibleHeight
             .drive(onNext: { [weak self] keyboardVisibleHeight in
                 self?.scrollView.contentInset.bottom = keyboardVisibleHeight
             })
             .disposed(by: disposeBag)
-        
-        let urlValidation = Observable.combineLatest(githubToggleTextField.rx.validSubmit,
-                                        blogToggleTextField.rx.validSubmit)
-            .map { $0 && $1 }
-        
-        let githubUrlString = githubToggleTextField.rx.validSubmit
-            .flatMap { isValid in
-                isValid ? self.githubToggleTextField.rx.urlString.orEmpty.asObservable() : Observable.just("")
-            }
-        
-        let blogUrlString = blogToggleTextField.rx.validSubmit
-            .flatMap { isValid in
-                isValid ? self.blogToggleTextField.rx.urlString.orEmpty.asObservable() : Observable.just("")
-            }
-        
-        let input = VideoDetailsViewModel.Input(
-            backButtonTapped: backButton.rx.tap.throttle(.seconds(1), scheduler: MainScheduler.instance),
-            title: titleTextField.rx.text.orEmpty.asObservable(),
-            description: descriptionTextView.rx.text.orEmpty.asObservable(),
-            urlValidation: urlValidation,
-            githubUrlString: githubUrlString,
-            blogUrlString: blogUrlString,
-            uploadButtonTapped: uploadButton.rx.tap.asObservable()
-            )
             
         let output = viewModel.transform(input: input)
         

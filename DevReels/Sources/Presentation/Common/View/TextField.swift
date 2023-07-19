@@ -97,6 +97,10 @@ final class TextField: UIView {
         }
     }
     
+    func removeText() {
+        textField.text = ""
+    }
+    
     private func bindUrl() {
         disposable = textField.rx.text
             .withUnretained(self)
