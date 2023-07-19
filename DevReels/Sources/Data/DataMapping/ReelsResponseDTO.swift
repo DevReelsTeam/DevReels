@@ -18,13 +18,14 @@ struct ReelsResponseDTO: Codable {
     private let githubUrl: StringValue
     private let blogUrl: StringValue
     private let hearts: IntegerValue
+    private let date: IntegerValue
     
     private enum RootKey: String, CodingKey {
         case fields
     }
     
     private enum FieldKeys: String, CodingKey {
-        case id, uid, videoURL, thumbnailURL, title, videoDescription, githubUrl, blogUrl, hearts
+        case id, uid, videoURL, thumbnailURL, title, videoDescription, githubUrl, blogUrl, hearts, date
     }
     
     init(from decoder: Decoder) throws {
@@ -39,6 +40,7 @@ struct ReelsResponseDTO: Codable {
         self.githubUrl = try fieldContainer.decode(StringValue.self, forKey: .githubUrl)
         self.blogUrl = try fieldContainer.decode(StringValue.self, forKey: .blogUrl)
         self.hearts = try fieldContainer.decode(IntegerValue.self, forKey: .hearts)
+        self.date = try fieldContainer.decode(IntegerValue.self, forKey: .date)
     }
     
     init(reels: Reels) {
@@ -51,6 +53,7 @@ struct ReelsResponseDTO: Codable {
         self.githubUrl = StringValue(value: reels.githubUrl)
         self.blogUrl = StringValue(value: reels.blogUrl)
         self.hearts = IntegerValue(value: "\(reels.hearts)")
+        self.date = IntegerValue(value: "\(reels.date)")
     }
     
     func toDomain() -> Reels {
@@ -60,6 +63,7 @@ struct ReelsResponseDTO: Codable {
                      githubUrl: githubUrl.value,
                      blogUrl: blogUrl.value,
                      hearts: Int(hearts.value) ?? 0,
+                     date: Int(date.value) ?? 0,
                      uid: uid.value,
                      videoURL: videoURL.value,
                      thumbnailURL: thumbnailURL.value)
