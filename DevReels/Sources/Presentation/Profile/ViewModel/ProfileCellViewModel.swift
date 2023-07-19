@@ -23,16 +23,19 @@ final class ProfileCellViewModel: ViewModel {
     var disposeBag = DisposeBag()
     var commentCount = PublishSubject<String>()
     
-    var commentListUseCase = DIContainer.shared.container.resolve(CommentListUseCaseProtocol.self)
+    var commentListUseCase: CommentListUseCaseProtocol?
     
     func transform(input: Input) -> Output {
         
         input.reels
             .withUnretained(self)
-            .flatMap { $0.0.commentListUseCase?.commentList(reelsID: $0.1.uid ?? " ").asResult() ?? .empty() }
+            .flatMap { $0.0.commentListUseCase?.commentList(reelsID: $0.1.id).asResult() ?? .empty() }
             .subscribe(onNext: { [weak self] result in
                 switch result {
                 case .success(let data):
+                    print("\n\n\n")
+                    print(data)
+                    print("\n\n\n")
                     self?.commentCount.onNext("\(data.count)")
                 case .failure:
                     break

@@ -100,7 +100,7 @@ final class ProfileViewController: ViewController {
             for: indexPath
         ) as? ReelsCollectionCell else { return UICollectionViewCell() }
 
-            cell.configure(reels: item)
+            cell.bind(reels: item)
             
         return cell
     }, configureSupplementaryView: { [weak self] dataSource, collectionView, kind, indexPath in

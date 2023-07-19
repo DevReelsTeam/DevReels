@@ -59,7 +59,7 @@ class ReelsCollectionCell: UICollectionViewCell, Identifiable {
     private let likeCountLabel = UILabel().then {
         $0.font = .systemFont(ofSize: 12)
         $0.textColor = .white
-        $0.text = "123"
+        $0.text = ""
     }
     
     private let commentImageView = UIImageView().then {
@@ -70,12 +70,12 @@ class ReelsCollectionCell: UICollectionViewCell, Identifiable {
     private let commentCountLabel = UILabel().then {
          $0.font = .systemFont(ofSize: 12)
          $0.textColor = .white
-         $0.text = "123"
+         $0.text = ""
      }
     
     // MARK: - Properties
     
-    var viewModel = ProfileCellViewModel()
+    var viewModel = DIContainer.shared.container.resolve(ProfileCellViewModel.self)
     var disposeBag = DisposeBag()
     
     // MARK: - Inits
@@ -92,14 +92,14 @@ class ReelsCollectionCell: UICollectionViewCell, Identifiable {
     
     // MARK: - Methods
     
-    func configure(reels: Reels) {
+    func bind(reels: Reels) {
         self.thumbnailImageView.imageURL = reels.thumbnailURL
         self.likeCountLabel.text = "\(reels.hearts)"
         self.titleLabel.text = "\(reels.title)"
         
-        let output = viewModel.transform(input: ProfileCellViewModel.Input(reels: Observable.just(reels)))
+        let output = viewModel?.transform(input: ProfileCellViewModel.Input(reels: Observable.just(reels)))
         
-        output.commentCount
+        output?.commentCount
             .drive(commentCountLabel.rx.text)
             .disposed(by: disposeBag)
     }

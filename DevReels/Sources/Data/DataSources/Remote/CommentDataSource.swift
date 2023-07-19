@@ -48,6 +48,9 @@ struct CommentDataSource: CommentDataSourceProtocol {
                             .compactMap { try? JSONDecoder().decode(Comment.self, from: $0) }
                             .map { CommentResponseDTO(comment: $0) }
                         
+                        print("\n\n\n DataSource in ")
+                        print(reelsID)
+                        print("\n\n\n")
                         emitter.onNext(comments)
                         emitter.onCompleted()
                     }
