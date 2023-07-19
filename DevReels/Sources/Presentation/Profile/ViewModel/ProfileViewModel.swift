@@ -127,6 +127,7 @@ final class ProfileViewModel: ViewModel {
                     githubURL: "https://github.com/",
                     blogURL: "https://www.naver.com/",
                     introduce: "비 로그인 상태입니다.",
+                    likedList: [],
                     uid: "")
                 viewModel.currentUser.onNext(failureUser)
             }

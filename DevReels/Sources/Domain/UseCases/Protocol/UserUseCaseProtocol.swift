@@ -11,5 +11,5 @@ import RxSwift
 
 protocol UserUseCaseProtocol {
     func currentUser() -> Observable<User>
-    func fetchUser(uid: String) -> Observable<User> 
+    func fetchUser(uid: String) -> Observable<User>
 }

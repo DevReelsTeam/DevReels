@@ -94,7 +94,15 @@ struct ReelsDataSource: ReelsDataSourceProtocol {
         }
     }
 
-    
+    func update(reels: Reels) -> Observable<Void> {
+        Observable .create { emitter in
+            Firestore.firestore()
+                .collection("reels")
+                .document(reels.id)
+                .updateData(reels.toDictionary())
+            return Disposables.create()
+        }
+    }
 }
 
 enum ReelsTarget {

@@ -50,12 +50,13 @@ final class ReelsViewController: UIViewController {
     
     var commentButtonTapped = PublishSubject<Reels>()
     var heartButtonTapped = PublishSubject<Int>()
+    
     private let viewModel: ReelsViewModel
-       private var videoController: VideoPlayerController {
-           viewModel.videoController
-       }
-       private let disposeBag = DisposeBag()
-       private var currentReels: Reels?
+    private var videoController: VideoPlayerController {
+        viewModel.videoController
+    }
+    private let disposeBag = DisposeBag()
+    private var currentReels: Reels?
     
     // MARK: - Inits
     init(viewModel: ReelsViewModel) {
@@ -111,7 +112,11 @@ final class ReelsViewController: UIViewController {
                     })
                     .disposed(by: cell.disposeBag)
                 
-                self.currentReels = reels
+                cell.isHeartFilled
+                    .bind(to: viewModel.isHeartFilled)
+                    .disposed(by: cell.disposeBag)
+                
+                viewModel.currentReels.onNext(reels)
                 
                 cell.prepareForReuse()
                 cell.configureCell(data: reels)
@@ -124,9 +129,10 @@ final class ReelsViewController: UIViewController {
             .disposed(by: disposeBag)
         
         output.shouldPlay
-            .drive(onNext: { [weak self] asd in
+            .drive(onNext: { [weak self] isPlay in
                 guard let self = self else { return }
-                if asd {
+                
+                if isPlay {
                     playAnimation()
                 } else {
                     pauseAnimation()
