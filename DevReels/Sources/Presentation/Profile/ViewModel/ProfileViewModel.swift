@@ -178,7 +178,7 @@ final class ProfileViewModel: ViewModel {
                 }
             })
             .disposed(by: disposeBag)
-        
+        //  reels 데이터 업로드하고 pose cell 정리할 차례
         currentUser
             .withUnretained(self)
             .flatMap { $0.0.profileUseCase?.follower(uid: $0.1?.uid ?? " ").asResult() ?? .empty() }

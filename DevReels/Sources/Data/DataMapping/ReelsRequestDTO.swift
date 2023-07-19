@@ -17,6 +17,7 @@ struct ReelsRequestDTO: Codable {
     private let videoDescription: StringValue
     private let githubUrl: StringValue
     private let blogUrl: StringValue
+    private let hearts: IntegerValue
     
     
     private enum RootKey: String, CodingKey {
@@ -49,5 +50,6 @@ struct ReelsRequestDTO: Codable {
         self.videoDescription = StringValue(value: reels.videoDescription)
         self.githubUrl = StringValue(value: reels.githubUrl)
         self.blogUrl = StringValue(value: reels.blogUrl)
+        self.hearts = IntegerValue(value: "\(reels.hearts)")
     }
 }
