@@ -157,6 +157,13 @@ final class DIContainer {
             return viewModel
         }
         
+        container.register(ProfileCellViewModel.self) { resolver in
+            let viewModel = ProfileCellViewModel()
+            viewModel.commentListUseCase = resolver.resolve(CommentListUseCaseProtocol.self)
+            
+            return viewModel
+        }
+        
         container.register(CommentViewModel.self) { resolver in
             let viewModel = CommentViewModel()
             viewModel.commentListUseCase = resolver.resolve(CommentListUseCaseProtocol.self)

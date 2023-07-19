@@ -45,7 +45,6 @@ struct ReelsRepository: ReelsRepositoryProtocol {
     }
     
     func fetch(uid: String) -> Observable<[Reels]> {
-        
         return reelsDataSource?.fetch(uid: uid)
             .map { $0.map { $0.toDomain() } } ?? .empty()
     }

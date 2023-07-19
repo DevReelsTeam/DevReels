@@ -93,13 +93,15 @@ final class ProfileViewController: ViewController {
     // MARK: - DataSource
     
     private lazy var  dataSource = RxCollectionViewSectionedReloadDataSource<SectionOfReelsPost>(
-        configureCell: { (datasource, collectionView, indexPath, item) in
+        configureCell: { (dataSource, collectionView, indexPath, item) in
         
         guard let cell = collectionView.dequeueReusableCell(
             withReuseIdentifier: ReelsCollectionCell.identifier,
             for: indexPath
         ) as? ReelsCollectionCell else { return UICollectionViewCell() }
 
+            cell.bind(reels: item)
+            
         return cell
     }, configureSupplementaryView: { [weak self] dataSource, collectionView, kind, indexPath in
        

@@ -47,7 +47,7 @@ struct ReelsResponseDTO: Codable {
         self.id = StringValue(value: reels.id)
         self.uid = StringValue(value: reels.uid ?? "")
         self.videoURL = StringValue(value: reels.videoURL ?? "")
-        self.thumbnailURL = StringValue(value: reels.videoDescription)
+        self.thumbnailURL = StringValue(value: reels.thumbnailURL ?? "")
         self.title = StringValue(value: reels.title)
         self.videoDescription = StringValue(value: reels.videoDescription)
         self.githubUrl = StringValue(value: reels.githubUrl)
