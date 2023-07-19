@@ -39,6 +39,7 @@ struct UpdateHeartsUseCase: UpdateHeartsUseCaseProtocol {
                           githubUrl: reels.githubUrl,
                           blogUrl: reels.blogUrl,
                           hearts: reels.hearts + 1,
+                          date: reels.date,
                           uid: reels.uid,
                           videoURL: reels.videoURL,
                           thumbnailURL: reels.thumbnailURL)
@@ -62,6 +63,7 @@ struct UpdateHeartsUseCase: UpdateHeartsUseCaseProtocol {
                           githubUrl: reels.githubUrl,
                           blogUrl: reels.blogUrl,
                           hearts: reels.hearts - 1,
+                          date: reels.date,
                           uid: reels.uid,
                           videoURL: reels.videoURL,
                           thumbnailURL: reels.thumbnailURL)
