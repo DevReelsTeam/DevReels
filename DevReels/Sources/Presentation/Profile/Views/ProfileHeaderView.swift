@@ -248,6 +248,8 @@ final class ProfileHeaderView: UICollectionReusableView, Identifiable {
         default:
             break
         }
+        
+//        settingButton.rx.tap.subscribe(onNext: { _ in print("taptaptapatpatap")})
     }
     
     func layout() {

@@ -103,7 +103,7 @@ final class ProfileViewController: ViewController {
             cell.bind(reels: item)
             
         return cell
-    }, configureSupplementaryView: { [weak self] dataSource, collectionView, kind, indexPath in
+    }, configureSupplementaryView: { [weak self] dataSource, collectionView, _, indexPath in
        
         guard let self = self,
               let header = collectionView.dequeueReusableSupplementaryView(
@@ -113,7 +113,6 @@ final class ProfileViewController: ViewController {
         ) as? ProfileHeaderView else { return UICollectionReusableView() }
         
         header.configure(header: dataSource.sectionModels[indexPath.section].header)
-        
         header.blogImageViewTap
             .bind(to: self.blogImageViewTapSubject)
             .disposed(by: disposeBag)
@@ -133,6 +132,7 @@ final class ProfileViewController: ViewController {
         header.settingButtonTap
             .bind(to: self.settingButtonTapSubject)
             .disposed(by: disposeBag)
+        
         header.unfollowButtonTap
             .bind(to: self.unfollowButtonTapSubject)
             .disposed(by: disposeBag)
@@ -170,7 +170,8 @@ final class ProfileViewController: ViewController {
             followButtonTap: followButtonTapSubject,
             unfollowBUttonTap: unfollowButtonTapSubject,
             editButtonTap: editButtonTapSubject,
-            settingButtonTap: settingButtonTapSubject,
+            settingButtonTap: settingButtonTapSubject
+                .throttle(.seconds(1), latest: false, scheduler: MainScheduler.asyncInstance),
             backButtonTap: doneButton.rx.tap
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance)
             )

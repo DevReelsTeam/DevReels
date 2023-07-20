@@ -64,7 +64,7 @@ final class CommentViewController: ViewController {
     override func bind() {
         
         let input = CommentViewModel.Input(
-            viewWillAppear: rx.viewWillAppear.map { _ in ()}.asObservable(),
+            viewWillAppear: rx.viewDidLoad.asObservable(),
             backButtonTapped: rightBarButton.rx.tap
                 .throttle(.seconds(1), scheduler: MainScheduler.instance),
             inputButtonDidTap: commentInputView.inputButton.rx.tap.asObservable()

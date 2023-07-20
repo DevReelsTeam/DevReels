@@ -38,6 +38,8 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
                     break
                 }
             })
+            .disposed(by: disposeBag)
+        
         let viewController = LoginViewController(viewModel: viewModel)
         push(viewController, animated: true, isRoot: true)
     }

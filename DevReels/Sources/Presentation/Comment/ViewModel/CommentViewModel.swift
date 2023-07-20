@@ -89,8 +89,11 @@ final class CommentViewModel: ViewModel {
             .bind(to: navigation)
             .disposed(by: disposeBag)
         
-        Observable.combineLatest(input.selectedUserProfile, currentUser)
-            .filter{ comment, user in
+        Observable.combineLatest(
+            input.selectedUserProfile,
+            currentUser
+        )
+            .filter { comment, user in
                 comment.writerUID != user?.uid
             }
             .withUnretained(self)
@@ -175,7 +178,11 @@ final class CommentViewModel: ViewModel {
             .compactMap { $0 }
             .map { comment, user -> Alert? in
                 if comment.writerUID == user?.uid {
-                   return Alert(title: "댓글 삭제", message: "댓글을 삭제하시겠습니까?", observer: removeCommentAlertObserver.asObserver())
+                   return Alert(
+                    title: "댓글 삭제",
+                    message: "댓글을 삭제하시겠습니까?",
+                    observer: removeCommentAlertObserver.asObserver()
+                   )
                 }
                 return nil
             }

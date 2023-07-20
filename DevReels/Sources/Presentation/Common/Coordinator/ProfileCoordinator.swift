@@ -33,6 +33,8 @@ final class ProfileCoordinator: BaseCoordinator<ProfileCoordinatorResult> {
         viewModel.navigation
             .subscribe(onNext: { [weak self]  in
                 switch $0 {
+                case .setting:
+                    self?.showSetting()
                 default:
                     break
                 }
@@ -47,5 +49,20 @@ final class ProfileCoordinator: BaseCoordinator<ProfileCoordinatorResult> {
     
     func showEditProfile() {
         print("Move To Profile Edit")
+    }
+    
+    func showSetting(){
+        let setting = SettingCoordinator(navigationController)
+        
+        coordinate(to: setting)
+            .subscribe(onNext: { [weak self] in
+                switch $0 {
+                case.logout:
+                    self?.finish.onNext(.finish)
+                case .back:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
     }
 }

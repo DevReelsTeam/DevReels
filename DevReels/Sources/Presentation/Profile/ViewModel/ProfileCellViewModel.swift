@@ -33,9 +33,6 @@ final class ProfileCellViewModel: ViewModel {
             .subscribe(onNext: { [weak self] result in
                 switch result {
                 case .success(let data):
-                    print("\n\n\n")
-                    print(data)
-                    print("\n\n\n")
                     self?.commentCount.onNext("\(data.count)")
                 case .failure:
                     break

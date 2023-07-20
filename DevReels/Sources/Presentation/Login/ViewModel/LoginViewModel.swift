@@ -20,7 +20,6 @@ final class LoginViewModel: ViewModel {
     
     struct Input {
         let appleCredential: Observable<OAuthCredential>
-        let righButtonTap: Observable<Void>
     }
     
     struct Output {
@@ -43,18 +42,10 @@ final class LoginViewModel: ViewModel {
                 case .success:
                     viewModel.navigation.onNext(.finish)
                 case .failure:
-                    // MARK: - 로그인 실패 알럿 띄워야함.
                     break
                 }
             }
             .disposed(by: disposeBag)
-        
-        input.righButtonTap
-            .subscribe(onNext: { [weak self] in
-                self?.navigation.onNext(.finish)
-            })
-            .disposed(by: DisposeBag())
-
         
         return Output()
     }

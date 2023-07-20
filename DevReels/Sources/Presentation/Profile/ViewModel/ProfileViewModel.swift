@@ -14,9 +14,7 @@ enum ProfileNavigation {
     case editProfile
     case github
     case blog
-    case follower
-    case following
-    case post
+    case setting
     case finish
 }
 
@@ -89,6 +87,7 @@ final class ProfileViewModel: ViewModel {
     func transform(input: Input) -> Output {
         
         input.viewWillAppear
+            .take(1)
             .withUnretained(self)
             .flatMap{ $0.0.userUseCase?.currentUser().asResult() ?? .empty() }
             .withUnretained(self)
@@ -104,7 +103,7 @@ final class ProfileViewModel: ViewModel {
        
         Observable.merge(
             Observable.just(()),
-            input.viewWillAppear.skip(1)
+            input.viewWillAppear.take(1)
         )
         .withLatestFrom(type)
         .filter { $0 == ProfileType.current }
@@ -136,6 +135,7 @@ final class ProfileViewModel: ViewModel {
         
         
         input.viewWillAppear
+            .take(1)
             .withLatestFrom(type)
             .compactMap { type in
                 switch type {
@@ -336,11 +336,10 @@ final class ProfileViewModel: ViewModel {
             .disposed(by: disposeBag)
         
         input.settingButtonTap
-            .subscribe(onNext: { _ in
-            print("\n\n\n")
-            print("setting")
-            print("\n\n\n")
-        })
-        .disposed(by: disposeBag)
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, _ in
+                viewModel.navigation.onNext(.setting)
+            })
+            .disposed(by: disposeBag)
     }
 }
