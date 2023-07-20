@@ -27,6 +27,8 @@ struct DevReelsColor {
     let neutral50 = UIColor(named: "Neutral50")
     let neutral500 = UIColor(named: "Neutral500")
     let neutral60 = UIColor(named: "Neutral60")
+    let neutral600 = UIColor(named: "Neutral600")
+    let neutral70 = UIColor(named: "Neutral70")
 
     // Primary
     let primary70 = UIColor(named: "Primary70")

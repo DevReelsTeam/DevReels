@@ -41,11 +41,6 @@ final class LoginViewController: ViewController {
     
     // MARK: - Properties
     
-    let rightButton = UIButton().then {
-        $0.setTitle("둘러보기", for: .normal)
-        $0.setTitleColor(UIColor.devReelsColor.neutral500, for: .normal)
-    }
-    
     let logoView = LogoView()
     
     private let appleLoginButton = LoginButton().then {
@@ -103,11 +98,10 @@ final class LoginViewController: ViewController {
             }
         
         let input = LoginViewModel.Input(
-            appleCredential: credential,
-            righButtonTap: rightButton.rx.tap.asObservable()
+            appleCredential: credential
         )
         
-        let _ = viewModel.transform(input: input)
+        viewModel.transform(input: input)
     }
 
     func startGitHubLogin() {
@@ -117,7 +111,6 @@ final class LoginViewController: ViewController {
         self.title = "{DevReels}"
         self.navigationController?.navigationBar.titleTextAttributes = [.foregroundColor: UIColor.devReelsColor.primary90]
         self.backButton.isHidden = true
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightButton)
     }
     
     private func layoutLogo() {

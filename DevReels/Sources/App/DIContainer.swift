@@ -32,6 +32,7 @@ final class DIContainer {
         }
         container.register(CommentDataSourceProtocol.self) { _ in CommentDataSource()}
         container.register(UserDataSourceProtocol.self) { _ in UserDataSource()}
+        container.register(SettingDataSourceProtocol.self) { _ in SettingDataSource()}
     }
     
     private func registerRepositories() {
@@ -62,6 +63,12 @@ final class DIContainer {
             var repository = UserRepository()
             repository.userDataSource = resolver.resolve(UserDataSourceProtocol.self)
             repository.keyChainManager = resolver.resolve(KeychainManagerProtocol.self)
+            return repository
+        }
+        
+        container.register(SettingRepositoryProtocol.self) { resolver in
+            var repository = SettingRepository()
+            repository.settingDataSource = resolver.resolve(SettingDataSourceProtocol.self)
             return repository
         }
     }
@@ -120,6 +127,18 @@ final class DIContainer {
         }
         
         container.register(HyperLinkUseCaseProtocol.self) { _ in HyperLinkUseCase() }
+        
+        container.register(SettingUseCaseProtocol.self) { resolver in
+            var useCase = SettingUseCase()
+            useCase.settingRepository = resolver.resolve(SettingRepositoryProtocol.self)
+            return useCase
+        }
+        
+        container.register(LogoutUseCaseProtocol.self) { resolver in
+            var useCase = LogoutUseCase()
+            useCase.tokenRepository = resolver.resolve(TokenRepositoryProtocol.self)
+            return useCase
+        }
     }
     
     private func registerViewModels() {
@@ -170,6 +189,14 @@ final class DIContainer {
             viewModel.commentUploadUseCase = resolver.resolve(CommentUploadUseCaseProtocol.self)
             viewModel.loginCheckUseCase = resolver.resolve(LoginCheckUseCaseProtocol.self)
             viewModel.userUseCase = resolver.resolve(UserUseCaseProtocol.self)
+            return viewModel
+        }
+        
+        container.register(SettingViewModel.self) { resolver in
+            let viewModel = SettingViewModel()
+            viewModel.settingUsecase = resolver.resolve(SettingUseCaseProtocol.self)
+            viewModel.hyperlinkUseCase = resolver.resolve(HyperLinkUseCaseProtocol.self)
+            viewModel.logoutUseCase = resolver.resolve(LogoutUseCaseProtocol.self)
             return viewModel
         }
     }
