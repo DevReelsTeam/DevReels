@@ -139,13 +139,19 @@ final class DIContainer {
             useCase.tokenRepository = resolver.resolve(TokenRepositoryProtocol.self)
             return useCase
         }
+        
+        container.register(AutoLoginUseCaseProtocol.self) { resolver in
+            var useCase = AutoLoginUseCase()
+            useCase.tokenRepository = resolver.resolve(TokenRepositoryProtocol.self)
+            return useCase
+        }
     }
     
     private func registerViewModels() {
         container.register(LoginViewModel.self) { resolver in
             let viewModel = LoginViewModel()
             viewModel.loginUseCase = resolver.resolve(LoginUseCaseProtocol.self)
-            
+            viewModel.autologinUseCase = resolver.resolve(AutoLoginUseCaseProtocol.self)
             return viewModel
         }
         
