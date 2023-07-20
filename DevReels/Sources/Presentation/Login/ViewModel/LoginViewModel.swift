@@ -20,6 +20,7 @@ final class LoginViewModel: ViewModel {
     
     struct Input {
         let appleCredential: Observable<OAuthCredential>
+        let viewWillAppear: Observable<Void>
     }
     
     struct Output {
@@ -27,6 +28,7 @@ final class LoginViewModel: ViewModel {
     
     let navigation = PublishSubject<LoginNavigation>()
     var loginUseCase: LoginUseCaseProtocol?
+    var autologinUseCase: AutoLoginUseCaseProtocol?
     var disposeBag = DisposeBag()
     
     func transform(input: Input) -> Output {
@@ -35,7 +37,8 @@ final class LoginViewModel: ViewModel {
         input.appleCredential
             .withUnretained(self)
             .flatMap { viewModel, credential in
-                viewModel.loginUseCase?.singIn(with: credential).asResult() ?? .empty() }
+                viewModel.loginUseCase?.singIn(with: credential).asResult() ?? .empty()
+            }
             .withUnretained(self)
             .subscribe { viewModel, result in
                 switch result {
@@ -46,6 +49,22 @@ final class LoginViewModel: ViewModel {
                 }
             }
             .disposed(by: disposeBag)
+        
+        input.viewWillAppear
+            .withUnretained(self)
+            .flatMap { $0.0.autologinUseCase?.load().asResult() ?? .empty() }
+            .delay(.seconds(2), scheduler: MainScheduler.instance)
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, result in
+                switch result {
+                case .success:
+                    viewModel.navigation.onNext(.finish)
+                case .failure:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
+        
         
         return Output()
     }

@@ -98,7 +98,8 @@ final class LoginViewController: ViewController {
             }
         
         let input = LoginViewModel.Input(
-            appleCredential: credential
+            appleCredential: credential,
+            viewWillAppear: rx.viewWillAppear.map { _ in () }
         )
         
         viewModel.transform(input: input)
