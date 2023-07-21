@@ -172,3 +172,10 @@ develop하게 되면 서버와 디자인에 가변적인 상황이 벌어질 수
 - 자체 Image Cacher, Network Layer를 모듈화하여 관리할 수 있었습니다.
 
 ---
+
+## **협업 방식**
+
+### **Github**
+
+- Github를 활용해 협업해왔습니다.
+- 2명 이상이 approve를 해야 PR이 merge되도록 설정하였습니다.
