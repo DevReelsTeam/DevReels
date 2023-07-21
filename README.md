@@ -19,3 +19,21 @@
 | [@gwd0311](https://github.com/gwd0311)                                     | [@HyeonjunKKang](https://github.com/HyeonjunKKang)                                        | [@Hoduya](https://github.com/Hoduya)                                           |
 
 </p>
+
+## **주요 기능 소개**
+
+### **릴스(숏폼) 기능**
+
+<p>
+<img alt="릴스" src="https://github.com/DevReelsTeam/DevReels/assets/121999075/01aa92ed-8697-495b-ba8a-046c8bc52c4b" width="350>
+</p>
+- 관심있는 상대방을 팔로우할 수 있습니다.
+- 좋아요를 눌러 관심을 표시할 수 있습니다.
+- 댓글을 남겨 의견을 공유할 수 있습니다.
+- 기능에 해당하는 깃허브로 이동할 수 있습니다.
+
+
+
+### **스터디원들과 채팅하기**
+
+
