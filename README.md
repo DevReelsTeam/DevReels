@@ -24,7 +24,7 @@
 
 ### **릴스(숏폼) 기능**
 
-<img alt="릴스" src="https://github.com/DevReelsTeam/DevReels/assets/121999075/01aa92ed-8697-495b-ba8a-046c8bc52c4b" width="350>
+<img alt="릴스" src="https://github.com/DevReelsTeam/DevReels/assets/121999075/01aa92ed-8697-495b-ba8a-046c8bc52c4b" width="350">
 </p>
   
 - 관심있는 상대방을 팔로우할 수 있습니다.
@@ -96,8 +96,10 @@ develop하게 되면 서버와 디자인에 가변적인 상황이 벌어질 수
 ---
 
 ### **RxSwift + MVVM**
-
-<img alt="Coodinator" src="https://user-images.githubusercontent.com/86254784/207780194-e8af1149-f392-4266-aa68-162b0fcc2c33.png">
+<p>
+<img alt="Coodinator" src="https://github.com/DevReelsTeam/DevReels/assets/121999075/515d1933-9d50-440e-b9f8-40a66d4cb5ae">
+<img alt="Coodinator" src="https://github.com/DevReelsTeam/DevReels/assets/121999075/c3769aba-9df1-4d33-baad-cd2bd23ae052">
+</p>
 
 **Why**
 
@@ -113,7 +115,7 @@ develop하게 되면 서버와 디자인에 가변적인 상황이 벌어질 수
 
 ### **Coordinator**
 
-<img alt="RXMVVM" src="https://user-images.githubusercontent.com/86254784/207780195-1d2a6544-c57b-425b-885c-2fae7af3a87b.png">
+<img alt="RXMVVM" src="https://github.com/DevReelsTeam/DevReels/assets/121999075/26d1ee9d-b4c2-4144-bbcf-3d15274f7463">
 
 **Why**
 
@@ -158,7 +160,6 @@ develop하게 되면 서버와 디자인에 가변적인 상황이 벌어질 수
 
 <p>
 <img width = "50%" alt="tuist1" src="https://user-images.githubusercontent.com/86254784/207780843-1b303ffa-d7ac-42b5-8ebb-1add1d1a3c01.png">
-<img width = "45%" alt="tuist2" src="https://user-images.githubusercontent.com/86254784/207780860-531eedfd-5f57-4dfb-bdfa-772c61d35642.png">
 </p>
 
 **Why**
