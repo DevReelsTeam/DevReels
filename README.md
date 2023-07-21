@@ -77,9 +77,11 @@
 ---
 
 
+
 ## **⚒️ 기술적 도전**
 
 ### **Clean Architecture**
+
 <img alt="클린아키텍쳐" src="https://github.com/DevReelsTeam/DevReels/assets/121999075/dc551c6c-25aa-4388-aafe-971c7f1aeea7">
 
 **Why**
