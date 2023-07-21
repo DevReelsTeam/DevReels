@@ -15,7 +15,7 @@
 
 | <img src="https://avatars.githubusercontent.com/u/64826110?v=4" width="200"> | <img src="https://avatars.githubusercontent.com/u/121999075?v=4" width="200"> | <img src="https://avatars.githubusercontent.com/u/73777995?v=4" width="200"> | 
 | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | 
-| **Jerry_한종우**                                                             | **Clamp_강현준**                                                              | **Hoduya_최호준**                                                             | **S043\_이주훈**                                                             |
+| **Jerry_한종우**                                                             | **Clamp_강현준**                                                              | **Hoduya_최호준**                                                             |                                                            |
 | [@gwd0311](https://github.com/gwd0311)                                     | [@HyeonjunKKang](https://github.com/HyeonjunKKang)                                        | [@Hoduya](https://github.com/Hoduya)                                           |
 
 </p>
@@ -82,7 +82,7 @@
 
 ### **Clean Architecture**
 
-<img alt="클린아키텍쳐" src="https://github.com/DevReelsTeam/DevReels/assets/121999075/dc551c6c-25aa-4388-aafe-971c7f1aeea7">
+<img alt="CleanArchitecture" src="https://github.com/DevReelsTeam/DevReels/assets/121999075/dc551c6c-25aa-4388-aafe-971c7f1aeea7">
 
 **Why**
 
