@@ -74,17 +74,19 @@ final class ReelsViewModel: ViewModel {
             })
             .disposed(by: disposeBag)
         
-        input.viewWillAppear
-            .take(1)
+        input.viewDidAppear
             .withUnretained(self)
             .flatMap { viewModel, _ in
                 viewModel.userUseCase?.currentUser().asResult() ?? .empty()
             }
             .withUnretained(self)
             .subscribe(onNext: { viewModel, result in
+                viewModel.videoController.shouldPlay = true
+                viewModel.shouldPlay.onNext(viewModel.videoController.shouldPlay)
                 switch result {
                 case let .success(user):
                     viewModel.currentUser.onNext(user)
+                    print("currentUser dd")
                 case .failure:
                     print("DEBUG:: Failed fetching currentUser")
                 }
@@ -107,14 +109,6 @@ final class ReelsViewModel: ViewModel {
             })
             .disposed(by: disposeBag)
         
-        input.viewDidAppear
-            .subscribe(onNext: { [weak self] _ in
-                guard let self = self else { return }
-                videoController.shouldPlay = true
-                shouldPlay.onNext(videoController.shouldPlay)
-            })
-            .disposed(by: disposeBag)
-        
         input.commentButtonTap
             .withUnretained(self)
             .subscribe(onNext: { viewModel, reels in
@@ -129,14 +123,17 @@ final class ReelsViewModel: ViewModel {
             isHeartFilled.asObservable()
         )
         .subscribe(onNext: { [weak self] hearts, user, reels, isFilled in
+            print("zz")
             guard let self = self else { return }
-            guard let reels = reels, let user = user else { return }
+            guard let reels = reels, let user = user else { print(user, reels); return }
             if isFilled {
                 updateHeartsUseCase?.removeHeart(user: user, reels: reels, hearts: hearts)
                 isHeartFilled.onNext(false)
+                print("false")
             } else {
                 updateHeartsUseCase?.addHeart(user: user, reels: reels, hearts: hearts)
                 isHeartFilled.onNext(true)
+                print("true")
             }
         })
         .disposed(by: disposeBag)
