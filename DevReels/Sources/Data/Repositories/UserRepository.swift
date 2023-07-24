@@ -46,9 +46,10 @@ struct UserRepository: UserRepositoryProtocol {
               let authorization = try? JSONDecoder().decode(Authorization.self, from: data) else {
             return Observable.error(UserRepositoryError.userNotFound)
         }
-                
-        return Observable.from(optional: imageData)
+        
+        return Observable.just(imageData ?? Data())
             .flatMap { imageData in
+                guard !imageData.isEmpty else { return Observable.just("") }
                 return userDataSource?.uploadProfileImage(uid: authorization.localId, imageData: imageData)
                     .map { $0.absoluteString }
                     .catchAndReturn("") ?? Observable.just("")
@@ -58,6 +59,7 @@ struct UserRepository: UserRepositoryProtocol {
                      identifier: authorization.email,
                      profileImageURLString: $0,
                      profile: profile)
+                print(user)
                 return user
             }
             .flatMap {
