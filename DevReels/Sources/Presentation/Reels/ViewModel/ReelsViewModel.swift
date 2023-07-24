@@ -23,7 +23,8 @@ final class ReelsViewModel: ViewModel {
         let viewWillDisAppear: Observable<Void>
         let viewDidAppear: Observable<Void>
         let reelsTapped: Observable<Void>
-        let reelsChanged: Observable<IndexPath>
+        let reelsWillDisplay: Observable<IndexPath>
+        let reelsEndDisplay: Observable<IndexPath>
         let reelsWillBeginDragging: Observable<Void>
         let reelsDidEndDragging: Observable<Void>
         let commentButtonTap: PublishSubject<Reels>
@@ -58,7 +59,6 @@ final class ReelsViewModel: ViewModel {
     
     func bind(input: Input) {
         input.viewWillAppear
-            .take(1)
             .withUnretained(self)
             .flatMap { viewModel, _ in
                 viewModel.reelsUseCase?.list().asResult() ?? .empty()
@@ -74,7 +74,7 @@ final class ReelsViewModel: ViewModel {
             })
             .disposed(by: disposeBag)
         
-        input.viewDidAppear
+        input.viewWillAppear
             .withUnretained(self)
             .flatMap { viewModel, _ in
                 viewModel.userUseCase?.currentUser().asResult() ?? .empty()
@@ -116,6 +116,25 @@ final class ReelsViewModel: ViewModel {
             })
             .disposed(by: self.disposeBag)
                
+        input.reelsWillDisplay
+            .withUnretained(self)
+            .flatMap { viewModel, _ in
+                viewModel.userUseCase?.currentUser().asResult() ?? .empty()
+            }
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, result in
+                viewModel.videoController.shouldPlay = true
+                viewModel.shouldPlay.onNext(viewModel.videoController.shouldPlay)
+                switch result {
+                case let .success(user):
+                    viewModel.currentUser.onNext(user)
+                    print("currentUser dd")
+                case .failure:
+                    print("DEBUG:: Failed fetching currentUser")
+                }
+            })
+            .disposed(by: disposeBag)
+        
         Observable.combineLatest(
             input.heartButtonTap.asObservable(),
             currentUser.asObservable(),
