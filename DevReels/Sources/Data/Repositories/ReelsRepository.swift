@@ -27,7 +27,6 @@ struct ReelsRepository: ReelsRepositoryProtocol {
         let reelsRequest = Observable.zip(videoURLObservable, thumbnailURLObservable)
             .map { return ($0.0.absoluteString, $0.1.absoluteString) }
             .map {
-                
                 let reels = Reels(id: reels.id,
                                   title: reels.title,
                                   videoDescription: reels.videoDescription,

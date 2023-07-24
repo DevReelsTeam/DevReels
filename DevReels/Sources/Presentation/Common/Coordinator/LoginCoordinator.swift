@@ -22,6 +22,7 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
     
     override func start() -> Observable<LoginCoordinatorResult> {
         showLogin()
+//        showCreateProfile()
         return finish
     }
     
@@ -33,9 +34,8 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
                 switch $0 {
                 case .finish:
                     self?.finish.onNext(.finish)
-                case .createUser:
-                    // 회원가입 온보딩
-                    break
+                case .createProfile:
+                    self?.showCreateProfile()
                 }
             })
             .disposed(by: disposeBag)
@@ -44,9 +44,23 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
         push(viewController, animated: true, isRoot: true)
     }
     
-    func showReels() {
-        let profile = ProfileCoordinator(navigationController)
+    
+    func showCreateProfile() {
+        guard let viewModel = DIContainer.shared.container.resolve(EditProfileViewModel.self) else { return }
+        viewModel.type.onNext(.create)
         
-        push(ProfileViewController(viewModel: ProfileViewModel()), animated: true)
+        viewModel.navigation
+            .subscribe (onNext: { [weak self] in
+                switch $0 {
+                case .finish:
+                    self?.finish.onNext(.finish)
+                case .back:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        let viewController = EditProfileViewController(viewModel: viewModel)
+        push(viewController, animated: true)
     }
 }

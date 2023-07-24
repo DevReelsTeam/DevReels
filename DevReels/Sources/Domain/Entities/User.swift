@@ -30,4 +30,15 @@ extension User {
         self.introduce = ""
         self.likedList = []
     }
+    
+    init(uid: String, identifier: String, profileImageURLString: String, profile: Profile) {
+        self.uid = uid
+        self.identifier = identifier
+        self.profileImageURLString = profileImageURLString
+        self.githubURL = profile.githubURLString
+        self.blogURL = profile.blogURLString
+        self.nickName = profile.nickName
+        self.introduce = profile.introduce
+        self.likedList = []
+    }
 }

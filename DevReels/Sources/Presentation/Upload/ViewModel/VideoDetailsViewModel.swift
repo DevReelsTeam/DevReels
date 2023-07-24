@@ -25,7 +25,6 @@ final class VideoDetailsViewModel: ViewModel {
         let urlValidation: Observable<Bool>
         let githubUrlString: Observable<String>
         let blogUrlString: Observable<String>
-        let hearts: Observable<Int>
         let uploadButtonTapped: Observable<Void>
     }
     

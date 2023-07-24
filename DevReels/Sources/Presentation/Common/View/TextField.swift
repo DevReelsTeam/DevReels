@@ -34,6 +34,12 @@ final class TextField: UIView {
             titleLabel.text = title
         }
     }
+    
+    var maxCount: Int = 0 {
+        didSet {
+            bindTextCount()
+        }
+    }
         
     // MARK: Private
     
@@ -70,10 +76,13 @@ final class TextField: UIView {
     
     init(isSecure: Bool = false, inputType: InputType = .normal) {
         super.init(frame: .zero)
-        layout()
-        if inputType == .url {
-            bind()
+        switch inputType {
+        case .normal:
+            break
+        case .url:
+            bindUrl()
         }
+        layout()
     }
     
     required init?(coder: NSCoder) {
@@ -88,21 +97,42 @@ final class TextField: UIView {
         }
     }
     
-    private func bind() {
-        disposable = textField.rx.text
-            .subscribe { [weak self] _ in
-                self?.update()
-            }
+    func removeText() {
+        textField.text = ""
     }
     
-    private func update() {
-        guard let urlString = textField.text else { return }
-        
-        if let url = URL(string: urlString),
+    private func bindUrl() {
+        disposable = textField.rx.text
+            .withUnretained(self)
+            .subscribe(onNext: { owner, text in
+                if let text {
+                    owner.checkUrlValid(text)
+                }
+            })
+    }
+    
+    private func bindTextCount() {
+        disposable = textField.rx.text
+            .withUnretained(self)
+            .subscribe(onNext: { owner, text in
+                if let text {
+                    owner.limitTextCount(text)
+                }
+            })
+    }
+    
+    private func checkUrlValid(_ text: String) {
+        if let url = URL(string: text),
            UIApplication.shared.canOpenURL(url) {
             validUrlLabel.text = nil
         } else {
             validUrlLabel.text = "올바르지 않은 URL 형식입니다."
+        }
+    }
+    
+    private func limitTextCount(_ text: String) {
+        if let str = textField.text?.prefix(maxCount) {
+            textField.text = String(str)
         }
     }
     

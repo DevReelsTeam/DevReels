@@ -12,7 +12,7 @@ import RxCocoa
 import FirebaseAuth
 
 enum LoginNavigation{
-    case createUser
+    case createProfile
     case finish
 }
 
@@ -24,6 +24,7 @@ final class LoginViewModel: ViewModel {
     }
     
     struct Output {
+        
     }
     
     let navigation = PublishSubject<LoginNavigation>()
@@ -43,7 +44,14 @@ final class LoginViewModel: ViewModel {
             .subscribe { viewModel, result in
                 switch result {
                 case .success:
-                    viewModel.navigation.onNext(.finish)
+                    viewModel.loginUseCase?.exist()
+                        .subscribe(onNext: { found in
+                            if found {
+                                viewModel.navigation.onNext(.finish)
+                            } else {
+                                viewModel.navigation.onNext(.createProfile)
+                            }
+                        })
                 case .failure:
                     break
                 }

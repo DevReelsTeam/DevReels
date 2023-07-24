@@ -9,9 +9,9 @@
 import RxSwift
 
 struct AutoLoginUseCase: AutoLoginUseCaseProtocol {
-    var tokenRepository: TokenRepositoryProtocol?
+    var userRepository: UserRepositoryProtocol?
     
-    func load() -> Observable<Authorization> {
-        return tokenRepository?.load() ?? .empty()
+    func load() -> Observable<User> {
+        return userRepository?.currentUser() ?? .empty()
     }
 }
