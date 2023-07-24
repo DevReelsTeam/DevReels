@@ -21,8 +21,8 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
     let finish = PublishSubject<LoginCoordinatorResult>()
     
     override func start() -> Observable<LoginCoordinatorResult> {
-//        showLogin()
-        showCreateProfile()
+        showLogin()
+//        showCreateProfile()
         return finish
     }
     
@@ -48,6 +48,18 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
     func showCreateProfile() {
         guard let viewModel = DIContainer.shared.container.resolve(EditProfileViewModel.self) else { return }
         viewModel.type.onNext(.create)
+        
+        viewModel.navigation
+            .subscribe (onNext: { [weak self] in
+                switch $0 {
+                case .finish:
+                    self?.finish.onNext(.finish)
+                case .back:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
+        
         let viewController = EditProfileViewController(viewModel: viewModel)
         push(viewController, animated: true)
     }

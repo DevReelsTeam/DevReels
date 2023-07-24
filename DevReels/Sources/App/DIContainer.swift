@@ -148,7 +148,7 @@ final class DIContainer {
         
         container.register(AutoLoginUseCaseProtocol.self) { resolver in
             var useCase = AutoLoginUseCase()
-            useCase.tokenRepository = resolver.resolve(TokenRepositoryProtocol.self)
+            useCase.userRepository = resolver.resolve(UserRepositoryProtocol.self)
             return useCase
         }
     }

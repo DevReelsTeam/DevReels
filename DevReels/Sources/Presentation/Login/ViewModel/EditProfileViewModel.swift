@@ -158,5 +158,11 @@ final class EditProfileViewModel: ViewModel {
             .map { EditProfileNavigation.finish }
             .bind(to: navigation)
             .disposed(by: disposeBag)
+        
+        input
+            .backButtonTapped
+            .map { EditProfileNavigation.back }
+            .bind(to: navigation)
+            .disposed(by: disposeBag)
     }
 }
