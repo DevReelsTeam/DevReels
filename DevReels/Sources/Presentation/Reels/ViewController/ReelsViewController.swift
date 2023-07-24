@@ -85,7 +85,8 @@ final class ReelsViewController: UIViewController {
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
             reelsTapped: tableView.rx.itemSelected.map { _ in () }
                 .throttle(.seconds(1), scheduler: MainScheduler.asyncInstance),
-            reelsChanged: tableView.rx.didEndDisplayingCell.map { $0.indexPath },
+            reelsWillDisplay: tableView.rx.willDisplayCell.map { $0.indexPath },
+            reelsEndDisplay: tableView.rx.didEndDisplayingCell.map { $0.indexPath },
             reelsWillBeginDragging: tableView.rx.willBeginDragging.map { _ in },
             reelsDidEndDragging: tableView.rx.didEndDragging.map { _ in },
             commentButtonTap: commentButtonTapped,

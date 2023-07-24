@@ -23,7 +23,8 @@ final class ReelsViewModel: ViewModel {
         let viewWillDisAppear: Observable<Void>
         let viewDidAppear: Observable<Void>
         let reelsTapped: Observable<Void>
-        let reelsChanged: Observable<IndexPath>
+        let reelsWillDisplay: Observable<IndexPath>
+        let reelsEndDisplay: Observable<IndexPath>
         let reelsWillBeginDragging: Observable<Void>
         let reelsDidEndDragging: Observable<Void>
         let commentButtonTap: PublishSubject<Reels>
@@ -58,7 +59,6 @@ final class ReelsViewModel: ViewModel {
     
     func bind(input: Input) {
         input.viewWillAppear
-            .take(1)
             .withUnretained(self)
             .flatMap { viewModel, _ in
                 viewModel.reelsUseCase?.list().asResult() ?? .empty()
@@ -75,16 +75,18 @@ final class ReelsViewModel: ViewModel {
             .disposed(by: disposeBag)
         
         input.viewWillAppear
-            .take(1)
             .withUnretained(self)
             .flatMap { viewModel, _ in
                 viewModel.userUseCase?.currentUser().asResult() ?? .empty()
             }
             .withUnretained(self)
             .subscribe(onNext: { viewModel, result in
+                viewModel.videoController.shouldPlay = true
+                viewModel.shouldPlay.onNext(viewModel.videoController.shouldPlay)
                 switch result {
                 case let .success(user):
                     viewModel.currentUser.onNext(user)
+                    print("currentUser dd")
                 case .failure:
                     print("DEBUG:: Failed fetching currentUser")
                 }
@@ -107,14 +109,6 @@ final class ReelsViewModel: ViewModel {
             })
             .disposed(by: disposeBag)
         
-        input.viewDidAppear
-            .subscribe(onNext: { [weak self] _ in
-                guard let self = self else { return }
-                videoController.shouldPlay = true
-                shouldPlay.onNext(videoController.shouldPlay)
-            })
-            .disposed(by: disposeBag)
-        
         input.commentButtonTap
             .withUnretained(self)
             .subscribe(onNext: { viewModel, reels in
@@ -122,6 +116,25 @@ final class ReelsViewModel: ViewModel {
             })
             .disposed(by: self.disposeBag)
                
+        input.reelsWillDisplay
+            .withUnretained(self)
+            .flatMap { viewModel, _ in
+                viewModel.userUseCase?.currentUser().asResult() ?? .empty()
+            }
+            .withUnretained(self)
+            .subscribe(onNext: { viewModel, result in
+                viewModel.videoController.shouldPlay = true
+                viewModel.shouldPlay.onNext(viewModel.videoController.shouldPlay)
+                switch result {
+                case let .success(user):
+                    viewModel.currentUser.onNext(user)
+                    print("currentUser dd")
+                case .failure:
+                    print("DEBUG:: Failed fetching currentUser")
+                }
+            })
+            .disposed(by: disposeBag)
+        
         Observable.combineLatest(
             input.heartButtonTap.asObservable(),
             currentUser.asObservable(),
@@ -129,14 +142,17 @@ final class ReelsViewModel: ViewModel {
             isHeartFilled.asObservable()
         )
         .subscribe(onNext: { [weak self] hearts, user, reels, isFilled in
+            print("zz")
             guard let self = self else { return }
-            guard let reels = reels, let user = user else { return }
+            guard let reels = reels, let user = user else { print(user, reels); return }
             if isFilled {
                 updateHeartsUseCase?.removeHeart(user: user, reels: reels, hearts: hearts)
                 isHeartFilled.onNext(false)
+                print("false")
             } else {
                 updateHeartsUseCase?.addHeart(user: user, reels: reels, hearts: hearts)
                 isHeartFilled.onNext(true)
+                print("true")
             }
         })
         .disposed(by: disposeBag)
