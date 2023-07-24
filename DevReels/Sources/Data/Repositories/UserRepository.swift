@@ -12,16 +12,11 @@ import RxSwift
 struct UserRepository: UserRepositoryProtocol {
     
     enum UserRepositoryError: Error {
-        case noUserInfo
+        case userNotFound
     }
     
     var userDataSource: UserDataSourceProtocol?
     var keyChainManager: KeychainManagerProtocol?
-    
-    func create(uid: String, email: String) -> Observable<Void> {
-        let request = UserRequestDTO(uid: uid, email: email)
-        return userDataSource?.create(request: request) ?? .empty()
-    }
     
     func fetch(uid: String) -> Observable<User> {
         return userDataSource?.read(uid: uid)
@@ -31,10 +26,43 @@ struct UserRepository: UserRepositoryProtocol {
     func currentUser() -> Observable<User> {
         guard let data = keyChainManager?.load(key: .authorization),
               let authorization = try? JSONDecoder().decode(Authorization.self, from: data) else {
-            return Observable.error(UserRepositoryError.noUserInfo)
+            return Observable.error(UserRepositoryError.userNotFound)
         }
         
         return fetch(uid: authorization.localId)
+    }
+    
+    func exist() -> Observable<Bool> {
+        guard let data = keyChainManager?.load(key: .authorization),
+              let authorization = try? JSONDecoder().decode(Authorization.self, from: data) else {
+            return Observable.error(UserRepositoryError.userNotFound)
+        }
+        
+        return userDataSource?.exist(uid: authorization.localId) ?? .empty()
+    }
+    
+    func set(profile: Profile, imageData: Data?) -> Observable<Void> {
+        guard let data = keyChainManager?.load(key: .authorization),
+              let authorization = try? JSONDecoder().decode(Authorization.self, from: data) else {
+            return Observable.error(UserRepositoryError.userNotFound)
+        }
+                
+        return Observable.from(optional: imageData)
+            .flatMap { imageData in
+                return userDataSource?.uploadProfileImage(uid: authorization.localId, imageData: imageData)
+                    .map { $0.absoluteString }
+                    .catchAndReturn("") ?? Observable.just("")
+            }
+            .map {
+                let user = User(uid: authorization.localId,
+                     identifier: authorization.email,
+                     profileImageURLString: $0,
+                     profile: profile)
+                return user
+            }
+            .flatMap {
+                userDataSource?.set(request: UserRequestDTO(user: $0)) ?? .empty()
+            }
     }
     
     func fetchFollower(uid: String) -> Observable<[User]> {
