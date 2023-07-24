@@ -22,7 +22,7 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
     
     override func start() -> Observable<LoginCoordinatorResult> {
 //        showLogin()
-        showEditProfile()
+        showCreateProfile()
         return finish
     }
     
@@ -34,8 +34,8 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
                 switch $0 {
                 case .finish:
                     self?.finish.onNext(.finish)
-                case .createUser:
-                    self?.showEditProfile()
+                case .createProfile:
+                    self?.showCreateProfile()
                 }
             })
         let viewController = LoginViewController(viewModel: viewModel)
@@ -43,9 +43,9 @@ final class LoginCoordinator: BaseCoordinator<LoginCoordinatorResult> {
     }
     
     
-    func showEditProfile() {
-        let viewModel = EditProfileViewModel()
-        
+    func showCreateProfile() {
+        guard let viewModel = DIContainer.shared.container.resolve(EditProfileViewModel.self) else { return }
+        viewModel.type.onNext(.create)
         let viewController = EditProfileViewController(viewModel: viewModel)
         push(viewController, animated: true)
     }

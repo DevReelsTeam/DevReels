@@ -10,10 +10,10 @@ import Foundation
 import RxSwift
 
 protocol UserDataSourceProtocol {
-    func create(request: UserRequestDTO) -> Observable<Void>
-    func update(request: UserRequestDTO) -> Observable<Void>
+    func set(request: UserRequestDTO) -> Observable<Void>
     func exist(uid: String) -> Observable<Bool>
     func read(uid: String) -> Observable<UserResponseDTO>
+    func uploadProfileImage(uid: String, imageData: Data) -> Observable<URL>
     func fetchFollower(uid: String) -> Observable<[UserResponseDTO]>
     func fetchFollowing(uid: String) -> Observable<[UserResponseDTO]>
 }

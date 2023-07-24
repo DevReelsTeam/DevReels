@@ -11,6 +11,5 @@ import RxSwift
 
 protocol EditProfileUseCaseProtocol {
     func loadProfile() -> Observable<User>
-    func createProfile(user: User) -> Observable<Void> 
-    func editProfile(user: User) -> Observable<Void>
+    func setProfile(profile: Profile) -> Observable<Void>
 }

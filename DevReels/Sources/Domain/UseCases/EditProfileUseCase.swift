@@ -6,22 +6,19 @@
 //  Copyright © 2023 DevReels. All rights reserved.
 //
 
-import Foundation
+import UIKit
 import RxSwift
 
 struct EditProfileUseCase: EditProfileUseCaseProtocol {
-
+    
     var userRepository: UserRepositoryProtocol?
     
     func loadProfile() -> Observable<User> {
         return userRepository?.currentUser() ?? .empty()
     }
     
-    func createProfile(user: User) -> Observable<Void> {
-        return userRepository?.create(user: user) ?? .empty()
-    }
-    
-    func editProfile(user: User) -> Observable<Void> {
-        return userRepository?.update(user: user) ?? .empty()
+    func setProfile(profile: Profile) -> Observable<Void> {
+        let imageData: Data? = profile.profileImage?.jpegData(compressionQuality: 0.5)
+        return userRepository?.set(profile: profile, imageData: imageData) ?? .empty()
     }
 }

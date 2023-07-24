@@ -36,26 +36,35 @@ final class EditProfileViewModel: ViewModel {
     struct Output {
         let originName: Driver<String>
         let originIntroduce: Driver<String>
-        let originProfileImage: Driver<UIImage>
+        let originProfileImage: Driver<UIImage?>
         let inputValidation: Driver<Bool>
+        let type: Driver<EditType>
     }
     
     var disposeBag = DisposeBag()
     var editProfileUseCase: EditProfileUseCaseProtocol?
     let navigation = PublishSubject<EditProfileNavigation>()
     let type = BehaviorSubject<EditType>(value: .edit)
+    private let profile = PublishSubject<Profile>()
     private let user = BehaviorSubject<User?>(value: nil)
     private let name = BehaviorSubject<String>(value: "")
     private let introduce = BehaviorSubject<String>(value: "")
-    private let image = BehaviorSubject<UIImage>(value: UIImage())
+    private let image = BehaviorSubject<UIImage?>(value: nil)
     private let inputValidation = BehaviorSubject<Bool>(value: false)
+    private let githubUrlString = BehaviorSubject<String>(value: "")
+    private let blogUrlString = BehaviorSubject<String>(value:"")
     private let alert = PublishSubject<Alert>()
     
     func transform(input: Input) -> Output {
         bindUser(input: input)
+        bindImage(input: input)
         bindScene(input: input)
         
-        return Output()
+        return Output(originName: name.asDriver(onErrorJustReturn: ""),
+                      originIntroduce: introduce.asDriver(onErrorJustReturn: ""),
+                      originProfileImage: image.asDriver(onErrorJustReturn: nil),
+                      inputValidation: inputValidation.asDriver(onErrorJustReturn: false),
+                      type: type.asDriver(onErrorJustReturn: .edit))
     }
     
     private func bindUser(input: Input) {
@@ -85,10 +94,70 @@ final class EditProfileViewModel: ViewModel {
             .bind(to: introduce)
             .disposed(by: disposeBag)
         
-
+        Observable.merge(user.compactMap { $0?.githubURL }, input.githubUrlString )
+            .bind(to: githubUrlString)
+            .disposed(by: disposeBag)
+        
+        Observable.merge(user.compactMap { $0?.blogURL }, input.blogUrlString )
+            .bind(to: blogUrlString)
+            .disposed(by: disposeBag)
+        
+        Observable.combineLatest(
+            input.urlValidation,
+            name.map { (2...15).contains($0.count) }
+        )
+        .map { $0.0 && $0.1 }
+        .bind(to: inputValidation)
+        .disposed(by: disposeBag)
+        
+        Observable.combineLatest(
+            name,
+            introduce,
+            image,
+            githubUrlString,
+            blogUrlString
+        )
+        .map {
+            Profile(nickName: $0.0,
+                    introduce: $0.1,
+                    profileImage: $0.2,
+                    githubURLString: $0.3,
+                    blogURLString: $0.4
+            )
+        }
+        .bind(to: profile)
+        .disposed(by: disposeBag)
+        
+    }
+    
+    private func bindImage(input: Input) {
+        Observable
+            .merge(
+                user
+                    .compactMap { $0?.profileImageURLString }
+                    .compactMap { URL(string: $0) }
+                    .observe(on: ConcurrentDispatchQueueScheduler(qos: .background))
+                    .compactMap { try? Data(contentsOf: $0) }
+                    .observe(on: MainScheduler.asyncInstance)
+                    .compactMap { UIImage(data: $0) },
+                input.profileImage
+            )
+            .debug()
+            .bind(to: image)
+            .disposed(by: disposeBag)
     }
     
     private func bindScene(input: Input) {
         
+        input
+            .completeButtonTapped
+            .withLatestFrom(profile)
+            .withUnretained(self)
+            .flatMap { viewModel, profile in
+                return viewModel.editProfileUseCase?.setProfile(profile: profile) ?? .empty()
+            }
+            .map { EditProfileNavigation.finish }
+            .bind(to: navigation)
+            .disposed(by: disposeBag)
     }
 }

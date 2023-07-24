@@ -10,18 +10,15 @@ import Firebase
 import RxSwift
 
 struct UserDataSource: UserDataSourceProtocol {
-    
+        
     let fireStore = Firestore.firestore().collection("users")
     
-    // 유저 생성
-    func create(request: UserRequestDTO) -> Observable<Void> {
+    // 유저 정보 저장
+    func set(request: UserRequestDTO) -> Observable<Void> {
         return Observable.create { emitter in
-            fireStore.document(request.uid).getDocument { snapshot, _ in
-                if snapshot?.data() == nil {
-                    self.fireStore.document(request.uid)
-                        .setData(request.toDictionary()) { _ in
-                            emitter.onNext(())
-                        }
+            fireStore.document(request.uid).setData(request.toDictionary()) { error in
+                if let error {
+                    emitter.onError(error)
                 } else {
                     emitter.onNext(())
                 }
@@ -29,30 +26,11 @@ struct UserDataSource: UserDataSourceProtocol {
             return Disposables.create()
         }
     }
-    
-    // 유저 정보 업데이트
-    func update(request: UserRequestDTO) -> Observable<Void> {
-        return Observable.create { emitter in
-            fireStore.document(request.uid).getDocument { snapshot, _ in
-                if snapshot?.data() == nil {
-                    self.fireStore.document(request.uid)
-                        .updateData(request.toDictionary()){ _ in
-                            emitter.onNext(())
-                        }
-                } else {
-                    emitter.onNext(())
-                }
-            }
-            return Disposables.create()
-        }
-    }
-    
-    
     
     // 유저 정보 확인
     func exist(uid: String) -> Observable<Bool> {
         return Observable.create { emitter in
-            fireStore.document(uid).getDocument { snapshot, error in
+            fireStore.document(uid).getDocument { snapshot, _ in
                 if let snapshot {
                     emitter.onNext(snapshot.exists)
                 } else {
@@ -75,6 +53,31 @@ struct UserDataSource: UserDataSourceProtocol {
                 }
             }
             
+            return Disposables.create()
+        }
+    }
+    
+    // 프로필 이미지 업로드
+    func uploadProfileImage(uid: String, imageData: Data) -> Observable<URL> {
+        return Observable.create { emitter in
+            
+            let fileName = UUID().uuidString + String(Date().timeIntervalSince1970)
+            let ref = Storage.storage().reference().child(uid).child("profileImage").child("profile_image")
+            ref.putData(imageData, metadata: nil) { _, error in
+                if let error = error {
+                    emitter.onError(error)
+                    return
+                }
+                ref.downloadURL { url, error in
+                    guard let url else {
+                        if let error = error {
+                            emitter.onError(error)
+                        }
+                        return
+                    }
+                    emitter.onNext(url)
+                }
+            }
             return Disposables.create()
         }
     }

@@ -10,8 +10,7 @@ import Foundation
 import RxSwift
 
 protocol UserRepositoryProtocol {
-    func create(user: User) -> Observable<Void>
-    func update(user: User) -> Observable<Void>
+    func set(profile: Profile, imageData: Data?) -> Observable<Void>
     func exist() -> Observable<Bool>
     func fetch(uid: String) -> Observable<User>
     func currentUser() -> Observable<User>

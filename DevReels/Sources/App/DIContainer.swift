@@ -119,6 +119,12 @@ final class DIContainer {
             return useCase
         }
         
+        container.register(EditProfileUseCaseProtocol.self) { resolver in
+            var useCase = EditProfileUseCase()
+            useCase.userRepository = resolver.resolve(UserRepositoryProtocol.self)
+            return useCase
+        }
+        
         container.register(HyperLinkUseCaseProtocol.self) { _ in HyperLinkUseCase() }
     }
     
@@ -162,6 +168,12 @@ final class DIContainer {
             viewModel.commentUploadUseCase = resolver.resolve(CommentUploadUseCaseProtocol.self)
             viewModel.loginCheckUseCase = resolver.resolve(LoginCheckUseCaseProtocol.self)
             viewModel.userUseCase = resolver.resolve(UserUseCaseProtocol.self)
+            return viewModel
+        }
+        
+        container.register(EditProfileViewModel.self) { resolver in
+            let viewModel = EditProfileViewModel()
+            viewModel.editProfileUseCase = resolver.resolve(EditProfileUseCaseProtocol.self)
             return viewModel
         }
     }

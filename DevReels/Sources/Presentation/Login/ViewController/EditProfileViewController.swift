@@ -16,7 +16,7 @@ import SnapKit
 final class EditProfileViewController: ViewController {
     
     // MARK: - Properties
-
+        
     private let scrollView = UIScrollView().then {
         $0.showsHorizontalScrollIndicator = false
         $0.bounces = true
@@ -24,15 +24,9 @@ final class EditProfileViewController: ViewController {
     
     private let contentView = UIView()
     
-    private let roundProfileImageView = RoundProfileImageView(120.0).then {
-        $0.image = UIImage(systemName: "person.crop.circle")
-        $0.snp.makeConstraints {
-            $0.size.equalTo(120.0)
-        }
-    }
+    private let roundProfileImageView = RoundProfileImageView(120.0)
     
     private let addImageButton = UIButton()
-    
     
     private let nameTextfield = TextField().then {
         $0.title = "이름"
@@ -126,8 +120,6 @@ final class EditProfileViewController: ViewController {
                 self?.scrollView.contentInset.bottom = keyboardVisibleHeight
             })
             .disposed(by: disposeBag)
-
-        let output = viewModel.transform(input: input)
         
         addImageButton.rx.tap
             .withUnretained(self)
@@ -135,32 +127,40 @@ final class EditProfileViewController: ViewController {
                 viewController.presentImagePicker()
             })
             .disposed(by: disposeBag)
+
+        let output = viewModel.transform(input: input)
         
-//        output.originName
-//            .drive(nameTextfield.rx.text)
-//            .disposed(by: disposeBag)
-//
-//        output.originIntroduce
-//            .drive(introuceCountTextView.rx.text)
-//            .disposed(by: disposeBag)
-//
-//        output.originProfileImage
-//            .drive(roundProfileImageView.rx.image)
-//            .disposed(by: disposeBag)
-//
-//        output.inputValidation
-//            .drive(completeButton.rx.isEnabled)
-//            .disposed(by: disposeBag)
-//
-//        RxKeyboard.instance.visibleHeight
-//            .drive(onNext: { [weak self] keyboardVisibleHeight in
-//                self?.scrollView.contentInset.bottom = keyboardVisibleHeight
-//            })
-//            .disposed(by: disposeBag)
-//
-//        output.alert
-//            .emit(to: rx.presentAlert)
-//            .disposed(by: disposeBag)
+        output.type
+            .drive(onNext: { [weak self] in
+                switch $0 {
+                case .create:
+                    self?.backButton.isHidden = true
+                    self?.navigationItem.title = "프로필 생성"
+                case .edit:
+                    self?.backButton.isHidden = false
+                    self?.navigationItem.title = "프로필 수정"
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        output.originName
+            .drive(nameTextfield.rx.text)
+            .disposed(by: disposeBag)
+
+        output.originIntroduce
+            .drive(introduceCountTextView.rx.text)
+            .disposed(by: disposeBag)
+
+        output.originProfileImage
+            .map { $0 ?? UIImage(systemName: "person.crop.circle")?
+                .withTintColor(.devReelsColor.neutral200 ?? .white, renderingMode: .alwaysOriginal) }
+            .drive(roundProfileImageView.rx.image)
+            .disposed(by: disposeBag)
+
+        output.inputValidation
+            .drive(completeButton.rx.isEnabled)
+            .disposed(by: disposeBag)
+
     }
 
     // MARK: - Methods
@@ -189,7 +189,7 @@ final class EditProfileViewController: ViewController {
         contentView.addSubview(roundProfileImageView)
         roundProfileImageView.snp.makeConstraints { make in
             make.centerX.equalToSuperview()
-            make.top.equalToSuperview().inset(16.0)
+            make.top.equalToSuperview().inset(24.0)
         }
         
         contentView.addSubview(addImageButton)
@@ -200,7 +200,7 @@ final class EditProfileViewController: ViewController {
         contentView.addSubview(nameTextfield)
         nameTextfield.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview().inset(16.0)
-            make.top.equalTo(roundProfileImageView.snp.bottom).offset(18)
+            make.top.equalTo(roundProfileImageView.snp.bottom).offset(28)
         }
         
         contentView.addSubview(introduceCountTextView)

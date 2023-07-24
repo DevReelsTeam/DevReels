@@ -12,7 +12,7 @@ import RxCocoa
 import FirebaseAuth
 
 enum LoginNavigation{
-    case createUser
+    case createProfile
     case finish
 }
 
@@ -48,7 +48,7 @@ final class LoginViewModel: ViewModel {
                             if found {
                                 viewModel.navigation.onNext(.finish)
                             } else {
-                                viewModel.navigation.onNext(.createUser)
+                                viewModel.navigation.onNext(.createProfile)
                             }
                         })
                 case .failure:
