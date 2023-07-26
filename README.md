@@ -81,9 +81,8 @@
 ## **⚒️ 기술적 도전**
 
 ### **Clean Architecture**
-
 <p>
-<img alt="CleanArchitecture" src="https://github.com/DevReelsTeam/DevReels/assets/121999075/dc551c6c-25aa-4388-aafe-971c7f1aeea7">
+<img alt="Coodinator" src="https://github.com/DevReelsTeam/DevReels/assets/121999075/ae1a2e52-6ec8-494b-966d-025dd5624347">
 </p>
 
 **Why**
