@@ -48,9 +48,9 @@ struct UserDataSource: UserDataSourceProtocol {
             fireStore.document(uid).getDocument { snapshot, _ in
                 if let data = snapshot?.data(),
                    let response = try? JSONSerialization.data(withJSONObject: data),
-                   let decoded = try? JSONDecoder().decode(User.self, from: response) {
+                   let decoded = try? JSONDecoder().decode(UserResponseDTO.self, from: response) {
                     
-                    emitter.onNext(UserResponseDTO(user: decoded))
+                    emitter.onNext(decoded)
                 }
             }
             
