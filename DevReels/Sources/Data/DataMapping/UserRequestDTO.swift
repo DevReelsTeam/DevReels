@@ -15,6 +15,7 @@ struct UserRequestDTO: Encodable {
     let githubURL: String
     let blogURL: String
     let introduce: String
+    let likedList: [String]
     let uid: String
     
     init(user: User) {
@@ -24,6 +25,7 @@ struct UserRequestDTO: Encodable {
         self.githubURL = user.githubURL
         self.blogURL = user.blogURL
         self.introduce = user.introduce
+        self.likedList = user.likedList
         self.uid = user.uid
     }
     
@@ -35,6 +37,7 @@ struct UserRequestDTO: Encodable {
         self.githubURL = ""
         self.blogURL = ""
         self.introduce = ""
+        self.likedList = []
         self.uid = uid
     }
 }
