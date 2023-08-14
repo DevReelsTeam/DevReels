@@ -24,51 +24,33 @@ struct UpdateHeartsUseCase: UpdateHeartsUseCaseProtocol {
         
     }
     
-    func addHeart(user: User, reels: Reels, hearts: Int) {
-        let user = User(identifier: user.identifier,
-                        profileImageURLString: user.profileImageURLString,
-                        nickName: user.nickName,
-                        githubURL: user.githubURL,
-                        blogURL: user.blogURL,
-                        introduce: user.introduce,
-                        likedList: user.likedList + [reels.id],
-                        uid: user.uid)
+    func addHeart(uid: String, reels: Reels) {
         let reels = Reels(id: reels.id,
                           title: reels.title,
                           videoDescription: reels.videoDescription,
                           githubUrl: reels.githubUrl,
                           blogUrl: reels.blogUrl,
-                          hearts: reels.hearts + 1,
+                          likedList: reels.likedList + [uid],
                           date: reels.date,
                           uid: reels.uid,
                           videoURL: reels.videoURL,
                           thumbnailURL: reels.thumbnailURL)
         
-        userRepository?.update(user: user)
         reelsRepository?.update(reels: reels)
     }
     
-    func removeHeart(user: User, reels: Reels, hearts: Int) {
-        let user = User(identifier: user.identifier,
-                        profileImageURLString: user.profileImageURLString,
-                        nickName: user.nickName,
-                        githubURL: user.githubURL,
-                        blogURL: user.blogURL,
-                        introduce: user.introduce,
-                        likedList: user.likedList.filter { $0 != reels.id },
-                        uid: user.uid)
+    func removeHeart(uid: String, reels: Reels) {
         let reels = Reels(id: reels.id,
                           title: reels.title,
                           videoDescription: reels.videoDescription,
                           githubUrl: reels.githubUrl,
                           blogUrl: reels.blogUrl,
-                          hearts: reels.hearts - 1,
+                          likedList: reels.likedList.filter { $0 != uid },
                           date: reels.date,
                           uid: reels.uid,
                           videoURL: reels.videoURL,
                           thumbnailURL: reels.thumbnailURL)
         
-        userRepository?.update(user: user)
         reelsRepository?.update(reels: reels)
     }
 }

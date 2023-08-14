@@ -144,13 +144,13 @@ final class ReelsViewModel: ViewModel {
         .subscribe(onNext: { [weak self] hearts, user, reels, isFilled in
             print("zz")
             guard let self = self else { return }
-            guard let reels = reels, let user = user else { print(user, reels); return }
+            guard let reels = reels, let user = user else { return }
             if isFilled {
-                updateHeartsUseCase?.removeHeart(user: user, reels: reels, hearts: hearts)
+                updateHeartsUseCase?.removeHeart(uid: user.uid, reels: reels)
                 isHeartFilled.onNext(false)
                 print("false")
             } else {
-                updateHeartsUseCase?.addHeart(user: user, reels: reels, hearts: hearts)
+                updateHeartsUseCase?.addHeart(uid: user.uid, reels: reels)
                 isHeartFilled.onNext(true)
                 print("true")
             }
@@ -166,7 +166,7 @@ final class ReelsViewModel: ViewModel {
             guard let self = self else { return }
             let user = currentUser
             let reels = currentReels
-            let isLiked = user?.likedList.contains(reels?.id ?? "")
+            let isLiked = reels?.likedList.contains(reels?.id ?? "")
             isHeartFilled.onNext(isLiked ?? false)
         })
         .disposed(by: disposeBag)
