@@ -63,6 +63,7 @@ final class ReelsViewModel: ViewModel {
             .flatMap { viewModel, _ in
                 viewModel.reelsUseCase?.list().asResult() ?? .empty()
             }
+            .observe(on: MainScheduler.asyncInstance)
             .withUnretained(self)
             .subscribe(onNext: { viewModel, result in
                 switch result {
@@ -138,13 +139,13 @@ final class ReelsViewModel: ViewModel {
         Observable.combineLatest(
             input.heartButtonTap.asObservable(),
             currentUser.asObservable(),
-            currentReels.asObserver(),
-            isHeartFilled.asObservable()
+            currentReels.asObserver()
         )
-        .subscribe(onNext: { [weak self] hearts, user, reels, isFilled in
+        .observe(on: MainScheduler.asyncInstance)
+        .subscribe(onNext: { [weak self] hearts, user, reels in
             print("zz")
             guard let self = self else { return }
-            guard let reels = reels, let user = user else { return }
+            guard let reels = reels, let user = user, let isFilled = try? isHeartFilled.value() else { return }
             if isFilled {
                 updateHeartsUseCase?.removeHeart(uid: user.uid, reels: reels)
                 isHeartFilled.onNext(false)
