@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>98821341525-s6fc2gr2bmhm1uq62sr9p9jbo3236o23.apps.googleusercontent.com</string>
+	<string>98821341525-v1ghq0arokl3hk8g00obs6clb44a91e5.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.98821341525-s6fc2gr2bmhm1uq62sr9p9jbo3236o23</string>
+	<string>com.googleusercontent.apps.98821341525-v1ghq0arokl3hk8g00obs6clb44a91e5</string>
 	<key>API_KEY</key>
 	<string>AIzaSyBNoYT0iwPgxq2gtGnwhDpuGEOqEQMz_F4</string>
 	<key>GCM_SENDER_ID</key>
@@ -19,16 +19,16 @@
 	<key>STORAGE_BUCKET</key>
 	<string>devreels.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_ANALYTICS_ENABLED</key>
-	<false></false>
+	<false/>
 	<key>IS_APPINVITE_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_GCM_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>IS_SIGNIN_ENABLED</key>
-	<true></true>
+	<true/>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:98821341525:ios:c9ec683e059a3926bfefdc</string>
+	<string>1:98821341525:ios:dc04db0999916484bfefdc</string>
 </dict>
 </plist>
