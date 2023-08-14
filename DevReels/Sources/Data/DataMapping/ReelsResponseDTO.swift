@@ -17,7 +17,7 @@ struct ReelsResponseDTO: Codable {
     private let videoDescription: StringValue
     private let githubUrl: StringValue
     private let blogUrl: StringValue
-    private let hearts: IntegerValue
+    private let likedList: ArrayValue<String>
     private let date: IntegerValue
     
     private enum RootKey: String, CodingKey {
@@ -25,7 +25,7 @@ struct ReelsResponseDTO: Codable {
     }
     
     private enum FieldKeys: String, CodingKey {
-        case id, uid, videoURL, thumbnailURL, title, videoDescription, githubUrl, blogUrl, hearts, date
+        case id, uid, videoURL, thumbnailURL, title, videoDescription, githubUrl, blogUrl, likedList, date
     }
     
     init(from decoder: Decoder) throws {
@@ -39,7 +39,7 @@ struct ReelsResponseDTO: Codable {
         self.videoDescription = try fieldContainer.decode(StringValue.self, forKey: .videoDescription)
         self.githubUrl = try fieldContainer.decode(StringValue.self, forKey: .githubUrl)
         self.blogUrl = try fieldContainer.decode(StringValue.self, forKey: .blogUrl)
-        self.hearts = try fieldContainer.decode(IntegerValue.self, forKey: .hearts)
+        self.likedList = try fieldContainer.decode(ArrayValue.self, forKey: .likedList)
         self.date = try fieldContainer.decode(IntegerValue.self, forKey: .date)
     }
     
@@ -52,7 +52,7 @@ struct ReelsResponseDTO: Codable {
         self.videoDescription = StringValue(value: reels.videoDescription)
         self.githubUrl = StringValue(value: reels.githubUrl)
         self.blogUrl = StringValue(value: reels.blogUrl)
-        self.hearts = IntegerValue(value: "\(reels.hearts)")
+        self.likedList = ArrayValue(values: reels.likedList)
         self.date = IntegerValue(value: "\(reels.date)")
     }
     
@@ -62,7 +62,7 @@ struct ReelsResponseDTO: Codable {
                      videoDescription: videoDescription.value,
                      githubUrl: githubUrl.value,
                      blogUrl: blogUrl.value,
-                     hearts: Int(hearts.value) ?? 0,
+                     likedList: likedList.arrayValue["values"] ?? [],
                      date: Int(date.value) ?? 0,
                      uid: uid.value,
                      videoURL: videoURL.value,

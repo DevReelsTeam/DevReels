@@ -10,6 +10,6 @@ import Foundation
 import RxSwift
 
 protocol UpdateHeartsUseCaseProtocol {
-    func addHeart(user: User, reels: Reels, hearts: Int)
-    func removeHeart(user: User, reels: Reels, hearts: Int)
+    func addHeart(uid: String, reels: Reels)
+    func removeHeart(uid: String, reels: Reels)
 }

@@ -196,7 +196,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         self.videoURL = data.videoURL
         self.titleLabel.text = data.title
         self.descriptionLabel.text = data.videoDescription
-        self.heartNumberLabel.text = "\(data.hearts)"
+        self.heartNumberLabel.text = "\(data.likedList.count)"
         self.reels = data
     }
     

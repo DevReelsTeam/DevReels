@@ -94,7 +94,7 @@ class ReelsCollectionCell: UICollectionViewCell, Identifiable {
     
     func bind(reels: Reels) {
         self.thumbnailImageView.imageURL = reels.thumbnailURL
-        self.likeCountLabel.text = "\(reels.hearts)"
+        self.likeCountLabel.text = "\(reels.likedList.count)"
         self.titleLabel.text = "\(reels.title)"
         
         let output = viewModel?.transform(input: ProfileCellViewModel.Input(reels: Observable.just(reels)))

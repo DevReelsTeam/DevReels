@@ -14,7 +14,7 @@ struct Reels: Codable {
     let videoDescription: String
     let githubUrl: String
     let blogUrl: String
-    let hearts: Int
+    let likedList: [String]
     let date: Int
     let uid: String?
     let videoURL: String?
@@ -27,7 +27,7 @@ struct Reels: Codable {
         self.videoDescription = videoDescription
         self.githubUrl = githubUrl
         self.blogUrl = blogUrl
-        self.hearts = 0
+        self.likedList = []
         self.date = Date().toInt(dateFormat: Format.chatDateFormat)
         self.uid = uid
         self.videoURL = videoURL
@@ -35,13 +35,13 @@ struct Reels: Codable {
     }
     
     // 로드 시
-    init(id: String, title: String, videoDescription: String, githubUrl: String, blogUrl: String, hearts: Int, date: Int, uid: String?, videoURL: String?, thumbnailURL: String?) {
+    init(id: String, title: String, videoDescription: String, githubUrl: String, blogUrl: String, likedList: [String], date: Int, uid: String?, videoURL: String?, thumbnailURL: String?) {
         self.id = id
         self.title = title
         self.videoDescription = videoDescription
         self.githubUrl = githubUrl
         self.blogUrl = blogUrl
-        self.hearts = hearts
+        self.likedList = likedList
         self.date = date
         self.uid = uid
         self.videoURL = videoURL
