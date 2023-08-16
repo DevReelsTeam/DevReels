@@ -146,6 +146,13 @@ final class ReelsCell: UITableViewCell, Identifiable {
             })
             .disposed(by: disposeBag)
         
+        githubButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                guard let self else { return }
+                openLink(url: reels?.githubUrl ?? "")
+            })
+            .disposed(by: disposeBag)
+        
         isHeartFilled
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] isFilled in
@@ -198,6 +205,15 @@ final class ReelsCell: UITableViewCell, Identifiable {
         self.descriptionLabel.text = data.videoDescription
         self.heartNumberLabel.text = "\(data.likedList.count)"
         self.reels = data
+    }
+    
+    private func openLink(url: String) {
+        if let url = URL(string: url) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else {
+            print("잘못된 URL입니다.")
+            print(url)
+        }
     }
     
     // MARK: - Layout
