@@ -121,7 +121,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
     var reels: Reels?
     var commentButtonTap = PublishSubject<Reels>()
     var heartButtonTap = PublishSubject<Int>()
-    let isHeartFilled = BehaviorSubject<Bool>(value: false)
+    var isHeartFilled: Driver<Bool>?
     var disposeBag = DisposeBag()
     var videoLayer = AVPlayerLayer()
     var videoURL: String?
@@ -152,20 +152,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
                 openLink(url: reels?.githubUrl ?? "")
             })
             .disposed(by: disposeBag)
-        
-        isHeartFilled
-            .asDriver(onErrorJustReturn: false)
-            .drive(onNext: { [weak self] isFilled in
-                guard let self = self else { return }
-                
-                if isFilled {
-                    heartImageView.image = UIImage(systemName: "heart.fill")
-                } else {
-                    heartImageView.image = UIImage(systemName: "heart")
-                }
-            })
-            .disposed(by: disposeBag)
-        
+
         layout()
         self.layoutIfNeeded()
         
@@ -189,6 +176,17 @@ final class ReelsCell: UITableViewCell, Identifiable {
         videoLayer.frame = CGRect(x: 0, y: 0, width: self.frame.width - 32, height: thumbnailImageView.frame.height)
         self.thumbnailImageView.layer.cornerRadius = 12
         self.videoLayer.cornerRadius = 12
+        isHeartFilled?
+            .drive(onNext: { [weak self] isFilled in
+                DispatchQueue.main.async {
+                    if isFilled {
+                        self?.heartImageView.image = UIImage(systemName: "heart.fill")
+                    } else {
+                        self?.heartImageView.image = UIImage(systemName: "heart")
+                    }
+                }
+            })
+            .disposed(by: disposeBag)
     }
     
     func configureGradient() {
@@ -211,8 +209,7 @@ final class ReelsCell: UITableViewCell, Identifiable {
         if let url = URL(string: url) {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         } else {
-            print("잘못된 URL입니다.")
-            print(url)
+            print("잘못된 URL: \(url)")
         }
     }
     
