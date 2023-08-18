@@ -34,6 +34,7 @@ final class ReelsViewModel: ViewModel {
     struct Output {
         let reelsList: Driver<[Reels]>
         let shouldPlay: Driver<Bool>
+        let isHeartFilled: Driver<Bool>
     }
     
     var disposeBag = DisposeBag()
@@ -53,7 +54,8 @@ final class ReelsViewModel: ViewModel {
         bind(input: input)
         return Output(
             reelsList: reelsList.asDriver(onErrorJustReturn: []),
-            shouldPlay: shouldPlay.asDriver(onErrorJustReturn: false)
+            shouldPlay: shouldPlay.asDriver(onErrorJustReturn: false),
+            isHeartFilled: isHeartFilled.asDriver(onErrorJustReturn: false)
         )
     }
     
@@ -158,18 +160,15 @@ final class ReelsViewModel: ViewModel {
         })
         .disposed(by: disposeBag)
         
-        Observable.combineLatest(
-            input.viewWillAppear.asObservable(),
-            currentUser.asObservable(),
-            currentReels.asObservable()
-        )
-        .subscribe(onNext: { [weak self] _, currentUser, currentReels in
-            guard let self = self else { return }
-            let user = currentUser
-            let reels = currentReels
-            let isLiked = reels?.likedList.contains(reels?.id ?? "")
-            isHeartFilled.onNext(isLiked ?? false)
-        })
-        .disposed(by: disposeBag)
+        input.reelsWillDisplay
+            .subscribe(onNext: { [weak self] indexPath in
+                guard let self else { return }
+                
+                guard let user = try? currentUser.value(), let list = try? reelsList.value() else { return }
+
+                isHeartFilled.onNext(list[indexPath.row].likedList.contains(user.uid))
+                print("reelsWillDisplay \(list[indexPath.row].likedList.contains(user.uid))")
+            })
+            .disposed(by: disposeBag)
     }
 }

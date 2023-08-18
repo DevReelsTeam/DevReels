@@ -113,9 +113,7 @@ final class ReelsViewController: UIViewController {
                     })
                     .disposed(by: cell.disposeBag)
                 
-                cell.isHeartFilled
-                    .bind(to: viewModel.isHeartFilled)
-                    .disposed(by: cell.disposeBag)
+                cell.isHeartFilled = output.isHeartFilled
                 
                 viewModel.currentReels.onNext(reels)
                 
