@@ -52,15 +52,6 @@ final class LoginViewController: ViewController {
         }
     }
     
-    private let githubLoginButton = LoginButton().then {
-        $0.setTitle("깃허브 로그인", for: .normal)
-        $0.setTitleColor(.white, for: .normal)
-        $0.setBackgroundColor(UIColor.devReelsColor.primary90 ?? UIColor.orange, for: .normal)
-        $0.snp.makeConstraints {
-            $0.height.equalTo(Layout.LoginButtonHeight)
-        }
-    }
-    
     private let viewModel: LoginViewModel
     
     // MARK: - Initializer
@@ -136,7 +127,7 @@ final class LoginViewController: ViewController {
     }
     
     private func createButtonStackView() -> UIStackView {
-        return UIStackView(arrangedSubviews: [appleLoginButton, githubLoginButton]).then {
+        return UIStackView(arrangedSubviews: [appleLoginButton]).then {
             $0.axis = .vertical
             $0.spacing = 16
         }
